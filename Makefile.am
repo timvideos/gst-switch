@@ -41,5 +41,11 @@ coverage:
 	$(MAKE) -C tools coverage
 endif
 
+style:
+	true
+
+integration:
+	$(MAKE) -C python-api test
+	
 unittests:
 	$(MAKE) -C tests/unit check

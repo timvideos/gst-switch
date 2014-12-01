@@ -1,4 +1,4 @@
-.PHONY: lint unittests pytest integration test clean all
+.PHONY: lint pep8 style-check unittests integration performance test clean
 
 lint: export PYTHONWARNINGS := ignore
 lint: export PYTHONPATH := ${PYTHONPATH}:${PWD}
@@ -13,12 +13,6 @@ lint:
 	pylint --rcfile=.pylintrc_integrationtests tests/integrationtests/*.py
 	@echo "Code style is okay!!"
 
-unittests:
-	@rm -rf reports
-	@mkdir -p reports/coverage/unittests
-	py.test --cov gstswitch tests/unittests/ --pep8 -v -s
-	#-@mv htmlcov/*.* reports/coverage/unittests
-
 pep8:
 	pep8 gstswitch
 	@echo "gstswitch is pep8 clean!!"
@@ -27,9 +21,17 @@ pep8:
 	pep8 tests/integrationtests
 	@echo "integration tests are pep8 clean!!"
 
+style: pep8 lint
+
 imgurbash.sh:
 	-wget http://imgur.com/tools/imgurbash.sh -O imgurbash.sh
 	-chmod +x imgurbash.sh
+
+unittests:
+	@rm -rf reports
+	@mkdir -p reports/coverage/unittests
+	py.test --cov gstswitch tests/unittests/ --pep8 -v -s
+	#-@mv htmlcov/*.* reports/coverage/unittests
 
 integration: imgurbash.sh
 	@rm -f ../tools/*.c.gcov
@@ -43,6 +45,8 @@ performance:
 	py.test tests/performancetests/*.py -v -s
 	make clean
 
+test: unittests integration
+
 clean:
 	rm -f *.avi*
 	rm -f *.data*
@@ -53,5 +57,3 @@ clean:
 	rm -f tests/integrationtests/*.data
 	rm -rf .cache
 	rm -rf reports
-
-test: pep8 lint unittests integration clean

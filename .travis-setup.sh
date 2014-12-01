@@ -21,10 +21,10 @@ sudo pip install pylint --upgrade
 sudo apt-get -y install wget libav-tools
 
 # Needed to get coverage output
-if [ $TYPE == 'c' ]; then
-	sudo pip install cpp-coveralls
+if [[ $TEST == "server" ]]; then
+	sudo pip install cpp-coveralls --upgrade
 else
-	sudo pip install python-coveralls
+	sudo pip install python-coveralls --upgrade
 fi
 
 # Start an X server so the GUI works
