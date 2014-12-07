@@ -18,6 +18,13 @@ class Controller(object):
 
     :param: None
     """
+    COMPOSITE_NONE = 0
+    COMPOSITE_PIP = 1
+    COMPOSITE_DUAL_PREVIEW = 2
+    COMPOSITE_DUAL_EQUAL = 3
+    VIDEO_CHANNEL_A = ord('A')
+    VIDEO_CHANNEL_B = ord('B')
+    AUDIO_CHANNEL = ord('a')
 
     def __init__(
             self,
@@ -206,14 +213,20 @@ class Controller(object):
                                         'Should return a GVariant tuple')
 
     def set_composite_mode(self, mode):
-        """Set the current composite mode. Modes between 0 and 3 are allowed.
+        """Set the current composite mode.
+        Modes allowed are:
+         - COMPOSITE_NONE
+         - COMPOSITE_PIP
+         - COMPOSITE_DUAL_PREVIEW
+         - COMPOSITE_DUAL_EQUAL
 
         :param mode: new composite mode
         :returns: True when requested
         """
         self.establish_connection()
         # only modes from 0 to 3 are supported
-        if mode >= 0 and mode <= 3:
+        res = None
+        if mode in range(0, 4):
             try:
                 conn = self.connection.set_composite_mode(mode)
                 print conn
@@ -293,7 +306,10 @@ class Controller(object):
     def switch(self, channel, port):
         """Switch the channel to the target port
 
-        :param channel: The channel to be switched, 'A', 'B', 'a'
+        :param channel: The channel to be switched:
+            VIDEO_CHANNEL_A
+            VIDEO_CHANNEL_B
+            AUDIO_CHANNEL
         :param port: The target port number
         :returns: True when requested
         """
