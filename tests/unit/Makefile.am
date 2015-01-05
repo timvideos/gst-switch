@@ -1,8 +1,20 @@
+if GCOV_ENABLED
+# --coverage
+GCOV_CFLAGS = -fprofile-arcs -ftest-coverage
+GCOV_LFLAGS = -fprofile-arcs -ftest-coverage
+#GCOV_CFLAGS = --coverage
+#GCOV_LFLAGS = --coverage
+else
+GCOV_CFLAGS =
+GCOV_LFLAGS =
+endif
+
 include $(top_srcdir)/build/glib-tap.mk
 
 
 AM_CFLAGS = $(GLIB_CFLAGS) $(GST_CFLAGS) $(GST_BASE_CFLAGS) \
   $(GST_PLUGINS_BASE_CFLAGS) $(X_CFLAGS) $(GTK_CFLAGS) \
+  $(GCOV_CFLAGS) \
   -DLOG_PREFIX="\"./tests/unit\""
 LDADD = $(GLIB_LIBS) $(GST_LIBS) $(X_LIBS) $(LIBM) $(GTK_LIBS)
 

@@ -39,6 +39,7 @@ endif
 if GCOV_ENABLED
 coverage:
 	$(MAKE) -C tools coverage
+	$(MAKE) -C tests/unit coverage
 endif
 
 style:
