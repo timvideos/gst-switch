@@ -28,6 +28,8 @@ imgurbash.sh:
 	-chmod +x imgurbash.sh
 
 unittests:
+	@rm -f ../tools/*.c.gcov
+	@rm -f ../tools/*.gcda
 	@rm -rf reports
 	@mkdir -p reports/coverage/unittests
 	py.test --cov gstswitch tests/unittests/ --pep8 -v -s

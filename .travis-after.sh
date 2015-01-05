@@ -4,21 +4,23 @@
 # any build assets, logs and coverage information.
 
 
-if [[ $TYPE != "style" ]]; then
-
-	case $TEST in
-		python-api )
-			cd python-api
-			;;
-		server )
-			find ~ -name *.gcda
-			COVERALL_ARGS="-n -r $TRAVIS_BUILD_DIR/gst-switch-coverage"
-			;;
-	esac
-
-	coveralls $COVERALL_ARGS || {
-		printf "Coveralls failed!\n"
-		exit -1
-	}
-
+if [[ $TYPE == "style" ]]; then
+	exit 0
 fi
+
+make coverage
+
+case $TEST in
+	python-api )
+		cd python-api
+		;;
+	server )
+		cd tools
+		;;
+esac
+
+coveralls $COVERALL_ARGS || {
+	printf "Coveralls failed!\n"
+	exit -1
+}
+
