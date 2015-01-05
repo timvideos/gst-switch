@@ -1,6 +1,10 @@
 include $(top_srcdir)/build/glib-tap.mk
 
-LDADD = $(GTK_LIBS) $(GLIB_LIBS) $(GST_LIBS)
+
+AM_CFLAGS = $(GLIB_CFLAGS) $(GST_CFLAGS) $(GST_BASE_CFLAGS) \
+  $(GST_PLUGINS_BASE_CFLAGS) $(X_CFLAGS) $(GTK_CFLAGS) \
+  -DLOG_PREFIX="\"./tests/unit\""
+LDADD = $(GLIB_LIBS) $(GST_LIBS) $(X_LIBS) $(LIBM) $(GTK_LIBS)
 
 test_gstswitchopts_SOURCES = test_gstswitchopts.c
 test_gstswitchopts_CFLAGS = $(GST_CFLAGS) $(GST_BASE_CFLAGS) \
@@ -14,7 +18,6 @@ test_gst_pipeline_string_SOURCES = test_gst_pipeline_string.c ../../tools/gstwor
 test_gst_pipeline_string_CFLAGS = $(GST_CFLAGS) $(GST_BASE_CFLAGS) \
   $(GCOV_CFLAGS) $(GST_PLUGINS_BASE_CFLAGS) -DLOG_PREFIX="\"./tests\""
 test_gst_pipeline_string_LDFLAGS = $(GCOV_LFLAGS)
-
 
 dist_test_data = \
   $(NULL)
