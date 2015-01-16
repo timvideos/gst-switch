@@ -4,6 +4,35 @@
 
 gboolean verbose = FALSE;
 
+// Dummy methods needed by gstcase.c
+GstCaps *gst_switch_server_getcaps (void);
+const gchar *
+gst_switch_server_get_audio_caps_str (void)
+{
+  const gchar *caps = "AUDIO_CAPS";
+  return caps;
+}
+
+const gchar *
+gst_switch_server_get_video_caps_str (void)
+{
+  const gchar *caps = "VIDEO_CAPS";
+  return caps;
+}
+
+gint
+gst_composite_default_width ()
+{
+  return 100;
+}
+
+gint
+gst_composite_default_height ()
+{
+  return 100;
+}
+
+/*
 static gchar *results[GST_CASE__LAST_TYPE + 1] = {
   // GST_CASE_UNKNOWN
   NULL,
@@ -50,7 +79,7 @@ expected_string (int case_type, int serve_type)
   }
   return NULL;
 }
-
+*/
 
 static GstCase *
 new_case (int case_type, int serve_type)
