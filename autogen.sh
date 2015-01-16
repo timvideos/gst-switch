@@ -10,7 +10,7 @@ echo "#!/bin/sh" > autoregen.sh
 echo "./autogen.sh $@ \$@" >> autoregen.sh
 chmod +x autoregen.sh
 
-autoreconf --verbose --force --install --make || {
+autoreconf --verbose --force --install || {
  echo 'autogen.sh failed';
  exit 1;
 }
