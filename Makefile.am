@@ -40,3 +40,6 @@ if GCOV_ENABLED
 coverage:
 	$(MAKE) -C tools coverage
 endif
+
+unittests:
+	$(MAKE) -C tests/unit check
