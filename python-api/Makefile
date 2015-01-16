@@ -42,15 +42,14 @@ performance:
 	make clean
 
 clean:
+	rm -f *.avi*
+	rm -f *.data*
+	rm -f *.html
+	rm -f *.log
+	rm -f *.sh*
+	rm -f .coverage
+	rm -f tests/integrationtests/*.data
 	rm -rf .cache
 	rm -rf reports
-	rm -f *.data*
-	rm -f tests/integrationtests/*.data
-	rm -f *.log
-	rm -f *.html
-	rm -f *.sh.*
-	rm -f *.sh
-	rm -f .coverage
-
 
 test: lint unittests integration clean
