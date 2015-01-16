@@ -284,14 +284,14 @@ class TestSetCompositeMode(object):
         controller.establish_connection = Mock(return_value=None)
         controller.connection = MockConnection(True)
         with pytest.raises(ConnectionReturnError):
-            controller.set_composite_mode(1)
+            controller.set_composite_mode(Controller.COMPOSITE_NONE)
 
     def test_normal_unpack(self):
         """Test if valid"""
         controller = Controller(address='unix:abstract=abcdef')
         controller.establish_connection = Mock(return_value=None)
         controller.connection = MockConnection(False)
-        assert controller.set_composite_mode(1) is True
+        assert controller.set_composite_mode(Controller.COMPOSITE_NONE) is True
 
 
 class TestSetEncodeMode(object):
@@ -364,14 +364,14 @@ class TestSwitch(object):
         controller.establish_connection = Mock(return_value=None)
         controller.connection = MockConnection(True)
         with pytest.raises(ConnectionReturnError):
-            controller.switch(1, 2)
+            controller.switch(Controller.VIDEO_CHANNEL_A, 2)
 
     def test_normal_unpack(self):
         """Test if valid"""
         controller = Controller(address='unix:abstract=abcdef')
         controller.establish_connection = Mock(return_value=None)
         controller.connection = MockConnection(False)
-        assert controller.switch(1, 2) is True
+        assert controller.switch(Controller.VIDEO_CHANNEL_A, 2) is True
 
 
 class TestClickVideo(object):

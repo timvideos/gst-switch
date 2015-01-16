@@ -306,7 +306,8 @@ class TestSetCompositeMode(object):
                 sources.terminate_video()
                 serv.terminate(1)
                 if not generate_frames:
-                    if mode == 3:
+                    controller = Controller()
+                    if mode == Controller.COMPOSITE_DUAL_EQUAL:
                         assert res is False
                     else:
                         assert res is True
@@ -343,10 +344,21 @@ class TestSetCompositeMode(object):
             return True
         return False
 
-    def test_set_composite_mode(self):
+    def test_set_composite_mode_none(self):
         """Test set_composite_mode"""
-        for i in range(4):
-            self.set_composite_mode(i)
+        self.set_composite_mode(Controller.COMPOSITE_NONE)
+
+    def test_set_composite_mode_pip(self):
+        """Test set_composite_mode"""
+        self.set_composite_mode(Controller.COMPOSITE_PIP)
+
+    def test_set_composite_mode_preview(self):
+        """Test set_composite_mode"""
+        self.set_composite_mode(Controller.COMPOSITE_DUAL_PREVIEW)
+
+    def test_set_composite_mode_equal(self):
+        """Test set_composite_mode"""
+        self.set_composite_mode(Controller.COMPOSITE_DUAL_EQUAL)
 
 
 class TestNewRecord(object):
@@ -421,7 +433,7 @@ class TestAdjustPIP(object):
                 sources.new_test_video(pattern=4)
                 sources.new_test_video(pattern=5)
                 controller = Controller()
-                controller.set_composite_mode(1)
+                controller.set_composite_mode(Controller.COMPOSITE_PIP)
                 time.sleep(3)
                 res = controller.adjust_pip(xpos, ypos, width, heigth)
                 time.sleep(3)
@@ -513,7 +525,7 @@ class TestSwitch(object):
     def test_switch(self):
         """Test switch"""
         dic = [
-            [65, 3004]
+            [Controller.VIDEO_CHANNEL_A, 3004]
         ]
         start = 5
         for i in range(start, 6):
