@@ -46,7 +46,7 @@ style:
 	true
 
 integration:
-	$(MAKE) -C python-api test
+	$(MAKE) -C python-api integration
 	
 unittests:
 	$(MAKE) -C tests/unit check
