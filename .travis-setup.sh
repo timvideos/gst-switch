@@ -21,6 +21,7 @@ sudo pip install pylint --upgrade
 sudo apt-get -y install wget libav-tools
 
 # Needed to get coverage output
+sudo apt-get -y install libyaml-dev
 if [[ $TEST == "server" ]]; then
 	sudo pip install cpp-coveralls --upgrade
 else
