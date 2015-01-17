@@ -230,8 +230,6 @@ class Controller(object):
             try:
                 conn = self.connection.set_composite_mode(mode)
                 res = conn.unpack()[0]
-                if res is True:
-                    print "Set composite mode to %u" % (mode)
             except AttributeError:
                 raise ConnectionReturnError('Connection returned invalid '
                                             'values. Should return a '
@@ -252,11 +250,9 @@ class Controller(object):
         try:
             conn = self.connection.set_encode_mode(channel)
             res = conn.unpack()[0]
-            if res is True:
-                print "Set encode mode to %u" % (channel)
-            else:
-                pass
+            if not res is True:
                 # raise some exception
+                pass
             return res
         except AttributeError:
             raise ConnectionReturnError('Connection returned invalid values. '
@@ -271,10 +267,8 @@ class Controller(object):
         try:
             conn = self.connection.new_record()
             res = conn.unpack()[0]
-            if res is True:
-                # logging
-                print "New record"
-            else:
+            if not res is True:
+                # raise some exception
                 pass
         except AttributeError:
             raise ConnectionReturnError('Connection returned invalid values. '
@@ -294,8 +288,6 @@ class Controller(object):
         try:
             conn = self.connection.adjust_pip(xpos, ypos, width, height)
             res = conn.unpack()[0]
-            print "adjust pip xpos:%u ypos:%u w:%u h:%u" % (
-                xpos, ypos, width, height)
         except AttributeError:
             raise ConnectionReturnError('Connection returned invalid values. '
                                         'Should return a GVariant tuple')
@@ -316,9 +308,8 @@ class Controller(object):
         try:
             conn = self.connection.switch(channel, port)
             res = conn.unpack()[0]
-            if res is True:
-                print "Switch channel:%u port:%u" % (channel, port)
-            else:
+            if not res is True:
+                # raise some exception
                 pass
             return res
         except AttributeError:
@@ -338,10 +329,8 @@ class Controller(object):
         try:
             conn = self.connection.click_video(xpos, ypos, width, height)
             res = conn.unpack()[0]
-            if res is True:
-                print "Click video: xpos:%u ypos:%u width:%u height:%u" % (
-                    xpos, ypos, width, height)
-            else:
+            if not res is True:
+                # raise some exception
                 pass
         except:
             raise ConnectionReturnError('Connection returned invalid values. '
