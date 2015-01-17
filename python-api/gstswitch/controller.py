@@ -229,10 +229,9 @@ class Controller(object):
         if mode in range(0, 4):
             try:
                 conn = self.connection.set_composite_mode(mode)
-                print conn
                 res = conn.unpack()[0]
                 if res is True:
-                    print "Set composite mode to %s" % (str(mode))
+                    print "Set composite mode to %u" % (mode)
             except AttributeError:
                 raise ConnectionReturnError('Connection returned invalid '
                                             'values. Should return a '
@@ -254,7 +253,7 @@ class Controller(object):
             conn = self.connection.set_encode_mode(channel)
             res = conn.unpack()[0]
             if res is True:
-                print "Set encode mode to %s" % (str(channel))
+                print "Set encode mode to %u" % (channel)
             else:
                 pass
                 # raise some exception
@@ -295,8 +294,8 @@ class Controller(object):
         try:
             conn = self.connection.adjust_pip(xpos, ypos, width, height)
             res = conn.unpack()[0]
-            print "adjust pip xpos:%s ypos:%s w:%s h:%s" % (
-                str(xpos), str(ypos), str(width), str(height))
+            print "adjust pip xpos:%u ypos:%u w:%u h:%u" % (
+                xpos, ypos, width, height)
         except AttributeError:
             raise ConnectionReturnError('Connection returned invalid values. '
                                         'Should return a GVariant tuple')
@@ -318,7 +317,7 @@ class Controller(object):
             conn = self.connection.switch(channel, port)
             res = conn.unpack()[0]
             if res is True:
-                print "Switch channel:%s port:%s" % (str(channel), str(port))
+                print "Switch channel:%u port:%u" % (channel, port)
             else:
                 pass
             return res
@@ -340,8 +339,8 @@ class Controller(object):
             conn = self.connection.click_video(xpos, ypos, width, height)
             res = conn.unpack()[0]
             if res is True:
-                print "Click video: xpos:%s ypos:%s width:%s height:%s" % (
-                    str(xpos), str(ypos), str(width), str(height))
+                print "Click video: xpos:%u ypos:%u width:%u height:%u" % (
+                    xpos, ypos, width, height)
             else:
                 pass
         except:
