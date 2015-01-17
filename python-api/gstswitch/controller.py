@@ -250,7 +250,7 @@ class Controller(object):
         try:
             conn = self.connection.set_encode_mode(channel)
             res = conn.unpack()[0]
-            if not res is True:
+            if res is not True:
                 # raise some exception
                 pass
             return res
@@ -267,7 +267,7 @@ class Controller(object):
         try:
             conn = self.connection.new_record()
             res = conn.unpack()[0]
-            if not res is True:
+            if res is not True:
                 # raise some exception
                 pass
         except AttributeError:
@@ -308,7 +308,7 @@ class Controller(object):
         try:
             conn = self.connection.switch(channel, port)
             res = conn.unpack()[0]
-            if not res is True:
+            if res is not True:
                 # raise some exception
                 pass
             return res
@@ -329,7 +329,7 @@ class Controller(object):
         try:
             conn = self.connection.click_video(xpos, ypos, width, height)
             res = conn.unpack()[0]
-            if not res is True:
+            if res is not True:
                 # raise some exception
                 pass
         except:
