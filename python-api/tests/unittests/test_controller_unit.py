@@ -157,6 +157,13 @@ class MockConnection(object):
         else:
             return (False,)
 
+    def get_composite_mode(self):
+        """mock of set_composite_mode"""
+        if self.mode is False:
+            return GLib.Variant('(i)', (0,))
+        else:
+            return (False,)
+
     def set_encode_mode(self, mode):
         """mock of get_set_encode_mode"""
         if self.mode is False:
@@ -292,6 +299,26 @@ class TestSetCompositeMode(object):
         controller.establish_connection = Mock(return_value=None)
         controller.connection = MockConnection(False)
         assert controller.set_composite_mode(Controller.COMPOSITE_NONE) is True
+
+
+class TestGetCompositeMode(object):
+
+    """Test the get_composite_mode method"""
+
+    def test_unpack(self):
+        """Test if unpack fails"""
+        controller = Controller(address='unix:abstract=abcdefghijk')
+        controller.establish_connection = Mock(return_value=None)
+        controller.connection = MockConnection(True)
+        with pytest.raises(ConnectionReturnError):
+            controller.get_composite_mode()
+
+    def test_normal_unpack(self):
+        """Test if valid"""
+        controller = Controller(address='unix:abstract=abcdef')
+        controller.establish_connection = Mock(return_value=None)
+        controller.connection = MockConnection(False)
+        assert controller.get_composite_mode() is Controller.COMPOSITE_NONE
 
 
 class TestSetEncodeMode(object):
