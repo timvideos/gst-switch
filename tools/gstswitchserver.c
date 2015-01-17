@@ -1167,6 +1167,12 @@ end:
   return result;
 }
 
+gint
+gst_switch_server_get_composite_mode (GstSwitchServer * srv)
+{
+  return srv->composite->mode;
+}
+
 static void
 gst_switch_server_start_audio (GstCase * cas, GstSwitchServer * srv)
 {

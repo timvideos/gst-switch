@@ -64,6 +64,9 @@ static const gchar introspection_xml[] =
     "      <arg type='i' name='channel' direction='in'/>"
     "      <arg type='b' name='result' direction='out'/>"
     "    </method>"
+    "    <method name='get_composite_mode'>"
+    "      <arg type='i' name='result' direction='out'/>"
+    "    </method>"
     "    <method name='set_encode_mode'>"
     "      <arg type='i' name='channel' direction='in'/>"
     "      <arg type='b' name='result' direction='out'/>"
@@ -971,6 +974,24 @@ gst_switch_controller__set_composite_mode (GstSwitchController * controller,
 /**
  * @memberof GstSwitchController
  *
+ * Remoting method stub of "get_composite_mode".
+ */
+static GVariant *
+gst_switch_controller__get_composite_mode (GstSwitchController * controller,
+    GDBusConnection * connection, GVariant * parameters)
+{
+  GVariant *result = NULL;
+  gint mode;
+  if (controller->server) {
+    mode = gst_switch_server_get_composite_mode (controller->server);
+    result = g_variant_new ("(i)", mode);
+  }
+  return result;
+}
+
+/**
+ * @memberof GstSwitchController
+ *
  * Remoting method stub of "new_record".
  */
 static GVariant *
@@ -1089,6 +1110,8 @@ static MethodTableEntry gst_switch_controller_method_table[] = {
       (MethodFunc) gst_switch_controller__get_preview_ports},
   {"set_composite_mode",
       (MethodFunc) gst_switch_controller__set_composite_mode},
+  {"get_composite_mode",
+      (MethodFunc) gst_switch_controller__get_composite_mode},
   {"new_record", (MethodFunc) gst_switch_controller__new_record},
   {"adjust_pip", (MethodFunc) gst_switch_controller__adjust_pip},
   {"click_video", (MethodFunc) gst_switch_controller__click_video},

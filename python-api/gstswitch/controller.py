@@ -242,6 +242,30 @@ class Controller(object):
             # raise some Exception
         return res
 
+    def get_composite_mode(self):
+        """Set the current composite mode.
+        Modes allowed are:
+         - COMPOSITE_NONE
+         - COMPOSITE_PIP
+         - COMPOSITE_DUAL_PREVIEW
+         - COMPOSITE_DUAL_EQUAL
+
+        :returns: The current composition mode
+        """
+        self.establish_connection()
+        # only modes from 0 to 3 are supported
+        res = None
+        try:
+            conn = self.connection.get_composite_mode()
+            res = conn.unpack()[0]
+            if res in range(0, 4):
+                print "Current composite mode is %u" % (res)
+        except AttributeError:
+            raise ConnectionReturnError('Connection returned invalid '
+                                            'values. Should return a '
+                                            'GVariant tuple')
+        return res
+
     def set_encode_mode(self, channel):
         """Set the encode mode
         WARNING: THIS DOES NOT WORK.
