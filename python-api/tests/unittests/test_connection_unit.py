@@ -156,6 +156,7 @@ class MockConnection(object):
         'get_audio_port': (4000,),
         'get_preview_ports': ('[(3002, 1, 7), (3003, 1, 8)]',),
         'set_composite_mode': (False,),
+        'get_composite_mode': (0,),
         'set_encode_mode': (False,),
         'new_record': (False,),
         'adjust_pip': (1,),
@@ -255,6 +256,20 @@ def test_set_composite_mode():
     conn = Connection(default_interface=default_interface)
     conn.connection = MockConnection('set_composite_mode')
     assert conn.set_composite_mode(2) == (False,)
+
+
+def test_get_composite_mode():
+    """Test the set_composite_mode method"""
+    default_interface = "info.duzy.gst.switch"
+    conn = Connection(default_interface=default_interface)
+    conn.connection = MockConnection('get_composite_mode')
+    with pytest.raises(ConnectionError):
+        conn.get_composite_mode()
+
+    default_interface = "info.duzy.gst.switch.SwitchControllerInterface"
+    conn = Connection(default_interface=default_interface)
+    conn.connection = MockConnection('get_composite_mode')
+    assert conn.get_composite_mode() == (0,)
 
 
 def test_set_encode_mode():

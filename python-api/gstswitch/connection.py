@@ -282,6 +282,29 @@ class Connection(object):
             new_message = "{0}: {1}".format(message, "set_composite_mode")
             raise ConnectionError(new_message)
 
+    def get_composite_mode(self):
+        """get_composite_mode(out b result);
+        Calls get_composite_mode remotely
+
+        :returns: tuple with first element being the current compsition mode
+        """
+        try:
+            connection = self.connection
+            result = connection.call_sync(
+                self.bus_name,
+                self.object_path,
+                self.default_interface,
+                'get_composite_mode',
+                None,
+                GLib.VariantType.new("(i)"),
+                Gio.DBusCallFlags.NONE, -1,
+                None)
+            return result
+        except GLib.GError as error:
+            message = error.message
+            new_message = "{0}: {1}".format(message, "get_composite_mode")
+            raise ConnectionError(new_message)
+
     def set_encode_mode(self, channel):
         """set_encode_mode(in  i channel,
                             out b result);

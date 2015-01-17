@@ -175,6 +175,7 @@ GArray *gst_switch_server_get_preview_sink_ports (GstSwitchServer * srv,
     GArray ** serves, GArray ** types);
 gboolean gst_switch_server_set_composite_mode (GstSwitchServer * srv,
     gint mode);
+gint gst_switch_server_get_composite_mode (GstSwitchServer * srv);
 gboolean gst_switch_server_switch (GstSwitchServer * srv, gint channel,
     gint port);
 gboolean gst_switch_server_click_video (GstSwitchServer * srv,
