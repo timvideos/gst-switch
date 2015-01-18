@@ -35,7 +35,7 @@ class TestEstablishConnection(object):
 
     def test_establish(self):
         """Test for establish_connection"""
-        serv = Server(path=PATH)
+        serv = Server(path=PATH, video_format="debug")
         try:
             serv.run()
             for i in range(self.NUM):
@@ -219,7 +219,7 @@ class TestGetPreviewPorts(object):
         """Test get_preview_ports"""
 
         for _ in range(self.NUM):
-            serv = Server(path=PATH)
+            serv = Server(path=PATH, video_format="debug")
             try:
                 serv.run()
                 sources = TestSources(video_port=3000, audio_port=4000)
@@ -280,7 +280,7 @@ class TestSetCompositeMode(object):
         """Create Controller object and call set_composite_mode method"""
         for _ in range(self.NUM):
 
-            serv = Server(path=PATH)
+            serv = Server(path=PATH, video_format="debug")
             try:
                 serv.run()
 
@@ -378,7 +378,8 @@ class TestNewRecord(object):
     def test_new_record(self):
         """Test new_record"""
         for _ in range(self.NUM):
-            serv = Server(path=PATH, record_file="test-%Y.data")
+            serv = Server(path=PATH, record_file="test-%Y.data",
+                          video_format="debug")
             try:
                 serv.run()
 
@@ -422,7 +423,7 @@ class TestAdjustPIP(object):
                    generate_frames=False):
         """Create Controller object and call adjust_pip"""
         for _ in range(self.NUM):
-            serv = Server(path=PATH)
+            serv = Server(path=PATH, video_format="debug")
             try:
                 serv.run()
                 sources = TestSources(video_port=3000)
@@ -490,7 +491,7 @@ class TestSwitch(object):
     def switch(self, channel, port, index):
         """Create Controller object and call switch method"""
         for _ in range(self.NUM):
-            serv = Server(path=PATH)
+            serv = Server(path=PATH, video_format="debug")
             try:
                 serv.run()
 
@@ -547,7 +548,7 @@ class TestClickVideo(object):
                     generate_frames=False):
         """Create Controller object and call click_video method"""
         for _ in range(self.NUM):
-            serv = Server(path=PATH)
+            serv = Server(path=PATH, video_format="debug")
             try:
                 serv.run()
                 sources = TestSources(video_port=3000)
@@ -616,7 +617,7 @@ class TestMarkFace(object):
     def mark_face(self, faces, index, generate_frames=False):
         """Create the Controller object and call mark_face method"""
         for _ in range(self.NUM):
-            serv = Server(path=PATH)
+            serv = Server(path=PATH, video_format="debug")
             try:
                 serv.run()
                 sources = TestSources(video_port=3000)
@@ -679,7 +680,7 @@ class TestMarkTracking(object):
     def mark_tracking(self, faces, index, generate_frames=False):
         """Create Controller object and call mark_tracking method"""
         for _ in range(self.NUM):
-            serv = Server(path=PATH)
+            serv = Server(path=PATH, video_format="debug")
             try:
                 serv.run()
                 sources = TestSources(video_port=3000)
