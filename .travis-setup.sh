@@ -26,3 +26,8 @@ if [ $TYPE == 'c' ]; then
 else
 	sudo pip install python-coveralls
 fi
+
+# Start an X server so the GUI works
+sudo apt-get -y install xvfb xclip
+export DISPLAY=:99.0
+/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1024x768x16

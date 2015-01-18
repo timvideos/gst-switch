@@ -1,5 +1,7 @@
 #! /bin/bash -ex
 
+export DISPLAY=:99.0
+
 ./autogen.sh --prefix=/usr || {
   printf "Failed to do autogen!!!\n"
   exit -1
