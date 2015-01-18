@@ -26,11 +26,13 @@ pep8:
 	pep8 tests/integrationtests
 	@echo "integration tests are pep8 clean!!"
 
-integration:
-	@rm -f ../tools/*.c.gcov
-	@rm -f ../tools/*.gcda
+imgurbash.sh:
 	-wget http://imgur.com/tools/imgurbash.sh -O imgurbash.sh
 	-chmod +x imgurbash.sh
+
+integration: imgurbash.sh
+	@rm -f ../tools/*.c.gcov
+	@rm -f ../tools/*.gcda
 	@rm -rf reports
 	@mkdir -p reports/coverage/integration
 	py.test --cov gstswitch tests/integrationtests/ --pep8 -s -v 
