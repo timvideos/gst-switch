@@ -56,7 +56,6 @@ class BasePipeline(Gst.Pipeline):
 
 
 class VideoPipeline(BasePipeline):
-
     """A Video Pipeline which can be used by a Video Test Source
     :param port: The port of where the TCP stream will be sent
     Should be same as video port of gst-switch-src
@@ -66,6 +65,14 @@ class VideoPipeline(BasePipeline):
     :param timeoverlay: True to enable a running time over video
     :param clockoverlay: True to enable current clock time over video
     """
+
+    VIDEO_CAPS = """
+video/x-raw,
+  format=(string)I420, pixel-aspect-ratio=(fraction)1/1,
+  width=(int){0}, height=(int){1},
+  framerate=(fraction)25/1
+"""
+
 
     def __init__(
             self,
@@ -130,8 +137,7 @@ class VideoPipeline(BasePipeline):
         element = self.make("capsfilter", "vfilter")
         width = str(width)
         height = str(height)
-        capsstring = "video/x-raw, format=(string)I420, width={0},\
-         height={1}".format(width, height)
+        capsstring = self.VIDEO_CAPS.format(width, height)
         print capsstring
         caps = Gst.Caps.from_string(capsstring)
         element.set_property('caps', caps)
