@@ -2,6 +2,7 @@
 Performance/Torture test for DBus methods
 """
 
+from __future__ import absolute_import, print_function, unicode_literals
 
 import sys
 import os
@@ -24,7 +25,7 @@ def get_compose_port(num):
             serv.run()
             sources = TestSources(video_port=video_port)
             sources.new_test_video()
-            
+
             expected_res = [video_port + 1] * num
 
             controller = Controller()
@@ -38,11 +39,11 @@ def get_compose_port(num):
             if serv.proc:
                     poll = serv.proc.poll()
                     if poll == -11:
-                        print "SEGMENTATION FAULT OCCURRED"
-                    print "ERROR CODE - {0}".format(poll)
+                        print("SEGMENTATION FAULT OCCURRED")
+                    print("ERROR CODE - {0}".format(poll))
                     serv.terminate(1)
                     log = open('server.log')
-                    print log.read()
+                    print(log.read())
 
 
 class TestGetComposePort(object):
@@ -64,7 +65,7 @@ class TestGetComposePort(object):
         """Performance test for get_compose_port method"""
         number_test_runs = 300
         get_compose_port(number_test_runs)
-    
+
 
     def test_400(self):
         """Performance test for get_compose_port method"""
@@ -85,7 +86,7 @@ def get_encode_port(num):
             serv.run()
             sources = TestSources(video_port=video_port)
             sources.new_test_video()
-            
+
             expected_res = [video_port + 2] * num
 
             controller = Controller()
@@ -99,11 +100,11 @@ def get_encode_port(num):
             if serv.proc:
                     poll = serv.proc.poll()
                     if poll == -11:
-                        print "SEGMENTATION FAULT OCCURRED"
-                    print "ERROR CODE - {0}".format(poll)
+                        print("SEGMENTATION FAULT OCCURRED")
+                    print("ERROR CODE - {0}".format(poll))
                     serv.terminate(1)
                     log = open('server.log')
-                    print log.read()
+                    print(log.read())
 
 
 class TestGetEncodePort(object):
@@ -144,7 +145,7 @@ def get_audio_port(num):
             serv.run()
             sources = TestSources(audio_port=audio_port)
             sources.new_test_audio()
-            
+
             expected_res = [3003] * num
 
             controller = Controller()
@@ -159,39 +160,39 @@ def get_audio_port(num):
             if serv.proc:
                     poll = serv.proc.poll()
                     if poll == -11:
-                        print "SEGMENTATION FAULT OCCURRED"
-                    print "ERROR CODE - {0}".format(poll)
+                        print("SEGMENTATION FAULT OCCURRED")
+                    print("ERROR CODE - {0}".format(poll))
                     serv.terminate(1)
                     log = open('server.log')
-                    print log.read()
+                    print(log.read())
 
 
 class TestGetAudioPort(object):
- 
+
     def test_100(self):
         """Performance test for get_audio_port method - 100 times"""
         number_test_runs = 100
         get_audio_port(number_test_runs)
 
-    
+
     def test_200(self):
         """Performance test for get_audio_port method - 200 times"""
         number_test_runs = 200
         get_audio_port(number_test_runs)
 
-    
+
     def test_300(self):
         """Performance test for get_audio_port method - 300 times"""
         number_test_runs = 300
         get_audio_port(number_test_runs)
-    
-    
+
+
     def test_400(self):
         """Performance test for get_audio_port method - 400 times"""
         number_test_runs = 400
         get_audio_port(number_test_runs)
 
-    
+
     def test_500(self):
         """Performance test for get_audio_port method - 500 times"""
         number_test_runs = 500
@@ -205,29 +206,29 @@ def get_preview_ports(num):
     try:
         serv.run()
         sources = TestSources(video_port=video_port)
-        
-        
+
+
         expected_res = [ i for i in range(3003, 3003 + num)]
 
         controller = Controller()
-        
+
         res = []
         for _ in range(num):
             sources.new_test_video()
         controller.establish_connection()
         res = controller.get_preview_ports()
-        print res
+        print(res)
 
         assert expected_res == res
     finally:
         if serv.proc:
                 poll = serv.proc.poll()
                 if poll == -11:
-                    print "SEGMENTATION FAULT OCCURRED"
-                print "ERROR CODE - {0}".format(poll)
+                    print("SEGMENTATION FAULT OCCURRED")
+                print("ERROR CODE - {0}".format(poll))
                 serv.terminate(1)
                 log = open('server.log')
-                print log.read()
+                print(log.read())
 
 
 class _TestGetPreviewPorts(object):
@@ -250,7 +251,7 @@ class _TestGetPreviewPorts(object):
     def test_500(self):
         """Test when 500 sources are added"""
         number_souces = 500
-        get_preview_ports(number_souces) 
+        get_preview_ports(number_souces)
 
     def test_1000(self):
         """Test when 1000 sources are added"""
@@ -290,11 +291,11 @@ def permutate_composite_mode(num, delay):
         if serv.proc:
                 poll = serv.proc.poll()
                 if poll == -11:
-                    print "SEGMENTATION FAULT OCCURRED"
-                print "ERROR CODE - {0}".format(poll)
+                    print("SEGMENTATION FAULT OCCURRED")
+                print("ERROR CODE - {0}".format(poll))
                 serv.terminate(1)
                 log = open('server.log')
-                print log.read()
+                print(log.read())
 
 class TestSetCompositeMode(object):
     """Performance Tests for set_composite_mode"""
@@ -341,7 +342,7 @@ def permutate_adjust_pip(num, delay):
             ypos = random.randrange(-20, 20)
             res = controller.adjust_pip(xpos, ypos, 0, 0)
             time.sleep(delay)
-            assert res is not None 
+            assert res is not None
         preview.terminate()
         sources.terminate_video()
 
@@ -349,11 +350,11 @@ def permutate_adjust_pip(num, delay):
         if serv.proc:
                 poll = serv.proc.poll()
                 if poll == -11:
-                    print "SEGMENTATION FAULT OCCURRED"
-                print "ERROR CODE - {0}".format(poll)
+                    print("SEGMENTATION FAULT OCCURRED")
+                print("ERROR CODE - {0}".format(poll))
                 serv.terminate(1)
                 log = open('server.log')
-                print log.read()
+                print(log.read())
 
 class TestAdjustPip(object):
     """Performance Tests for set_adjust_pip"""
@@ -377,5 +378,3 @@ class TestAdjustPip(object):
         delay = 0.2
         num = 20
         permutate_adjust_pip(num, delay)
-
-

@@ -4,6 +4,8 @@ The Controller class creates the controller,
 which can be used to invoke the remote methods.
 """
 
+from __future__ import absolute_import, print_function, unicode_literals
+
 import ast
 from .connection import Connection
 from .exception import ConnectionReturnError
@@ -256,11 +258,11 @@ class Controller(object):
             conn = self.connection.get_composite_mode()
             res = conn.unpack()[0]
             if res in range(0, 4):
-                print "Current composite mode is %u" % (res)
+                print("Current composite mode is %u" % (res))
         except AttributeError:
             raise ConnectionReturnError('Connection returned invalid '
-                                            'values. Should return a '
-                                            'GVariant tuple')
+                                        'values. Should return a '
+                                        'GVariant tuple')
         return res
 
     def set_encode_mode(self, channel):

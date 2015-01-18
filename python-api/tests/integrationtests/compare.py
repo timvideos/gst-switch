@@ -3,6 +3,8 @@ Comparison between two videos
 Generates reference frames and compares test frames with them
 """
 
+from __future__ import absolute_import, print_function, unicode_literals
+
 import os
 
 from scipy.misc import imread
@@ -52,8 +54,8 @@ class BaseCompareVideo(object):
         # compare
         n_0 = self.compare_images(img1, img2)
         return n_0 * 1.0 / img1.size
-        # print "Manhattan norm:", n_m, "/ per pixel:", n_m/img1.size
-        # print "Zero norm:", n_0, "/ per pixel:", n_0*1.0/img1.size
+        # print("Manhattan norm:", n_m, "/ per pixel:", n_m/img1.size)
+        # print("Zero norm:", n_0, "/ per pixel:", n_0*1.0/img1.size)
 
     def normalize(self, arr):
         """Normalize an image"""
@@ -83,7 +85,7 @@ class BaseCompareVideo(object):
         {1}/out{2}_1.png".format(self.video, directory, self.TESTS[self.test])
         cmd2 = CONV + " -i {0} -ss 00:00:05.000 -f image2 -vframes 1 \
         {1}/out{2}_2.png".format(self.video, directory, self.TESTS[self.test])
-        # print cmd
+        # print(cmd)
         proc = subprocess.Popen(
             cmd1.split(),
             bufsize=-1,
@@ -121,7 +123,7 @@ class CompareVideo(BaseCompareVideo):
         self.test_frame_dir = tempfile.mkdtemp()
         self.test = test
         self.video = video
-        print self.test_frame_dir
+        print(self.test_frame_dir)
 
     def compare(self):
         """Compare videos"""

@@ -3,6 +3,9 @@ connection deals with all low level method calls over dbus
 The Connection object is capable of invoking remote methods over dbus
 """
 
+from __future__ import absolute_import, print_function, unicode_literals
+
+
 from gi.repository import Gio, GLib
 from .exception import ConnectionError
 import sys
