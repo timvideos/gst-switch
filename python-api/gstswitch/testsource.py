@@ -178,8 +178,13 @@ video/x-raw,
 
 
 class AudioPipeline(BasePipeline):
-
     """docstring for AudioPipeline"""
+
+    AUDIO_CAPS = """
+audio/x-raw,
+  rate=48000, channels=2,
+  format=S16LE, layout=interleaved
+"""
 
     def __init__(
             self,
@@ -193,12 +198,26 @@ class AudioPipeline(BasePipeline):
 
         src = self.make_audiotestsrc(freq, wave)
         self.add(src)
+        afilter = self.make_capsfilter()
+        self.add(afilter)
+        src.link(afilter)
         gdppay = self.make_gdppay()
         self.add(gdppay)
-        src.link(gdppay)
+        afilter.link(gdppay)
         sink = self.make_tcpclientsink(port)
         self.add(sink)
         gdppay.link(sink)
+
+    def make_capsfilter(self):
+        """Return a caps filter
+        :returns: A caps filter element
+        """
+        element = self.make("capsfilter", "afilter")
+        capsstring = self.AUDIO_CAPS
+        print capsstring
+        caps = Gst.Caps.from_string(capsstring)
+        element.set_property('caps', caps)
+        return element
 
     def make_audiotestsrc(self, freq, wave=None):
         """Return a Audio Source Element
