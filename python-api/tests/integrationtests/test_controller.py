@@ -331,14 +331,18 @@ class TestSetCompositeMode(object):
         cmpr = CompareVideo(test, video)
         res1, res2 = cmpr.compare()
         print "RESULTS", res1, res2
-        folder = cmpr.test_frame_dir
-        cmd = "./imgurbash.sh {0}/*.*".format(folder)
-        print cmd
-        proc = subprocess.Popen(
-            cmd,
-            bufsize=-1,
-            shell=True)
-        print proc.wait()
+
+        # In the CI environment, upload to imgur the results.
+        if os.environ.get('CI', "False") == "true":
+            folder = cmpr.test_frame_dir
+            cmd = "./imgurbash.sh {0}/*.*".format(folder)
+            print cmd
+            proc = subprocess.Popen(
+                cmd,
+                bufsize=-1,
+                shell=True)
+            print proc.wait()
+
         # Experimental Value
         if res1 <= 0.04 and res2 <= 0.04:
             return True
