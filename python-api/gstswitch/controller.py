@@ -259,8 +259,8 @@ class Controller(object):
                 print "Current composite mode is %u" % (res)
         except AttributeError:
             raise ConnectionReturnError('Connection returned invalid '
-                                            'values. Should return a '
-                                            'GVariant tuple')
+                                        'values. Should return a '
+                                        'GVariant tuple')
         return res
 
     def set_encode_mode(self, channel):
