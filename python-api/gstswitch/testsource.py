@@ -97,11 +97,11 @@ class VideoPipeline(BasePipeline):
             vfilter.link(_timeoverlay)
             _timeoverlay.link(_clockoverlay)
             _clockoverlay.link(gdppay)
-        if timeoverlay:
+        elif timeoverlay:
             self.add(_timeoverlay)
             vfilter.link(_timeoverlay)
             _timeoverlay.link(gdppay)
-        if clockoverlay:
+        elif clockoverlay:
             self.add(_clockoverlay)
             vfilter.link(_clockoverlay)
             _clockoverlay.link(gdppay)
