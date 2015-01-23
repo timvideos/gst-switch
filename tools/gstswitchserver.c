@@ -48,7 +48,7 @@
 #define GST_SWITCH_SERVER_DEFAULT_HOST "0.0.0.0"
 #define GST_SWITCH_SERVER_DEFAULT_VIDEO_ACCEPTOR_PORT	3000
 #define GST_SWITCH_SERVER_DEFAULT_AUDIO_ACCEPTOR_PORT	4000
-#define GST_SWITCH_SERVER_DEFAULT_CONTROLLER_PORT	5000
+#define GST_SWITCH_SERVER_DEFAULT_CONTROLLER_ADDRESS	"tcp:host=0.0.0.0,port=5000"
 #define GST_SWITCH_SERVER_LISTEN_BACKLOG 8      /* client connection queue */
 
 #define GST_SWITCH_SERVER_HOST_SPEC "%q"
@@ -78,10 +78,10 @@
 G_DEFINE_TYPE (GstSwitchServer, gst_switch_server, G_TYPE_OBJECT);
 
 GstSwitchServerOpts opts = {
-  NULL, NULL, NULL,
+  NULL, NULL,
+  GST_SWITCH_SERVER_DEFAULT_CONTROLLER_ADDRESS,
   GST_SWITCH_SERVER_DEFAULT_VIDEO_ACCEPTOR_PORT,
   GST_SWITCH_SERVER_DEFAULT_AUDIO_ACCEPTOR_PORT,
-  GST_SWITCH_SERVER_DEFAULT_CONTROLLER_PORT,
 //FALSE,
   FALSE,
   NULL, NULL
@@ -228,8 +228,8 @@ static GOptionEntry entries[] = {
       "Specify the video input listen port.", "NUM"},
   {"audio-input-port", 'a', 0, G_OPTION_ARG_INT, &opts.audio_input_port,
       "Specify the audio input listen port.", "NUM"},
-  {"control-port", 'p', 0, G_OPTION_ARG_INT, &opts.control_port,
-      "Specify the control port.", "NUM"},
+  {"controller-address", 'c', 0, G_OPTION_ARG_STRING, &opts.controller_address,
+      "Specify DBus-Address for remote control, defaults to " GST_SWITCH_SERVER_DEFAULT_CONTROLLER_ADDRESS ".", "ADDRESS"},
   {NULL}
 };
 

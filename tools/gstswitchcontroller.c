@@ -478,9 +478,7 @@ gst_switch_controller_init (GstSwitchController * controller)
 
   auth_observer = g_dbus_auth_observer_new ();
 
-  gchar *address = g_strdup_printf(SWITCH_CONTROLLER_ADDRESS, opts.control_port);
-  controller->bus_server = g_dbus_server_new_sync (address, flags, guid, auth_observer, /* GCancellable */NULL, &error);
-  g_free(address);
+  controller->bus_server = g_dbus_server_new_sync (opts.controller_address, flags, guid, auth_observer, /* GCancellable */NULL, &error);
 
   if (error != NULL) {
     g_error ("failed to register controller: %s", error->message);

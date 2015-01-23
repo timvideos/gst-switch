@@ -38,7 +38,6 @@
 #define GST_IS_SWITCH_CONTROLLER(object) (G_TYPE_CHECK_INSTANCE_TYPE ((object), GST_TYPE_SWITCH_CONTROLLER))
 #define GST_IS_SWITCH_CONTROLLER_CLASS(class) (G_TYPE_CHECK_CLASS_TYPE ((class), GST_TYPE_SWITCH_CONTROLLER))
 
-#define SWITCH_CONTROLLER_ADDRESS	"tcp:host=0.0.0.0,port=%u"
 #define SWITCH_CONTROLLER_OBJECT_NAME	 "info.duzy.gst.switch.SwitchControllerInterface"
 #define SWITCH_CONTROLLER_OBJECT_PATH	"/info/duzy/gst/switch/SwitchController"
 #define SWITCH_UI_OBJECT_NAME		 "info.duzy.gst.switch.SwitchUIInterface"
