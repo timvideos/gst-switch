@@ -131,9 +131,6 @@ struct _GstSwitchServer
   gint audio_acceptor_port;
 
   GMutex controller_lock;
-  GThread *controller_thread;
-  GSocket *controller_socket;
-  gint controller_port;
   GstSwitchController *controller;
 
   GMutex alloc_port_lock;

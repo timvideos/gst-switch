@@ -277,9 +277,6 @@ gst_switch_server_init (GstSwitchServer * srv)
   srv->audio_acceptor_port = opts.audio_input_port;
   srv->audio_acceptor_socket = NULL;
   srv->audio_acceptor = NULL;
-  srv->controller_port = opts.control_port;
-  srv->controller_socket = NULL;
-  srv->controller_thread = NULL;
   srv->controller = NULL;
   srv->main_loop = NULL;
   srv->cases = NULL;
@@ -341,16 +338,6 @@ gst_switch_server_finalize (GstSwitchServer * srv)
   if (srv->audio_acceptor) {
     DEBUG("Waiting for audio_acceptor thread to die.");
     g_thread_join (srv->audio_acceptor);
-  }
-*/
-  if (srv->controller_socket) {
-    g_object_unref (srv->controller_socket);
-    srv->controller_socket = NULL;
-  }
-/*
-  if (srv->controller_thread) {
-    DEBUG("Waiting for controller_thread thread to die.");
-    g_thread_join (srv->controller_thread);
   }
 */
   if (srv->controller) {
@@ -772,18 +759,6 @@ error_start_workcase:
 }
 
 /**
- * gst_switch_server_allow_tcp_control:
- *
- * (deprecated)
- */
-static void
-gst_switch_server_allow_tcp_control (GstSwitchServer * srv, GSocket * client)
-{
-  ERROR ("control via TCP not implemented");
-  g_object_unref (client);
-}
-
-/**
  * gst_switch_server_listen:
  * @port: The port number to listen on.
  * @bound_port: The local bound port number of the socket.
@@ -966,43 +941,6 @@ gst_switch_server_audio_acceptor (GstSwitchServer * srv)
   g_thread_unref (srv->audio_acceptor);
   srv->audio_acceptor = NULL;
   GST_SWITCH_SERVER_UNLOCK_AUDIO_ACCEPTOR (srv);
-  return NULL;
-}
-
-/**
- * gst_switch_server_controller:
- *
- * The controller serving thread.
- *
- * (Deprecated.)
- */
-static gpointer
-gst_switch_server_controller (GstSwitchServer * srv)
-{
-  GSocket *socket;
-  GError *error;
-  gint bound_port;
-
-  srv->controller_socket = gst_switch_server_listen (srv,
-      srv->controller_port, &bound_port);
-  if (!srv->controller_socket) {
-    return NULL;
-  }
-
-  while (srv->controller_thread && srv->controller_socket && srv->cancellable) {
-    socket = g_socket_accept (srv->controller_socket, srv->cancellable, &error);
-    if (!socket) {
-      ERROR ("accept: %s", error->message);
-      continue;
-    }
-
-    gst_switch_server_allow_tcp_control (srv, socket);
-  }
-
-  GST_SWITCH_SERVER_LOCK_CONTROLLER (srv);
-  g_thread_unref (srv->controller_thread);
-  srv->controller_thread = NULL;
-  GST_SWITCH_SERVER_UNLOCK_CONTROLLER (srv);
   return NULL;
 }
 
@@ -1851,10 +1789,6 @@ gst_switch_server_run (GstSwitchServer * srv)
       (GThreadFunc)
       gst_switch_server_audio_acceptor, srv);
 
-  srv->controller_thread = g_thread_new ("switch-server-controller",
-      (GThreadFunc)
-      gst_switch_server_controller, srv);
-
   // TODO: quit the server if controller is not ready
   gst_switch_server_prepare_bus_controller (srv);
 
@@ -1867,7 +1801,6 @@ gst_switch_server_run (GstSwitchServer * srv)
 /*
   g_thread_join (srv->video_acceptor);
   g_thread_join (srv->audio_acceptor);
-  g_thread_join (srv->controller_thread);
 */
   return;
 
