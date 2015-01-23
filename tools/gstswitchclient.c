@@ -655,16 +655,14 @@ error_subscribe:
  */
 static void
 gst_switch_client_connect_controller (GstSwitchClient * client,
-    GstSwitchClientRole role)
+    GstSwitchClientRole role, const gchar *address)
 {
   GError *error = NULL;
   gboolean okay = FALSE;
 
   GST_SWITCH_CLIENT_LOCK_CONTROLLER (client);
 
-  client->controller = g_dbus_connection_new_for_address_sync (SWITCH_CONTROLLER_ADDRESS, G_DBUS_SERVER_FLAGS_RUN_IN_THREAD | G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT, NULL,      /* GDBusAuthObserver */
-      NULL,                     /* GCancellable */
-      &error);
+  client->controller = g_dbus_connection_new_for_address_sync (address, G_DBUS_SERVER_FLAGS_RUN_IN_THREAD | G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT, /* GDBusAuthObserver */NULL, /* GCancellable */NULL, &error);
 
   if (client->controller == NULL)
     goto error_new_connection;
@@ -727,14 +725,14 @@ gst_switch_client_is_connected (GstSwitchClient * client)
  *
  */
 gboolean
-gst_switch_client_connect (GstSwitchClient * client, GstSwitchClientRole role)
+gst_switch_client_connect (GstSwitchClient * client, GstSwitchClientRole role, const gchar *address)
 {
   if (gst_switch_client_is_connected (client)) {
     ERROR ("already connected");
     return FALSE;
   }
 
-  gst_switch_client_connect_controller (client, role);
+  gst_switch_client_connect_controller (client, role, address);
 
   return gst_switch_client_is_connected (client);
 }

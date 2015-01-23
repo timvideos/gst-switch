@@ -15,7 +15,7 @@ class Connection(object):
     """Class which makes all remote object class.
     Deals with lower level connection and remote method invoking
 
-    :default bus-address: unix:abstract=gstswitch
+    :default bus-address: tcp:host=127.0.0.1,port=5000
 
     :param: None
     """
@@ -23,7 +23,7 @@ class Connection(object):
 
     def __init__(
             self,
-            address="unix:abstract=gstswitch",
+            address="tcp:host=127.0.0.1,port=5000",
             bus_name='info.duzy.gst.switch.SwitchController',
             object_path="/info/duzy/gst/switch/SwitchController",
             default_interface=("info.duzy.gst.switch."

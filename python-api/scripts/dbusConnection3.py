@@ -1,7 +1,7 @@
 from gi.repository import Gio, GLib
 from time import sleep
 
-address = "unix:abstract=gstswitch"
+address = "tcp:host=127.0.0.1,port=5000"
 name = None
 object_path = "/info/duzy/gst/switch/SwitchController"
 

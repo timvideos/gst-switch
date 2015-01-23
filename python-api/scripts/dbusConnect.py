@@ -13,7 +13,7 @@ def main():
     loop.run()
 
 if __name__=="__main__":
-    os.environ["DBUS_SESSION_BUS_ADDRESS"] = "unix:abstract=gstswitch"
+    os.environ["DBUS_SESSION_BUS_ADDRESS"] = "tcp:host=127.0.0.1,port=5000"
     dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
     main()
     

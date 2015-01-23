@@ -36,6 +36,7 @@
 #include "gstaudiovisual.h"
 #include "gstcase.h"
 
+#define GST_SWITCH_UI_DEFAULT_ADDRESS "tcp:host=127.0.0.1,port=5000"
 #define GST_SWITCH_UI_LOCK_AUDIO(ui) (g_mutex_lock (&(ui)->audio_lock))
 #define GST_SWITCH_UI_UNLOCK_AUDIO(ui) (g_mutex_unlock (&(ui)->audio_lock))
 #define GST_SWITCH_UI_LOCK_COMPOSE(ui) (g_mutex_lock (&(ui)->compose_lock))
@@ -50,11 +51,14 @@
 G_DEFINE_TYPE (GstSwitchUI, gst_switch_ui, GST_TYPE_SWITCH_CLIENT);
 
 gboolean verbose;
+gchar *srv_address = GST_SWITCH_UI_DEFAULT_ADDRESS;
 
 static GOptionEntry entries[] = {
   {"verbose", 'v', 0, G_OPTION_ARG_NONE, &verbose, "Be verbose", NULL},
   {"dbus-timeout", 'd', 0, G_OPTION_ARG_INT, &gst_switch_client_dbus_timeout,
       "DBus timeout in ms (default 5000)", NULL},
+  {"address", 'a', 0, G_OPTION_ARG_STRING, &srv_address,
+      "Server Control-Adress, defaults to " GST_SWITCH_UI_DEFAULT_ADDRESS, NULL},
   {NULL}
 };
 
@@ -465,7 +469,7 @@ gst_switch_ui_tick (GstSwitchUI * ui)
 static void
 gst_switch_ui_run (GstSwitchUI * ui)
 {
-  if (!gst_switch_client_connect (GST_SWITCH_CLIENT (ui), CLIENT_ROLE_UI)) {
+  if (!gst_switch_client_connect (GST_SWITCH_CLIENT (ui), CLIENT_ROLE_UI, srv_address)) {
     ERROR ("failed to connect to controller");
     return;
   }
