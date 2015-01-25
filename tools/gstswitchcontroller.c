@@ -477,8 +477,9 @@ gst_switch_controller_init (GstSwitchController * controller)
   flags |= G_DBUS_SERVER_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS;
 
   auth_observer = g_dbus_auth_observer_new ();
-  controller->bus_server = g_dbus_server_new_sync (SWITCH_CONTROLLER_ADDRESS, flags, guid, auth_observer, NULL, /* GCancellable */
-      &error);
+
+  controller->bus_server = g_dbus_server_new_sync (opts.controller_address, flags, guid, auth_observer, /* GCancellable */NULL, &error);
+
   if (error != NULL) {
     g_error ("failed to register controller: %s", error->message);
   }

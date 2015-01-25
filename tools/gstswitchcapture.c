@@ -49,6 +49,7 @@
 #define GST_SWITCH_CAPTURE_WORKER_CLASS(class) (G_TYPE_CHECK_CLASS_CAST ((class), GST_TYPE_SWITCH_CAPTURE_WORKER, GstSwitchCaptureWorkerClass))
 #define GST_IS_SWITCH_CAPTURE_WORKER(object) (G_TYPE_CHECK_INSTANCE_TYPE ((object), GST_TYPE_SWITCH_CAPTURE_WORKER))
 #define GST_IS_SWITCH_CAPTURE_WORKER_CLASS(class) (G_TYPE_CHECK_CLASS_TYPE ((class), GST_TYPE_SWITCH_CAPTURE_WORKER))
+#define GST_SWITCH_CAPTURE_DEFAULT_ADDRESS "tcp:host=127.0.0.1,port=5000"
 
 /**
  * @class GstSwitchCaptureWorker
@@ -80,6 +81,7 @@ G_DEFINE_TYPE (GstSwitchCaptureWorker, gst_switch_capture_worker,
 gboolean verbose = FALSE;
 const char *device = "/dev/ttyUSB0";
 const char *protocol = "visca";
+const char *srv_address = GST_SWITCH_CAPTURE_DEFAULT_ADDRESS;
 const char **srcsegments = NULL;
 int srcsegmentc = 0;
 
@@ -89,6 +91,8 @@ static GOptionEntry options[] = {
       "PTZ camera control device", "DEVICE"},
   {"protocol", 'p', 0, G_OPTION_ARG_STRING, &protocol,
       "PTZ camera control protocol", "NAME"},
+  {"address", 'a', 0, G_OPTION_ARG_STRING, &srv_address,
+      "Server Control-Adress, defaults to " GST_SWITCH_CAPTURE_DEFAULT_ADDRESS, NULL},
   {NULL}
 };
 
@@ -228,7 +232,7 @@ static void
 gst_switch_capture_run (GstSwitchCapture * capture)
 {
   if (!gst_switch_client_connect (GST_SWITCH_CLIENT (capture),
-          CLIENT_ROLE_CAPTURE)) {
+          CLIENT_ROLE_CAPTURE, srv_address)) {
     ERROR ("failed to connect to controller");
     return;
   }

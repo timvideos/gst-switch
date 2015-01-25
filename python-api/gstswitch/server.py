@@ -28,7 +28,8 @@ class Server(object):
     By default looks in the current $PATH.
     :param video_port: The video port number - default = 3000
     :param audio_port: The audio port number - default = 4000
-    :param control_port: The control port number - default = 5000
+    :param controller_address: The DBus-Address for remote control -
+        default = tcp:host=0.0.0.0,port=5000
     :param record_file: The record file format
     :returns: nothing
     """
@@ -39,7 +40,7 @@ class Server(object):
             path=None,
             video_port=3000,
             audio_port=4000,
-            control_port=5000,
+            controller_address='tcp:host=0.0.0.0,port=5000',
             record_file=False):
 
         super(Server, self).__init__()
@@ -47,14 +48,14 @@ class Server(object):
         self._path = None
         self._video_port = None
         self._audio_port = None
-        self._control_port = None
+        self._controller_address = None
         self._record_file = None
         self.gst_option_string = ''
 
         self.path = path
         self.video_port = video_port
         self.audio_port = audio_port
-        self.control_port = control_port
+        self.controller_address = controller_address
         self.record_file = record_file
 
         self.proc = None
@@ -125,31 +126,32 @@ class Server(object):
                                 " not '{0}'".format(type(audio_port)))
 
     @property
-    def control_port(self):
+    def controller_address(self):
         """Get the control port"""
-        return self._control_port
+        return self._controller_address
 
-    @control_port.setter
-    def control_port(self, control_port):
-        """Set Control Port
-        :raises ValueError: Control Port cannot be left blank
-        :raises ValueError: Control Port must be in range 1 to 65535
-        :raises TypeError: Control Port must be a string or a number
+    @controller_address.setter
+    def controller_address(self, controller_address):
+        """Set Control Address
+        :raises ValueError: Control Address cannot be left blank
+        :raises ValueError: Control Address must contain at least one Colon
+        :raises TypeError: Control Address must be a string
         """
-        if not control_port:
-            raise ValueError("Control Port '{0}' cannot be blank"
-                             .format(control_port))
+        if not controller_address:
+            raise ValueError("Control Address '{0}' cannot be blank"
+                             .format(controller_address))
         else:
+            if not isinstance(controller_address, basestring):
+                raise TypeError("Control Address must be a string,"
+                                " not '{0}'".format(type(controller_address)))
+
             try:
-                i = int(control_port)
-                if i < 1 or i > 65535:
-                    raise ValueError(
-                        'Control Port must be in range 1 to 65535')
-                else:
-                    self._control_port = control_port
-            except TypeError:
-                raise TypeError("Control Port must be a string or a number,"
-                                " not '{0}'".format(type(control_port)))
+                controller_address.index(':')
+                self._controller_address = controller_address
+            except ValueError:
+                raise ValueError("Control Address must contain at least "
+                                 " one Colon. It is '{0}'" \
+                                 .format(controller_address))
 
     @property
     def record_file(self):
@@ -215,7 +217,7 @@ class Server(object):
             cmd += [self.gst_option_string]
         cmd.append("--video-input-port={0}".format(self.video_port))
         cmd.append("--audio-input-port={0}".format(self.audio_port))
-        cmd.append("--control-port={0}".format(self.control_port))
+        cmd.append("--controller-address={0}".format(self.controller_address))
         if self.record_file is False:
             pass
         elif self.record_file is True:

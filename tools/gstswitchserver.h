@@ -52,7 +52,6 @@ typedef struct _GstSwitchServerOpts GstSwitchServerOpts;
  *  @param controller_address the dbus address for the controller
  *  @param video_input_port the video input TCP port
  *  @param audio_input_port the audio input TCP port
- *  @param control_port (discarded)
  */
 struct _GstSwitchServerOpts
 {
@@ -61,7 +60,6 @@ struct _GstSwitchServerOpts
   gchar *controller_address;
   gint video_input_port;
   gint audio_input_port;
-  gint control_port;
 //should really be in here
 //gboolean verbose;
   gboolean low_res;
@@ -131,9 +129,6 @@ struct _GstSwitchServer
   gint audio_acceptor_port;
 
   GMutex controller_lock;
-  GThread *controller_thread;
-  GSocket *controller_socket;
-  gint controller_port;
   GstSwitchController *controller;
 
   GMutex alloc_port_lock;

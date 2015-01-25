@@ -29,7 +29,7 @@ class TestPath(object):
         serv._start_process = mock_method
         assert serv._run_process() == "/usr/gst-switch-srv \
 --video-input-port=3000 --audio-input-port=4000 \
---control-port=5000".split()
+--controller-address=tcp:host=0.0.0.0,port=5000".split()
 
     def test_path_provided_no_slash(self):
         """Test if a path is provided"""
@@ -41,7 +41,7 @@ class TestPath(object):
         serv._start_process = mock_method
         assert serv._run_process() == "/usr/gst-switch-srv \
 --video-input-port=3000 --audio-input-port=4000 \
---control-port=5000".split()
+--controller-address=tcp:host=0.0.0.0,port=5000".split()
 
     def test_path_empty(self, monkeypatch):
         """Test if null path is given"""
@@ -60,7 +60,7 @@ class TestPath(object):
             serv._start_process = mock_method
             assert serv._run_process() == "/usr/gst-switch-srv \
 --video-input-port=3000 --audio-input-port=4000 \
---control-port=5000".split()
+--controller-address=tcp:host=0.0.0.0,port=5000".split()
 
 
 class TestVideoPort(object):
@@ -119,32 +119,32 @@ class TestAudioPort(object):
                 Server(path=PATH, audio_port=audio_port)
 
 
-class TestControlPort(object):
+class TestControllerAddress(object):
 
-    """Test the control_port parameter"""
-    # Control Port Tests
+    """Test the controller_address parameter"""
+    # Control Address Tests
 
-    def test_invalid_control_port_null(self):
+    def test_invalid_controller_address_null(self):
         """Test when the control port is null"""
-        control_ports = [None, '', [], {}]
-        for control_port in control_ports:
+        controller_addresses = [None, '', [], {}]
+        for controller_address in controller_addresses:
             with pytest.raises(ValueError):
-                Server(path=PATH, control_port=control_port)
+                Server(path=PATH, controller_address=controller_address)
 
-    def test_invalid_control_port_type(self):
+    def test_invalid_controller_address_type(self):
         """Test when the control port is not a valid
         integral value"""
-        control_ports = [[1, 2, 3], {1: 2, 2: 3}]
-        for control_port in control_ports:
+        controller_addresses = [[1, 2, 3], {1: 2, 2: 3}]
+        for controller_address in controller_addresses:
             with pytest.raises(TypeError):
-                Server(path=PATH, control_port=control_port)
+                Server(path=PATH, controller_address=controller_address)
 
-    def test_invalid_control_port_range(self):
-        """Test when the control port is not in range"""
-        control_ports = [-99, -1, 1e6]
-        for control_port in control_ports:
+    def test_invalid_controller_address_range(self):
+        """Test when the control port does not contain a colon"""
+        controller_addresses = ['42', 'port=42', '127.0.0.1']
+        for controller_address in controller_addresses:
             with pytest.raises(ValueError):
-                Server(path=PATH, control_port=control_port)
+                Server(path=PATH, controller_address=controller_address)
 
 
 class TestRecordFile(object):
@@ -162,7 +162,7 @@ class TestRecordFile(object):
         serv._start_process = mock_method
         assert serv._run_process() == "/usr/gst-switch-srv \
 --video-input-port=3000 --audio-input-port=4000 \
---control-port=5000".split()
+--controller-address=tcp:host=0.0.0.0,port=5000".split()
 
     def test_record_file_true(self):
         """Test if record file is True"""
@@ -174,7 +174,7 @@ class TestRecordFile(object):
         serv._start_process = mock_method
         assert serv._run_process() == "/usr/gst-switch-srv \
 --video-input-port=3000 --audio-input-port=4000 \
---control-port=5000 -r".split()
+--controller-address=tcp:host=0.0.0.0,port=5000 -r".split()
 
     def test_record_file_valid(self):
         """Test if record file is valid"""
@@ -186,7 +186,7 @@ class TestRecordFile(object):
         serv._start_process = mock_method
         assert serv._run_process() == "/usr/gst-switch-srv \
 --video-input-port=3000 --audio-input-port=4000 \
---control-port=5000 --record=record.data".split()
+--controller-address=tcp:host=0.0.0.0,port=5000 --record=record.data".split()
 
     def test_record_file_valid_date(self):
         """Test if record file is valid"""
@@ -198,7 +198,7 @@ class TestRecordFile(object):
         serv._start_process = mock_method
         assert serv._run_process() == "/usr/gst-switch-srv \
 --video-input-port=3000 --audio-input-port=4000 \
---control-port=5000 \
+--controller-address=tcp:host=0.0.0.0,port=5000 \
 --record=record_%Y.data".split()
 
     def test_record_file_valid_space(self):
@@ -211,7 +211,8 @@ class TestRecordFile(object):
         serv._start_process = mock_method
         assert serv._run_process() == "/usr/gst-switch-srv \
 --video-input-port=3000 --audio-input-port=4000 \
---control-port=5000".split() + ["--record=record 1.data"]
+--controller-address=tcp:host=0.0.0.0,port=5000".split() + \
+            ["--record=record 1.data"]
 
     def test_record_file_invalid(self):
         """Test when the record_file is invalid"""

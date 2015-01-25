@@ -30,7 +30,7 @@ class TestAddress(object):
 
     def test_address_normal(self):
         """Test if address is valid"""
-        address = ['unix:abstract=gstswitch', 'unix:temp=/tmp/abcd/xyz']
+        address = ['tcp:host=127.0.0.1,port=5000', 'unix:temp=/tmp/abcd/xyz']
         for addr in address:
             conn = Controller(address=addr)
             assert conn.address == addr
