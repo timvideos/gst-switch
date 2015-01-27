@@ -475,6 +475,22 @@ gst_switch_server_end_case (GstCase * cas, GstSwitchServer * srv)
 
   if (caseport)
     gst_switch_server_revoke_port (srv, caseport);
+
+  switch (cas->type) {
+    case GST_CASE_BRANCH_VIDEO_A:
+    case GST_CASE_BRANCH_VIDEO_B:
+    case GST_CASE_BRANCH_AUDIO:
+    case GST_CASE_BRANCH_PREVIEW:
+      GST_SWITCH_SERVER_LOCK_CONTROLLER (srv);
+      if (srv->controller) {
+        gst_switch_controller_tell_preview_port_removed (srv->controller,
+            cas->sink_port, cas->serve_type, cas->type);
+      }
+      GST_SWITCH_SERVER_UNLOCK_CONTROLLER (srv);
+
+    default:
+      break;
+  }
 }
 
 /**

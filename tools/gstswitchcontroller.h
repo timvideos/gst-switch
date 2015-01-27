@@ -80,6 +80,8 @@ GType gst_switch_controller_get_type (void);
 gboolean gst_switch_controller_is_valid (GstSwitchController *);
 void gst_switch_controller_tell_preview_port_added (GstSwitchController *,
     gint port, gint serve, gint type);
+void gst_switch_controller_tell_preview_port_removed (GstSwitchController *,
+    gint port, gint serve, gint type);
 void gst_switch_controller_tell_new_mode_onlne (GstSwitchController *,
     gint mode);
 gboolean gst_switch_controller_select_face (GstSwitchController * controller,

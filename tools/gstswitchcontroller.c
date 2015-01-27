@@ -93,11 +93,11 @@ static const gchar introspection_xml[] =
     "      <arg type='i' name='serve'/>"
     "      <arg type='i' name='type'/>"
     "    </signal>"
-    //"    <signal name='preview_port_removed'>"
-    //"      <arg type='i' name='port'/>"
-    //"      <arg type='i' name='serve'/>"
-    //"      <arg type='i' name='type'/>"
-    //"    </signal>"
+    "    <signal name='preview_port_removed'>"
+    "      <arg type='i' name='port'/>"
+    "      <arg type='i' name='serve'/>"
+    "      <arg type='i' name='type'/>"
+    "    </signal>"
     "    <signal name='new_mode_online'>"
     "      <arg type='i' name='mode'/>"
     "    </signal>"
@@ -514,6 +514,14 @@ gst_switch_controller_tell_preview_port_added (GstSwitchController * controller,
     gint port, gint serve, gint type)
 {
   gst_switch_controller_emit_signal (controller, "preview_port_added",
+      g_variant_new ("(iii)", port, serve, type));
+}
+
+void
+gst_switch_controller_tell_preview_port_removed (GstSwitchController * controller,
+    gint port, gint serve, gint type)
+{
+  gst_switch_controller_emit_signal (controller, "preview_port_removed",
       g_variant_new ("(iii)", port, serve, type));
 }
 
