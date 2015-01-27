@@ -541,7 +541,7 @@ gst_switch_controller_tell_new_mode_onlne (GstSwitchController * controller,
     gint mode)
 {
   gst_switch_controller_emit_signal (controller, "new_mode_online",
-      g_variant_new ("(iii)", mode));
+      g_variant_new ("(i)", mode));
 }
 
 gboolean
