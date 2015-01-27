@@ -107,6 +107,10 @@ static const gchar introspection_xml[] =
     "    <signal name='show_track_marker'>"
     "      <arg type='a(iiii)' name='mode'/>"
     "    </signal>"
+    "    <signal name='select_face'>"
+    "      <arg type='i' name='x'/>"
+    "      <arg type='i' name='y'/>"
+    "    </signal>"
     "  </interface>"
     "</node>";
 /*
