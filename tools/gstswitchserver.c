@@ -501,7 +501,7 @@ gst_switch_server_end_case (GstCase * cas, GstSwitchServer * srv)
 static void
 gst_switch_server_start_case (GstCase * cas, GstSwitchServer * srv)
 {
-   switch (cas->type) {
+  switch (cas->type) {
     case GST_CASE_BRANCH_VIDEO_A:
     case GST_CASE_BRANCH_VIDEO_B:
     case GST_CASE_BRANCH_AUDIO:
