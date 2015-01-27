@@ -35,59 +35,6 @@ G_DEFINE_TYPE (GstSwitchClient, gst_switch_client, G_TYPE_OBJECT);
 #define GST_SWITCH_CLIENT_LOCK_COMPOSITE_MODE(c) (g_mutex_lock (&(c)->composite_mode_lock))
 #define GST_SWITCH_CLIENT_UNLOCK_COMPOSITE_MODE(c) (g_mutex_unlock (&(c)->composite_mode_lock))
 
-static GDBusNodeInfo *introspection_data = NULL;
-static const gchar introspection_xml[] =
-    "<node>"
-    "  <interface name='" SWITCH_UI_OBJECT_NAME "'>"
-    "    <method name='role'>"
-    "      <arg type='i' name='result' direction='out'/>"
-    "    </method>"
-    "    <method name='set_audio_port'>"
-    "      <arg type='i' name='port' direction='in'/>"
-    "    </method>"
-    "    <method name='set_compose_port'>"
-    "      <arg type='i' name='port' direction='in'/>"
-    "    </method>"
-    "    <method name='set_encode_port'>"
-    "      <arg type='i' name='port' direction='in'/>"
-    "    </method>"
-    "    <method name='add_preview_port'>"
-    "      <arg type='i' name='port' direction='in'/>"
-    "      <arg type='i' name='serve' direction='in'/>"
-    "      <arg type='i' name='type' direction='in'/>"
-    "    </method>"
-    "    <method name='new_mode_online'>"
-    "      <arg type='i' name='mode' direction='in'/>" "    </method>"
-    /*
-       "    <method name='click_video'>"
-       "      <arg type='i' name='x' direction='in'/>"
-       "      <arg type='i' name='y' direction='in'/>"
-       "    </method>"
-     */
-    "    <method name='show_face_marker'>"
-    "      <arg type='a(iiii)' name='faces' direction='in'/>"
-    "    </method>"
-    "    <method name='show_track_marker'>"
-    "      <arg type='a(iiii)' name='faces' direction='in'/>"
-    "    </method>"
-    "  </interface>"
-    "  <interface name='" SWITCH_CAPTURE_OBJECT_NAME "'>"
-    "    <method name='role'>"
-    "      <arg type='i' name='result' direction='out'/>"
-    "    </method>"
-    "    <method name='select_face'>"
-    "      <arg type='i' name='x' direction='in'/>"
-    "      <arg type='i' name='y' direction='in'/>" "    </method>"
-    /*
-       "    <method name='face_detected'>"
-       "      <arg type='i' name='x' direction='in'/>"
-       "      <arg type='i' name='y' direction='in'/>"
-       "      <arg type='i' name='w' direction='in'/>"
-       "      <arg type='i' name='h' direction='in'/>"
-       "    </method>"
-     */
-    "  </interface>" "</node>";
-
 extern gboolean verbose;
 gint gst_switch_client_dbus_timeout = 5000;
 
@@ -529,25 +476,6 @@ static const GDBusInterfaceVTable gst_switch_client_interface_vtable = {
 /**
  * @memberof GstSwitchClient
  *
- * Remote signal handler (useless currently).
- */
-static void
-gst_switch_client_on_signal_received (GDBusConnection * connection,
-    const gchar * sender_name,
-    const gchar * object_path,
-    const gchar * interface_name,
-    const gchar * signal_name, GVariant * parameters, gpointer user_data)
-{
-  GstSwitchClient *client = GST_SWITCH_CLIENT (user_data);
-
-  (void) client;
-
-  INFO ("signal: %s, %s", sender_name, signal_name);
-}
-
-/**
- * @memberof GstSwitchClient
- *
  * Invoked when the remote controller is closed.
  */
 static void
@@ -559,86 +487,6 @@ gst_switch_client_on_controller_closed (GDBusConnection * connection,
       GST_SWITCH_CLIENT_CLASS (G_OBJECT_GET_CLASS (client));
   if (klass->connection_closed)
     (*klass->connection_closed) (client, error);
-}
-
-static gboolean
-gst_switch_client_register_as_ui (GstSwitchClient * client)
-{
-  GError *error = NULL;
-  guint id;
-
-  id = g_dbus_connection_register_object (client->controller, SWITCH_UI_OBJECT_PATH, introspection_data->interfaces[0], &gst_switch_client_interface_vtable, client,    /* user_data */
-      NULL,                     /* user_data_free_func */
-      &error);
-
-  if (id <= 0)
-    goto error_register_object;
-
-  id = g_dbus_connection_signal_subscribe (client->controller, NULL,    /* sender */
-      SWITCH_CONTROLLER_OBJECT_NAME, NULL,      /* member */
-      SWITCH_CONTROLLER_OBJECT_PATH, NULL,      /* arg0 */
-      G_DBUS_SIGNAL_FLAGS_NONE,
-      gst_switch_client_on_signal_received, client, NULL
-      /* user_data, user_data_free_func */
-      );
-
-  if (id <= 0)
-    goto error_subscribe;
-
-  return TRUE;
-
-error_register_object:
-  {
-    ERROR ("%s", error->message);
-    g_error_free (error);
-    return FALSE;
-  }
-
-error_subscribe:
-  {
-    ERROR ("failed to subscribe signals");
-    return FALSE;
-  }
-}
-
-static gboolean
-gst_switch_client_register_as_capture (GstSwitchClient * client)
-{
-  GError *error = NULL;
-  guint id;
-
-  id = g_dbus_connection_register_object (client->controller, SWITCH_CAPTURE_OBJECT_PATH, introspection_data->interfaces[1], &gst_switch_client_interface_vtable, client,       /* user_data */
-      NULL,                     /* user_data_free_func */
-      &error);
-
-  if (id <= 0)
-    goto error_register_object;
-
-  id = g_dbus_connection_signal_subscribe (client->controller, NULL,    /* sender */
-      SWITCH_CONTROLLER_OBJECT_NAME, NULL,      /* member */
-      SWITCH_CONTROLLER_OBJECT_PATH, NULL,      /* arg0 */
-      G_DBUS_SIGNAL_FLAGS_NONE,
-      gst_switch_client_on_signal_received, client, NULL
-      /* user_data, user_data_free_func */
-      );
-
-  if (id <= 0)
-    goto error_subscribe;
-
-  return TRUE;
-
-error_register_object:
-  {
-    ERROR ("%s", error->message);
-    g_error_free (error);
-    return FALSE;
-  }
-
-error_subscribe:
-  {
-    ERROR ("failed to subscribe signals");
-    return FALSE;
-  }
 }
 
 /**
@@ -668,10 +516,10 @@ gst_switch_client_connect_controller (GstSwitchClient * client,
   /* Register Object Role */
   switch (role) {
     case CLIENT_ROLE_UI:
-      okay = gst_switch_client_register_as_ui (client);
+      //okay = gst_switch_client_register_as_ui (client);
       break;
     case CLIENT_ROLE_CAPTURE:
-      okay = gst_switch_client_register_as_capture (client);
+      //okay = gst_switch_client_register_as_capture (client);
       break;
     default:
       break;
@@ -1020,7 +868,4 @@ gst_switch_client_class_init (GstSwitchClientClass * klass)
     g_hash_table_insert (klass->methods, (gpointer) entry->name,
         (gpointer) entry->func);
   }
-
-  introspection_data = g_dbus_node_info_new_for_xml (introspection_xml, NULL);
-  g_assert (introspection_data != NULL);
 }

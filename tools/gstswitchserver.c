@@ -485,26 +485,11 @@ gst_switch_server_end_case (GstCase * cas, GstSwitchServer * srv)
 static void
 gst_switch_server_start_case (GstCase * cas, GstSwitchServer * srv)
 {
-  gboolean is_branch = FALSE;
-  switch (cas->type) {
-    case GST_CASE_BRANCH_VIDEO_A:
-    case GST_CASE_BRANCH_VIDEO_B:
-    case GST_CASE_BRANCH_AUDIO:
-    case GST_CASE_BRANCH_PREVIEW:
-      is_branch = TRUE;
-    default:
-      break;
-  }
-
-  if (srv->controller && is_branch) {
+  if(cas->type == GST_CASE_BRANCH_PREVIEW) {
     GST_SWITCH_SERVER_LOCK_CONTROLLER (srv);
-    if (srv->controller && is_branch) {
-      gst_switch_controller_tell_preview_port (srv->controller,
+    if (srv->controller) {
+      gst_switch_controller_tell_preview_port_added (srv->controller,
           cas->sink_port, cas->serve_type, cas->type);
-
-      if (cas->type == GST_CASE_BRANCH_AUDIO) {
-        gst_switch_controller_tell_audio_port (srv->controller, cas->sink_port);
-      }
     }
     GST_SWITCH_SERVER_UNLOCK_CONTROLLER (srv);
   }
@@ -1110,7 +1095,6 @@ static void
 gst_switch_server_start_audio (GstCase * cas, GstSwitchServer * srv)
 {
   INFO ("audio %d started", cas->sink_port);
-  gst_switch_controller_tell_audio_port (srv->controller, cas->sink_port);
 }
 
 /**
@@ -1501,14 +1485,7 @@ gst_switch_server_worker_null (GstWorker * worker, GstSwitchServer * srv)
 static void
 gst_switch_server_start_output (GstWorker * worker, GstSwitchServer * srv)
 {
-  g_return_if_fail (GST_IS_WORKER (worker));
-
-  GST_SWITCH_SERVER_LOCK_CONTROLLER (srv);
-  if (srv->controller) {
-    gst_switch_controller_tell_compose_port (srv->controller,
-        srv->composite->sink_port);
-  }
-  GST_SWITCH_SERVER_UNLOCK_CONTROLLER (srv);
+  INFO ("composite-output started");
 }
 
 /**
@@ -1519,14 +1496,7 @@ gst_switch_server_start_output (GstWorker * worker, GstSwitchServer * srv)
 static void
 gst_switch_server_start_recorder (GstWorker * worker, GstSwitchServer * srv)
 {
-  g_return_if_fail (GST_IS_WORKER (worker));
-
-  GST_SWITCH_SERVER_LOCK_CONTROLLER (srv);
-  if (srv->controller) {
-    gst_switch_controller_tell_encode_port (srv->controller,
-        srv->composite->encode_sink_port);
-  }
-  GST_SWITCH_SERVER_UNLOCK_CONTROLLER (srv);
+  INFO ("encoding-output started");
 }
 
 /**

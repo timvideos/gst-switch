@@ -27,21 +27,15 @@
 #include "gstswitchserver.h"
 #include "gstswitchclient.h"
 
-#define GST_SWITCH_CONTROLLER_LOCK_UIS(c) (g_mutex_lock (&(c)->uis_lock))
-#define GST_SWITCH_CONTROLLER_UNLOCK_UIS(c) (g_mutex_unlock (&(c)->uis_lock))
-#define GST_SWITCH_CONTROLLER_LOCK_CAPTURES(c) (g_mutex_lock (&(c)->captures_lock))
-#define GST_SWITCH_CONTROLLER_UNLOCK_CAPTURES(c) (g_mutex_unlock (&(c)->captures_lock))
-
-enum
-{
-  PROP_0,
-};
+#define GST_SWITCH_CONTROLLER_LOCK_CLIENTS(c) (g_mutex_lock (&(c)->clients_lock))
+#define GST_SWITCH_CONTROLLER_UNLOCK_CLIENTS(c) (g_mutex_unlock (&(c)->clients_lock))
 
 G_DEFINE_TYPE (GstSwitchController, gst_switch_controller, G_TYPE_OBJECT);
 
 static GDBusNodeInfo *introspection_data = NULL;
 static const gchar introspection_xml[] =
-    "<node>" "  <interface name='" SWITCH_CONTROLLER_OBJECT_NAME "'>"
+    "<node>"
+    "  <interface name='" SWITCH_CONTROLLER_OBJECT_NAME "'>"
     "    <method name='get_compose_port'>"
     "      <arg type='i' name='port' direction='out'/>"
     "    </method>"
@@ -93,20 +87,28 @@ static const gchar introspection_xml[] =
     "    <method name='mark_tracking'>"
     "      <arg type='a(iiii)' name='faces' direction='in'/>"
     "    </method>"
-    "    <signal name='audio_port'>"
-    "      <arg type='i' name='port'/>"
-    "    </signal>"
-    "    <signal name='compose_port'>"
-    "      <arg type='i' name='port'/>"
-    "    </signal>"
-    "    <signal name='encode_port'>"
-    "      <arg type='i' name='port'/>"
-    "    </signal>"
-    "    <signal name='preview_port'>"
+    "    "
+    "    <signal name='preview_port_added'>"
     "      <arg type='i' name='port'/>"
     "      <arg type='i' name='serve'/>"
     "      <arg type='i' name='type'/>"
-    "    </signal>" "  </interface>" "</node>";
+    "    </signal>"
+    //"    <signal name='preview_port_removed'>"
+    //"      <arg type='i' name='port'/>"
+    //"      <arg type='i' name='serve'/>"
+    //"      <arg type='i' name='type'/>"
+    //"    </signal>"
+    "    <signal name='new_mode_online'>"
+    "      <arg type='i' name='mode'/>"
+    "    </signal>"
+    "    <signal name='show_face_marker'>"
+    "      <arg type='a(iiii)' name='mode'/>"
+    "    </signal>"
+    "    <signal name='show_track_marker'>"
+    "      <arg type='a(iiii)' name='mode'/>"
+    "    </signal>"
+    "  </interface>"
+    "</node>";
 /*
   "    <property type='s' name='Name' access='readwrite'/>"
   "    <property type='i' name='Num' access='read'/>"
@@ -278,23 +280,28 @@ gst_switch_controller_export (GstSwitchController * controller)
  * @memberof GstSwitchController
  */
 static void
-gst_switch_controller_emit_ui_signal (GstSwitchController * controller,
+gst_switch_controller_emit_signal (GstSwitchController * controller,
     const gchar * signame, GVariant * parameters)
 {
   GError *error;
   gboolean res;
-  GList *ui;
+  GList *client;
   gint num;
 
-  GST_SWITCH_CONTROLLER_LOCK_UIS (controller);
+  GST_SWITCH_CONTROLLER_LOCK_CLIENTS (controller);
   g_assert (parameters);
   g_variant_ref_sink (parameters);
 
-  for (ui = controller->uis, num = 0; ui; ui = g_list_next (ui)) {
+  for (client = controller->clients, num = 0; client; client = g_list_next (client)) {
     error = NULL;
-    res = g_dbus_connection_emit_signal (G_DBUS_CONNECTION (ui->data), NULL,    /* destination_bus_name */
-        SWITCH_UI_OBJECT_PATH, SWITCH_UI_OBJECT_NAME,
-        signame, parameters, &error);
+    res = g_dbus_connection_emit_signal (
+      G_DBUS_CONNECTION (client->data),
+      /*destination_bus_name*/ NULL,
+      SWITCH_CONTROLLER_OBJECT_PATH,
+      SWITCH_CONTROLLER_OBJECT_NAME,
+      signame,
+      parameters,
+      &error);
 
     if (!res) {
       g_assert (error != NULL);
@@ -308,7 +315,7 @@ gst_switch_controller_emit_ui_signal (GstSwitchController * controller,
    */
   g_variant_unref (parameters);
 
-  GST_SWITCH_CONTROLLER_UNLOCK_UIS (controller);
+  GST_SWITCH_CONTROLLER_UNLOCK_CLIENTS (controller);
 }
 
 /**
@@ -327,69 +334,14 @@ gst_switch_controller_on_connection_closed (GDBusConnection * connection,
     WARN ("close: %s", error->message);
   }
 
-  GST_SWITCH_CONTROLLER_LOCK_UIS (controller);
-  controller->uis = g_list_remove (controller->uis, connection);
-  GST_SWITCH_CONTROLLER_UNLOCK_UIS (controller);
+  GST_SWITCH_CONTROLLER_LOCK_CLIENTS (controller);
+  controller->clients = g_list_remove (controller->clients, connection);
+  GST_SWITCH_CONTROLLER_UNLOCK_CLIENTS (controller);
 
-  INFO ("closed: %p, %d (%d uis)", connection, vanished,
-      g_list_length (controller->uis));
+  INFO ("closed: %p, %d (%d clients remaining)", connection, vanished,
+      g_list_length (controller->clients));
 
   g_object_unref (connection);
-}
-
-static GVariant *gst_switch_controller_call_client (GstSwitchController *
-    controller, GDBusConnection * connection, gint role,
-    const gchar * method_name, GVariant * parameters,
-    const GVariantType * reply_type);
-
-typedef struct
-{
-  GDBusConnection *connection;
-  GstSwitchController *controller;
-} GstSwitchAddNewClientParams;
-
-static gboolean
-gst_switch_controller_add_new_client (GstSwitchAddNewClientParams * params)
-{
-  GDBusConnection *connection = params->connection;
-  GstSwitchController *controller = params->controller;
-  gint role = CLIENT_ROLE_NONE;
-  gint tests[] = { CLIENT_ROLE_UI, CLIENT_ROLE_CAPTURE, };
-  GVariant *parameters = NULL, *res = NULL;
-  int n = 0;
-  for (; n < sizeof (tests) / sizeof (gint); ++n) {
-    role = CLIENT_ROLE_NONE;
-    parameters = g_variant_new ("()");
-    res = gst_switch_controller_call_client (controller,
-        connection, tests[n], "role", parameters, G_VARIANT_TYPE ("(i)"));
-    if (res) {
-      g_variant_get (res, "(i)", &role);
-      g_variant_unref (res);
-      break;
-    }
-  }
-
-  switch (role) {
-    case CLIENT_ROLE_UI:
-      GST_SWITCH_CONTROLLER_LOCK_UIS (controller);
-      controller->uis = g_list_append (controller->uis, connection);
-      GST_SWITCH_CONTROLLER_UNLOCK_UIS (controller);
-      break;
-    case CLIENT_ROLE_CAPTURE:
-      GST_SWITCH_CONTROLLER_LOCK_CAPTURES (controller);
-      controller->captures = g_list_append (controller->captures, connection);
-      GST_SWITCH_CONTROLLER_UNLOCK_CAPTURES (controller);
-      break;
-    default:
-      g_object_unref (connection);
-      ERROR ("unknown role: %d", role);
-      break;
-  }
-
-  g_free (params);
-
-  /* Return FALSE for one-shot */
-  return FALSE;
 }
 
 /**
@@ -401,11 +353,8 @@ gst_switch_controller_on_new_connection (GDBusServer * server,
     GDBusConnection * connection, gpointer user_data)
 {
   GstSwitchController *controller = GST_SWITCH_CONTROLLER (user_data);
-  GstSwitchAddNewClientParams *params = NULL;
   guint register_id = 0;
   GError *error = NULL;
-
-  //INFO ("new-connection...");
 
   register_id = g_dbus_connection_register_object (connection, SWITCH_CONTROLLER_OBJECT_PATH, introspection_data->interfaces[0], &gst_switch_controller_interface_vtable, controller,   /* user_data */
       NULL,                     /* user_data_free_func */
@@ -426,26 +375,12 @@ gst_switch_controller_on_new_connection (GDBusServer * server,
   g_signal_connect (connection, "closed",
       G_CALLBACK (gst_switch_controller_on_connection_closed), controller);
 
-  params = g_new0 (GstSwitchAddNewClientParams, 1);
-  params->controller = controller;
-  params->connection = connection;
+  GST_SWITCH_CONTROLLER_LOCK_CLIENTS (controller);
+  controller->clients = g_list_append (controller->clients, connection);
+  GST_SWITCH_CONTROLLER_UNLOCK_CLIENTS (controller);
+
   g_object_ref (connection);
 
-  g_timeout_add (500, (GSourceFunc) gst_switch_controller_add_new_client,
-      params);
-  return TRUE;
-}
-
-/**
- * @brief Authorizing new dbus connection.
- * @memberof GstSwitchController
- */
-static gboolean
-gst_switch_controller_authorize_authenticated_peer (GDBusAuthObserver *
-    observer,
-    GIOStream * stream, GCredentials * credentials, gpointer user_data)
-{
-  INFO ("authorize: %s", g_credentials_to_string (credentials));
   return TRUE;
 }
 
@@ -459,22 +394,17 @@ gst_switch_controller_init (GstSwitchController * controller)
 {
   gchar *guid = g_dbus_generate_guid ();
   GDBusServerFlags flags = G_DBUS_SERVER_FLAGS_NONE;
-  GDBusAuthObserver *auth_observer;
   GError *error = NULL;
 
-  g_mutex_init (&controller->uis_lock);
-  g_mutex_init (&controller->captures_lock);
-  controller->uis = NULL;
-  controller->captures = NULL;
+  g_mutex_init (&controller->clients_lock);
+  controller->clients = NULL;
 
-  flags |= G_DBUS_SERVER_FLAGS_RUN_IN_THREAD;
+  //flags |= G_DBUS_SERVER_FLAGS_RUN_IN_THREAD;
   flags |= G_DBUS_SERVER_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS;
-
-  auth_observer = g_dbus_auth_observer_new ();
 
   controller->bus_server =
       g_dbus_server_new_sync (opts.controller_address, flags, guid,
-      auth_observer, /* GCancellable */ NULL, &error);
+      /* GDBusAuthObserver */NULL, /* GCancellable */ NULL, &error);
 
   if (error != NULL) {
     g_error ("failed to register controller: %s", error->message);
@@ -487,17 +417,11 @@ gst_switch_controller_init (GstSwitchController * controller)
       g_dbus_server_get_client_address (controller->bus_server));
 
   g_signal_connect (controller->bus_server, "new-connection",
-      G_CALLBACK (gst_switch_controller_on_new_connection), controller);
-
-  g_signal_connect (auth_observer, "authorize-authenticated-peer",
-      G_CALLBACK
-      (gst_switch_controller_authorize_authenticated_peer), controller);
+      G_CALLBACK (gst_switch_controller_on_new_connection),
+      controller);
 
   g_dbus_server_start (controller->bus_server);
 
-  g_object_unref (auth_observer);
-
-  // TODO: singleton object
   return;
 }
 
@@ -517,8 +441,7 @@ gst_switch_controller_finalize (GstSwitchController * controller)
     controller->bus_server = NULL;
   }
 
-  g_mutex_clear (&controller->uis_lock);
-  g_mutex_clear (&controller->captures_lock);
+  g_mutex_clear (&controller->clients_lock);
 
   if (G_OBJECT_CLASS (gst_switch_controller_parent_class)->finalize)
     (*G_OBJECT_CLASS (gst_switch_controller_parent_class)->finalize)
@@ -539,176 +462,6 @@ gst_switch_controller_is_valid (GstSwitchController * controller)
     valid = TRUE;
   }
   return valid;
-}
-
-/**
- * @brief Invoke a remote method on a connected client.
- * @memberof GstSwitchController
- */
-static GVariant *
-gst_switch_controller_call_client (GstSwitchController * controller,
-    GDBusConnection * connection, gint role, const gchar * method_name,
-    GVariant * parameters, const GVariantType * reply_type)
-{
-  GVariant *value = NULL;
-  GError *error = NULL;
-
-  /*
-     INFO ("calling: %s/%s", SWITCH_CONTROLLER_OBJECT_NAME, method_name);
-   */
-
-  const char *path = "";
-  const char *name = "";
-  switch (role) {
-    case CLIENT_ROLE_UI:
-      path = SWITCH_UI_OBJECT_PATH;
-      name = SWITCH_UI_OBJECT_NAME;
-      break;
-    case CLIENT_ROLE_CAPTURE:
-      path = SWITCH_CAPTURE_OBJECT_PATH;
-      name = SWITCH_CAPTURE_OBJECT_NAME;
-      break;
-  }
-
-  if (G_IS_DBUS_CONNECTION (connection) == 0) {
-    return NULL;
-  }
-
-  value = g_dbus_connection_call_sync (connection, NULL,        /* bus_name */
-      path, name, method_name, parameters, reply_type, G_DBUS_CALL_FLAGS_NONE, gst_switch_controller_dbus_timeout,      /* timeout_msec */
-      NULL /* TODO: cancellable */ ,
-      &error);
-
-  if (error != NULL) {
-    ERROR ("%s (%s)", error->message, method_name);
-    g_error_free (error);
-    if (value)
-      g_variant_unref (value);
-    return NULL;
-  }
-  g_assert (value != NULL);
-
-  return value;
-}
-
-/**
- * @brief Invoke a remote method on all connected clients.
- * @memberof GstSwitchController
- */
-static void
-gst_switch_controller_call_clients (GstSwitchController * controller,
-    gint role, const gchar * method_name,
-    GVariant * parameters, const GVariantType * reply_type)
-{
-  GDBusConnection *connection;
-  GVariant *value;
-  GList *ui, *clients = NULL;
-
-  g_variant_ref_sink (parameters);
-
-  switch (role) {
-    case CLIENT_ROLE_UI:
-      GST_SWITCH_CONTROLLER_LOCK_UIS (controller);
-      clients = controller->uis;
-      break;
-    case CLIENT_ROLE_CAPTURE:
-      GST_SWITCH_CONTROLLER_LOCK_CAPTURES (controller);
-      clients = controller->captures;
-      break;
-  }
-
-  if (clients == NULL) {
-    WARN ("%s: no connections", method_name);
-    goto out;
-  }
-
-  for (ui = clients; ui;) {
-    connection = G_DBUS_CONNECTION (ui->data);
-    if (g_dbus_connection_is_closed (connection)) {
-      INFO ("UI closed: %p", connection);
-      ui = g_list_next (ui);
-      g_object_unref (connection);
-      clients = g_list_remove (clients, connection);
-      continue;
-    }
-
-    value = gst_switch_controller_call_client (controller,
-        connection, role, method_name, parameters, reply_type);
-    if (value) {
-      // ...
-      g_variant_unref (value);
-    }
-
-    ui = g_list_next (ui);
-  }
-
-out:
-  g_variant_unref (parameters);
-
-  switch (role) {
-    case CLIENT_ROLE_UI:
-      controller->uis = clients;
-      GST_SWITCH_CONTROLLER_UNLOCK_UIS (controller);
-      break;
-    case CLIENT_ROLE_CAPTURE:
-      controller->captures = clients;
-      GST_SWITCH_CONTROLLER_UNLOCK_CAPTURES (controller);
-      break;
-  }
-}
-
-/**
- * Convenient wrapper method for calling remoting method "set_audio_port"
- * on all clients.
- * @memberof GstSwitchController
- */
-static void
-gst_switch_controller_set_ui_audio_port (GstSwitchController * controller,
-    gint port)
-{
-  gst_switch_controller_call_clients (controller, CLIENT_ROLE_UI,
-      "set_audio_port", g_variant_new ("(i)", port), G_VARIANT_TYPE ("()"));
-}
-
-/**
- * Convenient wrapper for calling remoting method "set_compose_port" on
- * all clients.
- * @memberof GstSwitchController
- */
-static void
-gst_switch_controller_set_ui_compose_port (GstSwitchController * controller,
-    gint port)
-{
-  gst_switch_controller_call_clients (controller, CLIENT_ROLE_UI,
-      "set_compose_port", g_variant_new ("(i)", port), G_VARIANT_TYPE ("()"));
-}
-
-/**
- * @memberof GstSwitchController
- * Convenient wrapper for calling remoting method "set_encode_port" on all
- * clients.
- */
-static void
-gst_switch_controller_set_ui_encode_port (GstSwitchController * controller,
-    gint port)
-{
-  gst_switch_controller_call_clients (controller, CLIENT_ROLE_UI,
-      "set_encode_port", g_variant_new ("(i)", port), G_VARIANT_TYPE ("()"));
-}
-
-/**
- * @memberof GstSwitchController
- * 
- * Convenient wrapper for calling remoting method "add_preview_port" on all
- * clients.
- */
-static void
-gst_switch_controller_add_ui_preview_port (GstSwitchController * controller,
-    gint port, gint serve, gint type)
-{
-  gst_switch_controller_call_clients (controller, CLIENT_ROLE_UI,
-      "add_preview_port", g_variant_new ("(iii)", port, serve, type),
-      G_VARIANT_TYPE ("()"));
 }
 
 /**
@@ -748,54 +501,6 @@ gst_switch_controller_set_property (GstSwitchController * controller,
 }
 
 /**
- * @memberof GstSwitchController
- * @param controller the GstSwitchController instance
- * @param port the port number
- *
- *  Tell the audio port to the clients.
- */
-void
-gst_switch_controller_tell_audio_port (GstSwitchController * controller,
-    gint port)
-{
-  gst_switch_controller_emit_ui_signal (controller, "audio_port",
-      g_variant_new ("(i)", port));
-  gst_switch_controller_set_ui_audio_port (controller, port);
-}
-
-/**
- * @memberof GstSwitchController
- * @param controller the GstSwitchController instance
- * @param port the port number
- *
- *  Tell the compose port to the clients.
- */
-void
-gst_switch_controller_tell_compose_port (GstSwitchController * controller,
-    gint port)
-{
-  gst_switch_controller_emit_ui_signal (controller, "compose_port",
-      g_variant_new ("(i)", port));
-  gst_switch_controller_set_ui_compose_port (controller, port);
-}
-
-/**
- *  @memberof GstSwitchController
- *  @param controller the GstSwitchController instance
- *  @param port the port number
- *
- *  Tell the encode port to the clients.
- */
-void
-gst_switch_controller_tell_encode_port (GstSwitchController * controller,
-    gint port)
-{
-  gst_switch_controller_emit_ui_signal (controller, "encode_port",
-      g_variant_new ("(i)", port));
-  gst_switch_controller_set_ui_encode_port (controller, port);
-}
-
-/**
  *  @memberof GstSwitchController
  *  @param controller the GstSwitchController instance
  *  @param port the port number
@@ -805,12 +510,11 @@ gst_switch_controller_tell_encode_port (GstSwitchController * controller,
  *  Tell the preview port to the clients.
  */
 void
-gst_switch_controller_tell_preview_port (GstSwitchController * controller,
+gst_switch_controller_tell_preview_port_added (GstSwitchController * controller,
     gint port, gint serve, gint type)
 {
-  gst_switch_controller_emit_ui_signal (controller, "preview_port",
+  gst_switch_controller_emit_signal (controller, "preview_port_added",
       g_variant_new ("(iii)", port, serve, type));
-  gst_switch_controller_add_ui_preview_port (controller, port, serve, type);
 }
 
 /**
@@ -824,17 +528,17 @@ void
 gst_switch_controller_tell_new_mode_onlne (GstSwitchController * controller,
     gint mode)
 {
-  gst_switch_controller_call_clients (controller, CLIENT_ROLE_UI,
-      "new_mode_online", g_variant_new ("(i)", mode), G_VARIANT_TYPE ("()"));
+  gst_switch_controller_emit_signal (controller, "new_mode_online",
+      g_variant_new ("(iii)", mode));
 }
 
 gboolean
 gst_switch_controller_select_face (GstSwitchController * controller,
     gint x, gint y)
 {
-  //INFO ("click: %d, %d", x, y);
-  gst_switch_controller_call_clients (controller, CLIENT_ROLE_CAPTURE,
-      "select_face", g_variant_new ("(ii)", x, y), G_VARIANT_TYPE ("()"));
+  gst_switch_controller_emit_signal (controller, "select_face",
+      g_variant_new ("(ii)", x, y));
+
   return TRUE;
 }
 
@@ -842,18 +546,16 @@ void
 gst_switch_controller_show_face_marker (GstSwitchController * controller,
     GVariant * faces)
 {
-  GVariant *v = g_variant_new_tuple (&faces, 1);
-  gst_switch_controller_call_clients (controller, CLIENT_ROLE_UI,
-      "show_face_marker", v, G_VARIANT_TYPE ("()"));
+  gst_switch_controller_emit_signal (controller, "show_face_marker",
+      g_variant_new_tuple (&faces, 1));
 }
 
 void
 gst_switch_controller_show_track_marker (GstSwitchController * controller,
     GVariant * faces)
 {
-  GVariant *v = g_variant_new_tuple (&faces, 1);
-  gst_switch_controller_call_clients (controller, CLIENT_ROLE_UI,
-      "show_track_marker", v, G_VARIANT_TYPE ("()"));
+  gst_switch_controller_emit_signal (controller, "show_track_marker",
+      g_variant_new_tuple (&faces, 1));
 }
 
 /**
