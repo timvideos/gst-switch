@@ -110,9 +110,67 @@ class TestEstablishConnection(object):
     def test_normal(self, monkeypatch):
         """Test if the parameters are valid"""
         monkeypatch.setattr(Connection, 'connect_dbus', Mock())
+        monkeypatch.setattr(Connection, 'signal_subscribe', Mock())
         controller = Controller(address='unix:abstract=abcd')
         controller.establish_connection()
         assert controller.connection is not None
+
+
+class TestSiggnalHandler(object):
+
+    """Test the establish_connection method"""
+
+    def test_unknown_signal_name(self, monkeypatch):
+        """Test that nothing happens when a unknown signal is on the bus"""
+        monkeypatch.setattr(Connection, 'connect_dbus', Mock())
+        controller = Controller(address='unix:abstract=abcd')
+        controller._signal_handler(None, ':0', '/foo/bar', 'foo.bar', 'foobar', None, None)
+
+    def test_single_hanlder_calls(self, monkeypatch):
+        """Test that the various Hanlder gets calles"""
+        monkeypatch.setattr(Connection, 'connect_dbus', Mock())
+
+        for signal in ('preview_port_added', 'preview_port_removed', 'new_mode_online', 'show_face_marker', 'show_track_marker', 'select_face'):
+            test_cb = Mock()
+            controller = Controller(address='unix:abstract=abcd')
+            getattr(controller, 'on_'+signal)(test_cb)
+
+            controller._signal_handler(
+                None,
+                ':0',
+                '/info/duzy/gst/switch/SwitchControllerInterface',
+                'info.duzy.gst.switch.SwitchControllerInterface',
+                signal,
+                GLib.Variant('(iii)', (5, 10, 20,)),
+                None)
+            test_cb.assert_called_once_with(5, 10, 20)
+
+    def test_multiple_hanlder_calls(self, monkeypatch):
+        """Test that the various Hanlder gets calles"""
+        monkeypatch.setattr(Connection, 'connect_dbus', Mock())
+        controller = Controller(address='unix:abstract=abcd')
+
+        signals = ('preview_port_added', 'preview_port_removed', 'new_mode_online', 'show_face_marker', 'show_track_marker', 'select_face')
+        test_cbs = {}
+        for signal in signals:
+            test_cbs[signal] = Mock()
+            getattr(controller, 'on_'+signal)(test_cbs[signal])
+            getattr(controller, 'on_'+signal)(test_cbs[signal])
+            getattr(controller, 'on_'+signal)(test_cbs[signal])
+
+        for signal in signals:
+            controller._signal_handler(
+                None,
+                ':0',
+                '/info/duzy/gst/switch/SwitchControllerInterface',
+                'info.duzy.gst.switch.SwitchControllerInterface',
+                signal,
+                GLib.Variant('(i)', (123,)),
+                None)
+
+        for signal in signals:
+            test_cbs[signal].assert_called_with(123)
+            assert test_cbs[signal].call_count == 3
 
 
 class MockConnection(object):

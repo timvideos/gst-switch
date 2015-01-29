@@ -147,6 +147,59 @@ class TestConnectDBus(object):
         assert conn.connection is not None
 
 
+class TestSignalSubscribe(object):
+
+    """Unittests for signal_subscribe"""
+
+    def test_handler_not_callable(self, monkeypatch):
+        """Test if handler is not callable"""
+
+        conn = Connection()
+        test_cbs = ['', None, [], {}]
+        for test_cb in test_cbs:
+            with pytest.raises(ValueError):
+                conn.signal_subscribe(test_cb)
+
+    def test_handler_passed_to_gio(self, monkeypatch):
+        """Test if handler is correctly passed to Gio"""
+
+        monkeypatch.setattr(
+            Gio.DBusConnection, 'new_for_address_sync',
+            Mock(return_value=Gio.DBusConnection()))
+
+        SignalSubscribeMock = Mock()
+        monkeypatch.setattr(
+            Gio.DBusConnection, 'signal_subscribe',
+            SignalSubscribeMock)
+
+        conn = Connection()
+        conn.connect_dbus()
+        test_cb = lambda: None
+        conn.signal_subscribe(test_cb)
+
+        # test that Gio's signal_subscribe method is called once
+        # and passed the callback as-is
+        SignalSubscribeMock.assert_called_once()
+        args, kwargs = SignalSubscribeMock.call_args
+        assert args[6] == test_cb
+
+    def test_gio_error_is_converted(self, monkeypatch):
+        """Test if handler is correctly passed to Gio"""
+
+        monkeypatch.setattr(
+            Gio.DBusConnection, 'new_for_address_sync',
+            Mock(return_value=Gio.DBusConnection()))
+
+        monkeypatch.setattr(
+            Gio.DBusConnection, 'signal_subscribe',
+            Mock(side_effect = GLib.GError('Boom!')))
+
+        conn = Connection()
+        conn.connect_dbus()
+        test_cb = lambda: None
+        with pytest.raises(ConnectionError):
+            conn.signal_subscribe(test_cb)
+
 class MockConnection(object):
 
     """A class which mocks the Connection class"""
