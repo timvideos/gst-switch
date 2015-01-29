@@ -15,7 +15,7 @@ from gstswitch.controller import Controller
 import time
 import datetime
 
-from gi.repository import GLib, Gtk
+from gi.repository import GLib
 from mock import Mock
 from integrationtests.compare import CompareVideo
 
