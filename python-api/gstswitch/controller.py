@@ -49,6 +49,13 @@ class Controller(object):
         self.object_path = object_path
         self.default_interface = default_interface
 
+        self.cbs_preview_port_added = []
+        self.cbs_preview_port_removed = []
+        self.cbs_new_mode_online = []
+        self.cbs_show_face_marker = []
+        self.cbs_show_track_marker = []
+        self.cbs_select_face = []
+
     @property
     def address(self):
         """
@@ -156,6 +163,20 @@ class Controller(object):
             default_interface=self.default_interface)
 
         self.connection.connect_dbus()
+        self.connection.signal_subscribe(self._signal_handler)
+
+    def _signal_handler(self, connection, sender_name, object_path, interface_name, signal_name, parameters, user_data):
+        try:
+            cblist = getattr(self, 'cbs_'+signal_name)
+            if not isinstance(cblist, list):
+                raise AttributeError()
+
+            unpack = parameters.unpack()
+            for cb in cblist:
+                cb(*unpack)
+
+        except AttributeError:
+            pass
 
     def get_compose_port(self):
         """Get the compose port number
@@ -396,3 +417,39 @@ class Controller(object):
         for tupl in liststr:
             preview_ports.append(int(tupl[0]))
         return preview_ports
+
+    def on_preview_port_added(self, cb):
+        if not hasattr(cb, '__call__'):
+            raise ValueError('Provided argument cb is not callable')
+
+        self.cbs_preview_port_added.append(cb)
+
+    def on_preview_port_removed(self, cb):
+        if not hasattr(cb, '__call__'):
+            raise ValueError('Provided argument cb is not callable')
+
+        self.cbs_preview_port_removed.append(cb)
+
+    def on_new_mode_online(self, cb):
+        if not hasattr(cb, '__call__'):
+            raise ValueError('Provided argument cb is not callable')
+
+        self.cbs_new_mode_online.append(cb)
+
+    def on_show_face_marker(self, cb):
+        if not hasattr(cb, '__call__'):
+            raise ValueError('Provided argument cb is not callable')
+
+        self.cbs_show_face_marker.append(cb)
+
+    def on_show_track_marker(self, cb):
+        if not hasattr(cb, '__call__'):
+            raise ValueError('Provided argument cb is not callable')
+
+        self.cbs_show_track_marker.append(cb)
+
+    def on_select_face(self, cb):
+        if not hasattr(cb, '__call__'):
+            raise ValueError('Provided argument cb is not callable')
+
+        self.cbs_select_face.append(cb)

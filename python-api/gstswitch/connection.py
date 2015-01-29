@@ -154,6 +154,25 @@ class Connection(object):
             new_message = "{1} ({0})".format(message, self.address)
             raise ConnectionError(new_message)
 
+    def signal_subscribe(self, signal_handler):
+        if not hasattr(signal_handler, '__call__'):
+            raise ValueError('Provided argument signal_handler is not callable')
+
+        try:
+            self.connection.signal_subscribe(
+                None, # sender
+                self.default_interface,
+                None, #member
+                self.object_path,
+                None, #arg0
+                Gio.DBusSignalFlags.NONE,
+                signal_handler,
+                None) # user_data
+        except GLib.GError as error:
+            message = error.message
+            new_message = "{1} ({0})".format(message, self.address)
+            raise ConnectionError(new_message)
+
     def get_compose_port(self):
         """get_compose_port(out i port);
         Calls get_compose_port remotely
