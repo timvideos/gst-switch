@@ -15,6 +15,8 @@ from gstswitch.controller import Controller
 import time
 import datetime
 
+from gi.repository import GLib, Gtk
+from mock import Mock
 from integrationtests.compare import CompareVideo
 
 import subprocess
@@ -250,6 +252,82 @@ class TestGetPreviewPorts(object):
                     serv.terminate(1)
                     log = open('server.log')
                     print(log.read())
+
+
+class TestSignals(object):
+
+    """Test on_*() methods"""
+
+    def run_mainloop(self):
+        self.mainloop = GLib.MainLoop()
+        self.mainloop.run()
+
+
+    def quit_mainloop(self, *args):
+        self.mainloop.quit()
+
+    def test_on_new_mode_online(self):
+        """Create a Controller object, call on_new_mode_online method and check that the callback fires"""
+        serv = Server(path=PATH)
+        try:
+            serv.run()
+
+            controller = Controller()
+            controller.establish_connection()
+
+            test_cb = Mock(side_effect=self.quit_mainloop)
+            controller.on_new_mode_online(test_cb)
+            controller.set_composite_mode(0)
+
+            GLib.timeout_add_seconds(5, self.quit_mainloop)
+            self.run_mainloop()
+
+            test_cb.assert_called_once_with(0)
+
+            serv.terminate(1)
+        finally:
+            if serv.proc:
+                poll = serv.proc.poll()
+                print self.__class__
+                if poll == -11:
+                    print "SEGMENTATION FAULT OCCURRED"
+                print "ERROR CODE - {0}".format(poll)
+                serv.terminate(1)
+                log = open('server.log')
+                print log.read()
+
+    def test_on_preview_port_added(self):
+        """Create a Controller object, call add a source method and check that the callback fires"""
+        serv = Server(path=PATH, video_port=3000)
+        try:
+            serv.run()
+
+            controller = Controller()
+            controller.establish_connection()
+
+            test_cb = Mock(side_effect=self.quit_mainloop)
+            controller.on_preview_port_added(test_cb)
+
+            sources = TestSources(video_port=3000)
+            sources.new_test_video()
+            sources.new_test_video()
+
+            GLib.timeout_add_seconds(5, self.quit_mainloop)
+            self.run_mainloop()
+
+            test_cb.assert_called_once_with(3003, 1, 7)
+
+            serv.terminate(1)
+        finally:
+            if serv.proc:
+                poll = serv.proc.poll()
+                print self.__class__
+                if poll == -11:
+                    print "SEGMENTATION FAULT OCCURRED"
+                print "ERROR CODE - {0}".format(poll)
+                serv.terminate(1)
+                log = open('server.log')
+                print log.read()
 
 
 class VideoFileSink(object):
