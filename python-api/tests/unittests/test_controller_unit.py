@@ -127,8 +127,8 @@ class TestSiggnalHandler(object):
         controller.cb_signal_handler(None, ':0', '/foo/bar',
                                      'foo.bar', 'foobar', None, None)
 
-    def test_single_hanlder_calls(self, monkeypatch):
-        """Test that the various Hanlder gets calles"""
+    def test_single_handler_calls(self, monkeypatch):
+        """Test that the various Handler gets calles"""
         monkeypatch.setattr(Connection, 'connect_dbus', Mock())
 
         for signal in ('preview_port_added', 'preview_port_removed',
@@ -148,8 +148,8 @@ class TestSiggnalHandler(object):
                 None)
             test_cb.assert_called_once_with(5, 10, 20)
 
-    def test_multiple_hanlder_calls(self, monkeypatch):
-        """Test that the various Hanlder gets calles"""
+    def test_multiple_handler_calls(self, monkeypatch):
+        """Test that the various Handler gets calles"""
         monkeypatch.setattr(Connection, 'connect_dbus', Mock())
         controller = Controller(address='unix:abstract=abcd')
 
