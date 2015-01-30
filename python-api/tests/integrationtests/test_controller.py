@@ -216,24 +216,30 @@ class TestSignals(object):
 
     """Test on_*() methods"""
 
-    def run_mainloop(self):
-        self.quit_count = 0
+    def __init__(self):
         self.mainloop = GLib.MainLoop()
+        self.quit_count = 0
+
+    def run_mainloop(self):
+        """Start the MainLoop, set Quit-Counter to Zero"""
+        self.quit_count = 0
         self.mainloop.run()
 
-
-    def quit_mainloop(self, *args):
+    def quit_mainloop(self, *_):
+        """Quit the MainLoop, set Quit-Counter to Zero"""
         self.mainloop.quit()
         self.quit_count = 0
 
     def quit_mainloop_after(self, num):
+        """Increment Quit-Counter, if it reaches num, Quit the MainLoop"""
         self.quit_count += 1
-        print("quit_mainloop_after, self.quit_count=%s, num=%s", self.quit_count, num)
         if self.quit_count == num:
             self.quit_mainloop()
 
     def test_on_new_mode_online(self):
-        """Create a Controller object, call on_new_mode_online method and check that the callback fires"""
+        """Create a Controller object, call on_new_mode_online method and
+        check that the callback fires
+        """
         serv = Server(path=PATH)
         try:
             serv.run()
@@ -255,7 +261,9 @@ class TestSignals(object):
             assert_no_segfault(serv)
 
     def test_on_preview_port_added(self):
-        """Create a Controller object, call add a source method and check that the callback fires"""
+        """Create a Controller object, call add a source method and
+        check that the callback fires
+        """
         serv = Server(path=PATH, video_port=3000)
         try:
             serv.run()
@@ -263,7 +271,8 @@ class TestSignals(object):
             controller = Controller()
             controller.establish_connection()
 
-            test_cb = Mock(side_effect=lambda mode, serve, type: self.quit_mainloop_after(2))
+            test_cb = Mock(side_effect=lambda mode, serve, type:
+                           self.quit_mainloop_after(2))
             controller.on_preview_port_added(test_cb)
 
             sources = TestSources(video_port=3000)
@@ -273,7 +282,7 @@ class TestSignals(object):
             GLib.timeout_add_seconds(5, self.quit_mainloop)
             self.run_mainloop()
 
-            print(test_cb.call_args_list)
+            print test_cb.call_args_list
             test_cb.assert_any_call(3003, 1, 7)
             test_cb.assert_any_call(3004, 1, 8)
             assert test_cb.call_count == 2

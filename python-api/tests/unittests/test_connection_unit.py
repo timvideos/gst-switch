@@ -160,6 +160,7 @@ class TestSignalSubscribe(object):
             with pytest.raises(ValueError):
                 conn.signal_subscribe(test_cb)
 
+    # pylint: disable=unpacking-non-sequence
     def test_handler_passed_to_gio(self, monkeypatch):
         """Test if handler is correctly passed to Gio"""
 
@@ -167,10 +168,10 @@ class TestSignalSubscribe(object):
             Gio.DBusConnection, 'new_for_address_sync',
             Mock(return_value=Gio.DBusConnection()))
 
-        SignalSubscribeMock = Mock()
+        signal_subscribe_mock = Mock()
         monkeypatch.setattr(
             Gio.DBusConnection, 'signal_subscribe',
-            SignalSubscribeMock)
+            signal_subscribe_mock)
 
         conn = Connection()
         conn.connect_dbus()
@@ -179,8 +180,8 @@ class TestSignalSubscribe(object):
 
         # test that Gio's signal_subscribe method is called once
         # and passed the callback as-is
-        SignalSubscribeMock.assert_called_once()
-        args, kwargs = SignalSubscribeMock.call_args
+        signal_subscribe_mock.assert_called_once()
+        args, _ = signal_subscribe_mock.call_args
         assert args[6] == test_cb
 
     def test_gio_error_is_converted(self, monkeypatch):
@@ -192,7 +193,7 @@ class TestSignalSubscribe(object):
 
         monkeypatch.setattr(
             Gio.DBusConnection, 'signal_subscribe',
-            Mock(side_effect = GLib.GError('Boom!')))
+            Mock(side_effect=GLib.GError('Boom!')))
 
         conn = Connection()
         conn.connect_dbus()
@@ -200,9 +201,11 @@ class TestSignalSubscribe(object):
         with pytest.raises(ConnectionError):
             conn.signal_subscribe(test_cb)
 
+
 class MockConnection(object):
 
     """A class which mocks the Connection class"""
+
     funs = {
         'get_compose_port': (3001,),
         'get_encode_port': (3002,),

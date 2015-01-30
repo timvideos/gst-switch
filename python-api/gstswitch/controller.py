@@ -163,10 +163,11 @@ class Controller(object):
             default_interface=self.default_interface)
 
         self.connection.connect_dbus()
-        self.connection.signal_subscribe(self._signal_handler)
+        self.connection.signal_subscribe(self.cb_signal_handler)
 
-    def _signal_handler(self, connection, sender_name, object_path,
-                        interface_name, signal_name, parameters, user_data):
+    # pylint: disable=star-args
+    def cb_signal_handler(self, connection, sender_name, object_path,
+                          interface_name, signal_name, parameters, user_data):
         """Private Callback passed into Gio's signal_subscribe and called
         for every signal arriving on the bus.
 
