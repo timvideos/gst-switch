@@ -33,91 +33,6 @@
 G_DEFINE_TYPE (GstSwitchController, gst_switch_controller, G_TYPE_OBJECT);
 
 static GDBusNodeInfo *introspection_data = NULL;
-static const gchar introspection_xml[] =
-    "<node>"
-    "  <interface name='" SWITCH_CONTROLLER_OBJECT_NAME "'>"
-    "    <method name='get_compose_port'>"
-    "      <arg type='i' name='port' direction='out'/>"
-    "    </method>"
-    "    <method name='get_encode_port'>"
-    "      <arg type='i' name='port' direction='out'/>"
-    "    </method>"
-    "    <method name='get_audio_port'>"
-    "      <arg type='i' name='port' direction='out'/>"
-    "    </method>"
-    "    <method name='get_preview_ports'>"
-    "      <arg type='s' name='ports' direction='out'/>"
-    "    </method>"
-    "    <method name='set_composite_mode'>"
-    "      <arg type='i' name='channel' direction='in'/>"
-    "      <arg type='b' name='result' direction='out'/>"
-    "    </method>"
-    "    <method name='get_composite_mode'>"
-    "      <arg type='i' name='result' direction='out'/>"
-    "    </method>"
-    "    <method name='set_encode_mode'>"
-    "      <arg type='i' name='channel' direction='in'/>"
-    "      <arg type='b' name='result' direction='out'/>"
-    "    </method>"
-    "    <method name='new_record'>"
-    "      <arg type='b' name='result' direction='out'/>"
-    "    </method>"
-    "    <method name='adjust_pip'>"
-    "      <arg type='i' name='dx' direction='in'/>"
-    "      <arg type='i' name='dy' direction='in'/>"
-    "      <arg type='i' name='dw' direction='in'/>"
-    "      <arg type='i' name='dh' direction='in'/>"
-    "      <arg type='u' name='result' direction='out'/>"
-    "    </method>"
-    "    <method name='switch'>"
-    "      <arg type='i' name='channel' direction='in'/>"
-    "      <arg type='i' name='port' direction='in'/>"
-    "      <arg type='b' name='result' direction='out'/>"
-    "    </method>"
-    "    <method name='click_video'>"
-    "      <arg type='i' name='x' direction='in'/>"
-    "      <arg type='i' name='y' direction='in'/>"
-    "      <arg type='i' name='fw' direction='in'/>"
-    "      <arg type='i' name='fh' direction='in'/>"
-    "      <arg type='b' name='result' direction='out'/>"
-    "    </method>"
-    "    <method name='mark_face'>"
-    "      <arg type='a(iiii)' name='faces' direction='in'/>"
-    "    </method>"
-    "    <method name='mark_tracking'>"
-    "      <arg type='a(iiii)' name='faces' direction='in'/>"
-    "    </method>"
-    "    "
-    "    <signal name='preview_port_added'>"
-    "      <arg type='i' name='port'/>"
-    "      <arg type='i' name='serve'/>"
-    "      <arg type='i' name='type'/>"
-    "    </signal>"
-    "    <signal name='preview_port_removed'>"
-    "      <arg type='i' name='port'/>"
-    "      <arg type='i' name='serve'/>"
-    "      <arg type='i' name='type'/>"
-    "    </signal>"
-    "    <signal name='new_mode_online'>"
-    "      <arg type='i' name='mode'/>"
-    "    </signal>"
-    "    <signal name='show_face_marker'>"
-    "      <arg type='a(iiii)' name='mode'/>"
-    "    </signal>"
-    "    <signal name='show_track_marker'>"
-    "      <arg type='a(iiii)' name='mode'/>"
-    "    </signal>"
-    "    <signal name='select_face'>"
-    "      <arg type='i' name='x'/>"
-    "      <arg type='i' name='y'/>"
-    "    </signal>"
-    "  </interface>"
-    "</node>";
-/*
-  "    <property type='s' name='Name' access='readwrite'/>"
-  "    <property type='i' name='Num' access='read'/>"
-*/
-
 gint gst_switch_controller_dbus_timeout = 5000;
 
 /**
@@ -856,6 +771,6 @@ gst_switch_controller_class_init (GstSwitchControllerClass * klass)
         (gpointer) entry->func);
   }
 
-  introspection_data = g_dbus_node_info_new_for_xml (introspection_xml, NULL);
+  introspection_data = g_dbus_node_info_new_for_xml (gstswitchcontroller_introspection_xml, NULL);
   g_assert (introspection_data != NULL);
 }
