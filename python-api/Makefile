@@ -37,7 +37,6 @@ integration: imgurbash.sh
 	@mkdir -p reports/coverage/integration
 	py.test --cov gstswitch tests/integrationtests/ --pep8 -s -v 
 	-@mv htmlcov/*.* reports/coverage/integration
-	-rm imgurbash.sh*
 
 performance:
 	py.test tests/performancetests/*.py -v -s
