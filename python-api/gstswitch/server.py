@@ -153,7 +153,7 @@ class Server(object):
                 self._controller_address = controller_address
             except ValueError:
                 raise ValueError("Control Address must contain at least "
-                                 " one Colon. It is '{0}'" \
+                                 " one Colon. It is '{0}'"
                                  .format(controller_address))
 
     @property

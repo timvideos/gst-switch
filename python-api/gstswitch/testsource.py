@@ -73,7 +73,6 @@ video/x-raw,
   framerate=(fraction)25/1
 """
 
-
     def __init__(
             self,
             port,
