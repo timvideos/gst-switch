@@ -54,4 +54,4 @@ clean:
 	rm -rf .cache
 	rm -rf reports
 
-test: lint unittests integration clean
+test: pep8 lint unittests integration clean
