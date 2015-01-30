@@ -72,3 +72,4 @@ test-driver
 *.avi
 *.mkv
 *.log
+.cache
