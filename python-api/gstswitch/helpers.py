@@ -10,8 +10,17 @@ from gstswitch import testsource
 from .exception import RangeError, InvalidIndexError
 
 
-__all__ = ["TestSources", "PreviewSinks"]
+__all__ = ["TestSources", "PreviewSinks", "assert_no_segfault"]
 
+def assert_no_segfault(serv):
+    if serv.proc:
+        poll = serv.proc.poll()
+        if poll == -11:
+            print("SEGMENTATION FAULT OCCURRED")
+        print("ERROR CODE - {0}".format(poll))
+        serv.terminate(1)
+        log = open('server.log')
+        print(log.read())
 
 class TestSources(object):
 
