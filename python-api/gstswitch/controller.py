@@ -419,37 +419,37 @@ class Controller(object):
         return preview_ports
 
     def on_preview_port_added(self, cb):
-        if not hasattr(cb, '__call__'):
+        if not callable(cb):
             raise ValueError('Provided argument cb is not callable')
 
         self.cbs_preview_port_added.append(cb)
 
     def on_preview_port_removed(self, cb):
-        if not hasattr(cb, '__call__'):
+        if not callable(cb):
             raise ValueError('Provided argument cb is not callable')
 
         self.cbs_preview_port_removed.append(cb)
 
     def on_new_mode_online(self, cb):
-        if not hasattr(cb, '__call__'):
+        if not callable(cb):
             raise ValueError('Provided argument cb is not callable')
 
         self.cbs_new_mode_online.append(cb)
 
     def on_show_face_marker(self, cb):
-        if not hasattr(cb, '__call__'):
+        if not callable(cb):
             raise ValueError('Provided argument cb is not callable')
 
         self.cbs_show_face_marker.append(cb)
 
     def on_show_track_marker(self, cb):
-        if not hasattr(cb, '__call__'):
+        if not callable(cb):
             raise ValueError('Provided argument cb is not callable')
 
         self.cbs_show_track_marker.append(cb)
 
     def on_select_face(self, cb):
-        if not hasattr(cb, '__call__'):
+        if not callable(cb):
             raise ValueError('Provided argument cb is not callable')
 
         self.cbs_select_face.append(cb)
