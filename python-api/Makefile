@@ -17,6 +17,7 @@ unittests:
 	@rm -rf reports
 	@mkdir -p reports/coverage/unittests
 	py.test --cov gstswitch tests/unittests/ --pep8 -v -s
+	#-@mv htmlcov/*.* reports/coverage/unittests
 
 pep8:
 	pep8 gstswitch
@@ -36,7 +37,7 @@ integration: imgurbash.sh
 	@rm -rf reports
 	@mkdir -p reports/coverage/integration
 	py.test --cov gstswitch tests/integrationtests/ --pep8 -s -v 
-	-@mv htmlcov/*.* reports/coverage/integration
+	#-@mv htmlcov/*.* reports/coverage/integration
 
 performance:
 	py.test tests/performancetests/*.py -v -s
