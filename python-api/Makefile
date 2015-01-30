@@ -17,6 +17,7 @@ unittests:
 	@rm -rf reports
 	@mkdir -p reports/coverage/unittests
 	py.test --cov gstswitch tests/unittests/ --pep8 -v -s
+	#-@mv htmlcov/*.* reports/coverage/unittests
 
 pep8:
 	pep8 gstswitch
@@ -26,16 +27,17 @@ pep8:
 	pep8 tests/integrationtests
 	@echo "integration tests are pep8 clean!!"
 
-integration:
-	@rm -f ../tools/*.c.gcov
-	@rm -f ../tools/*.gcda
+imgurbash.sh:
 	-wget http://imgur.com/tools/imgurbash.sh -O imgurbash.sh
 	-chmod +x imgurbash.sh
+
+integration: imgurbash.sh
+	@rm -f ../tools/*.c.gcov
+	@rm -f ../tools/*.gcda
 	@rm -rf reports
 	@mkdir -p reports/coverage/integration
 	py.test --cov gstswitch tests/integrationtests/ --pep8 -s -v 
-	-@mv htmlcov/*.* reports/coverage/integration
-	-rm imgurbash.sh*
+	#-@mv htmlcov/*.* reports/coverage/integration
 
 performance:
 	py.test tests/performancetests/*.py -v -s
@@ -52,4 +54,4 @@ clean:
 	rm -rf .cache
 	rm -rf reports
 
-test: lint unittests integration clean
+test: pep8 lint unittests integration clean

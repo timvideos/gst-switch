@@ -56,7 +56,6 @@ class BasePipeline(Gst.Pipeline):
 
 
 class VideoPipeline(BasePipeline):
-
     """A Video Pipeline which can be used by a Video Test Source
     :param port: The port of where the TCP stream will be sent
     Should be same as video port of gst-switch-src
@@ -67,10 +66,17 @@ class VideoPipeline(BasePipeline):
     :param clockoverlay: True to enable current clock time over video
     """
 
+    VIDEO_CAPS = """
+video/x-raw,
+  format=(string)I420, pixel-aspect-ratio=(fraction)1/1,
+  width=(int){0}, height=(int){1},
+  framerate=(fraction)25/1
+"""
+
     def __init__(
             self,
             port,
-            host='localhost',
+            host='127.0.0.1',
             width=300,
             height=200,
             pattern=None,
@@ -130,8 +136,7 @@ class VideoPipeline(BasePipeline):
         element = self.make("capsfilter", "vfilter")
         width = str(width)
         height = str(height)
-        capsstring = "video/x-raw, format=(string)I420, width={0},\
-         height={1}".format(width, height)
+        capsstring = self.VIDEO_CAPS.format(width, height)
         print capsstring
         caps = Gst.Caps.from_string(capsstring)
         element.set_property('caps', caps)
@@ -172,13 +177,18 @@ class VideoPipeline(BasePipeline):
 
 
 class AudioPipeline(BasePipeline):
-
     """docstring for AudioPipeline"""
+
+    AUDIO_CAPS = """
+audio/x-raw,
+  rate=48000, channels=2,
+  format=S16LE, layout=interleaved
+"""
 
     def __init__(
             self,
             port,
-            host='localhost',
+            host='127.0.0.1',
             freq=110,
             wave=None):
         super(AudioPipeline, self).__init__()
@@ -187,12 +197,26 @@ class AudioPipeline(BasePipeline):
 
         src = self.make_audiotestsrc(freq, wave)
         self.add(src)
+        afilter = self.make_capsfilter()
+        self.add(afilter)
+        src.link(afilter)
         gdppay = self.make_gdppay()
         self.add(gdppay)
-        src.link(gdppay)
+        afilter.link(gdppay)
         sink = self.make_tcpclientsink(port)
         self.add(sink)
         gdppay.link(sink)
+
+    def make_capsfilter(self):
+        """Return a caps filter
+        :returns: A caps filter element
+        """
+        element = self.make("capsfilter", "afilter")
+        capsstring = self.AUDIO_CAPS
+        print capsstring
+        caps = Gst.Caps.from_string(capsstring)
+        element.set_property('caps', caps)
+        return element
 
     def make_audiotestsrc(self, freq, wave=None):
         """Return a Audio Source Element
@@ -230,7 +254,7 @@ class PreviewPipeline(BasePipeline):
 
     def __init__(self, port):
         super(PreviewPipeline, self).__init__()
-        self.host = 'localhost'
+        self.host = '127.0.0.1'
         self.preview_port = port
         src = self.make_tcpclientsrc()
         self.add(src)
@@ -305,7 +329,7 @@ class VideoSrc(object):
     :param timeoverlay: True to enable a running time over video
     :param clockoverlay: True to enable current clock time over video
     """
-    HOST = 'localhost'
+    HOST = '127.0.0.1'
 
     def __init__(
             self,
@@ -497,7 +521,7 @@ class AudioSrc(object):
 
     """docstring for AudioSrc"""
 
-    HOST = 'localhost'
+    HOST = '127.0.0.1'
 
     def __init__(
             self,

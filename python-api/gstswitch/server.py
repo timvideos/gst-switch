@@ -31,6 +31,7 @@ class Server(object):
     :param controller_address: The DBus-Address for remote control -
         default = tcp:host=0.0.0.0,port=5000
     :param record_file: The record file format
+    :param video_format: The video format to use on the server.
     :returns: nothing
     """
     SLEEP_TIME = 0.5
@@ -41,7 +42,8 @@ class Server(object):
             video_port=3000,
             audio_port=4000,
             controller_address='tcp:host=0.0.0.0,port=5000',
-            record_file=False):
+            record_file=False,
+            video_format=None):
 
         super(Server, self).__init__()
 
@@ -57,6 +59,7 @@ class Server(object):
         self.audio_port = audio_port
         self.controller_address = controller_address
         self.record_file = record_file
+        self.video_format = video_format
 
         self.proc = None
         self.pid = -1
@@ -150,7 +153,7 @@ class Server(object):
                 self._controller_address = controller_address
             except ValueError:
                 raise ValueError("Control Address must contain at least "
-                                 " one Colon. It is '{0}'" \
+                                 " one Colon. It is '{0}'"
                                  .format(controller_address))
 
     @property
@@ -225,6 +228,9 @@ class Server(object):
         else:
             if self.record_file is not False:
                 cmd.append("--record={0}".format(self.record_file))
+
+        if self.video_format is not None:
+            cmd.append("--video-format={0}".format(self.video_format))
 
         proc = self._start_process(cmd)
         return proc
