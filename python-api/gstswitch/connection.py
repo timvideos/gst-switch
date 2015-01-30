@@ -155,6 +155,7 @@ class Connection(object):
             raise ConnectionError(new_message)
 
     def signal_subscribe(self, signal_handler):
+        """Subscribe to Signals on the bus"""
         if not hasattr(signal_handler, '__call__'):
             raise ValueError('Provided argument signal_handler is not callable')
 

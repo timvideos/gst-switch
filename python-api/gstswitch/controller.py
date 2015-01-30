@@ -49,12 +49,12 @@ class Controller(object):
         self.object_path = object_path
         self.default_interface = default_interface
 
-        self.cbs_preview_port_added = []
-        self.cbs_preview_port_removed = []
-        self.cbs_new_mode_online = []
-        self.cbs_show_face_marker = []
-        self.cbs_show_track_marker = []
-        self.cbs_select_face = []
+        self.callbacks_preview_port_added = []
+        self.callbacks_preview_port_removed = []
+        self.callbacks_new_mode_online = []
+        self.callbacks_show_face_marker = []
+        self.callbacks_show_track_marker = []
+        self.callbacks_select_face = []
 
     @property
     def address(self):
@@ -165,15 +165,22 @@ class Controller(object):
         self.connection.connect_dbus()
         self.connection.signal_subscribe(self._signal_handler)
 
-    def _signal_handler(self, connection, sender_name, object_path, interface_name, signal_name, parameters, user_data):
+    def _signal_handler(self, connection, sender_name, object_path,
+                        interface_name, signal_name, parameters, user_data):
+        """Private Callback passed into Gio's signal_subscribe and called
+        for every signal arriving on the bus.
+
+        For params see Gio-Docs: <https://lazka.github.io/pgi-docs/#Gio-2.0/
+        classes/DBusConnection.html#Gio.DBusConnection.signal_subscribe>
+        """
         try:
-            cblist = getattr(self, 'cbs_'+signal_name)
-            if not isinstance(cblist, list):
+            callbacks = getattr(self, 'callbacks_'+signal_name)
+            if not isinstance(callbacks, list):
                 raise AttributeError()
 
             unpack = parameters.unpack()
-            for cb in cblist:
-                cb(*unpack)
+            for callback in callbacks:
+                callback(*unpack)
 
         except AttributeError:
             pass
@@ -418,38 +425,56 @@ class Controller(object):
             preview_ports.append(int(tupl[0]))
         return preview_ports
 
-    def on_preview_port_added(self, cb):
-        if not callable(cb):
-            raise ValueError('Provided argument cb is not callable')
+    def on_preview_port_added(self, callback):
+        """Register a Callback for the preview_port_added Signal
+        """
 
-        self.cbs_preview_port_added.append(cb)
+        if not callable(callback):
+            raise ValueError('Provided argument callback is not callable')
 
-    def on_preview_port_removed(self, cb):
-        if not callable(cb):
-            raise ValueError('Provided argument cb is not callable')
+        self.callbacks_preview_port_added.append(callback)
 
-        self.cbs_preview_port_removed.append(cb)
+    def on_preview_port_removed(self, callback):
+        """Register a Callback for the preview_port_removed Signal
+        """
 
-    def on_new_mode_online(self, cb):
-        if not callable(cb):
-            raise ValueError('Provided argument cb is not callable')
+        if not callable(callback):
+            raise ValueError('Provided argument callback is not callable')
 
-        self.cbs_new_mode_online.append(cb)
+        self.callbacks_preview_port_removed.append(callback)
 
-    def on_show_face_marker(self, cb):
-        if not callable(cb):
-            raise ValueError('Provided argument cb is not callable')
+    def on_new_mode_online(self, callback):
+        """Register a Callback for the new_mode_online Signal
+        """
 
-        self.cbs_show_face_marker.append(cb)
+        if not callable(callback):
+            raise ValueError('Provided argument callback is not callable')
 
-    def on_show_track_marker(self, cb):
-        if not callable(cb):
-            raise ValueError('Provided argument cb is not callable')
+        self.callbacks_new_mode_online.append(callback)
 
-        self.cbs_show_track_marker.append(cb)
+    def on_show_face_marker(self, callback):
+        """Register a Callback for the show_face_marker Signal
+        """
 
-    def on_select_face(self, cb):
-        if not callable(cb):
-            raise ValueError('Provided argument cb is not callable')
+        if not callable(callback):
+            raise ValueError('Provided argument callback is not callable')
 
-        self.cbs_select_face.append(cb)
+        self.callbacks_show_face_marker.append(callback)
+
+    def on_show_track_marker(self, callback):
+        """Register a Callback for the show_track_marker Signal
+        """
+
+        if not callable(callback):
+            raise ValueError('Provided argument callback is not callable')
+
+        self.callbacks_show_track_marker.append(callback)
+
+    def on_select_face(self, callback):
+        """Register a Callback for the select_face Signal
+        """
+
+        if not callable(callback):
+            raise ValueError('Provided argument callback is not callable')
+
+        self.callbacks_select_face.append(callback)

@@ -13,6 +13,11 @@ from .exception import RangeError, InvalidIndexError
 __all__ = ["TestSources", "PreviewSinks", "assert_no_segfault"]
 
 def assert_no_segfault(serv):
+
+    """Test is a closed Server-Processed died because of a SEGMENTATION
+    FAULT and print its Log if it did
+    """
+
     if serv.proc:
         poll = serv.proc.poll()
         if poll == -11:
