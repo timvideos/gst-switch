@@ -46,7 +46,7 @@ typedef struct _GstSwitchCaptureWorker GstSwitchCaptureWorker;
  */
 typedef struct _GstSwitchCapture
 {
-  GstSwitchClient base; /*!< The base object */
+  GstSwitchClient base;         /*!< The base object */
 
   GMainLoop *mainloop;
 
@@ -61,7 +61,7 @@ typedef struct _GstSwitchCapture
  */
 typedef struct _GstSwitchCaptureClass
 {
-  GstSwitchClientClass base_class; /*!< The base class. */
+  GstSwitchClientClass base_class;      /*!< The base class. */
 } GstSwitchCaptureClass;
 
 GType gst_switch_capture_get_type (void);

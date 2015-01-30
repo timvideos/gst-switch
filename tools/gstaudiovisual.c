@@ -238,13 +238,12 @@ gst_audio_visual_get_pipeline_string (GstAudioVisual * visual)
 
   desc = g_string_new ("");
 
-  g_string_append_printf (
-      desc, "tcpclientsrc name=source port=%d ", visual->port);
+  g_string_append_printf (desc, "tcpclientsrc name=source port=%d ",
+      visual->port);
   g_string_append_printf (desc, "! gdpdepay ! tee name=a\n");
 
   if (visual->active) {
-    g_string_append_printf (
-        desc,
+    g_string_append_printf (desc,
         "a. ! queue ! audioconvert ! level name=level message=true !"
         " autoaudiosink name=play sync=false\n");
   }
@@ -257,7 +256,7 @@ gst_audio_visual_get_pipeline_string (GstAudioVisual * visual)
   g_string_append_printf (desc, "! videoconvert ");
   g_string_append_printf (desc, "! xvimagesink name=visual sync=false ");
 
-  INFO("Audio preview: %s", desc->str);
+  INFO ("Audio preview: %s", desc->str);
 
   return desc;
 }
@@ -350,7 +349,7 @@ gst_audio_visual_message (GstAudioVisual * visual, GstMessage * message)
         gdouble v = 0.0;
         channels = va->len;
         for (i = 0; i < channels; ++i) {
-          value = g_array_index (va, GValue*, i);
+          value = g_array_index (va, GValue *, i);
           rms_dB = g_value_get_double (value);
 
           /* converting from dB to normal gives us a value between 0.0 and 1.0

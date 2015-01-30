@@ -229,7 +229,8 @@ static GOptionEntry entries[] = {
   {"audio-input-port", 'a', 0, G_OPTION_ARG_INT, &opts.audio_input_port,
       "Specify the audio input listen port.", "NUM"},
   {"controller-address", 'c', 0, G_OPTION_ARG_STRING, &opts.controller_address,
-      "Specify DBus-Address for remote control, defaults to " GST_SWITCH_SERVER_DEFAULT_CONTROLLER_ADDRESS ".", "ADDRESS"},
+      "Specify DBus-Address for remote control, defaults to "
+        GST_SWITCH_SERVER_DEFAULT_CONTROLLER_ADDRESS ".", "ADDRESS"},
   {NULL}
 };
 

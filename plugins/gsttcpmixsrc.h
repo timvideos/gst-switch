@@ -25,7 +25,6 @@
 #include <gio/gio.h>
 
 G_BEGIN_DECLS
-
 #define GST_TYPE_TCP_MIX_SRC \
   (gst_tcp_mix_src_get_type())
 #define GST_TCP_MIX_SRC(obj) \
@@ -36,26 +35,27 @@ G_BEGIN_DECLS
   (G_TYPE_CHECK_INSTANCE_TYPE((obj),GST_TYPE_TCP_MIX_SRC))
 #define GST_IS_TCP_MIX_SRC_CLASS(klass) \
   (G_TYPE_CHECK_CLASS_TYPE((klass),GST_TYPE_TCP_MIX_SRC))
-
 typedef struct _GstTCPMixSrc GstTCPMixSrc;
 typedef struct _GstTCPMixSrcClass GstTCPMixSrcClass;
 
-typedef enum {
-  GST_TCP_MIX_SRC_OPEN       = (GST_ELEMENT_FLAG_LAST << 0),
-  GST_TCP_MIX_SRC_FLAG_LAST  = (GST_ELEMENT_FLAG_LAST << 2)
+typedef enum
+{
+  GST_TCP_MIX_SRC_OPEN = (GST_ELEMENT_FLAG_LAST << 0),
+  GST_TCP_MIX_SRC_FLAG_LAST = (GST_ELEMENT_FLAG_LAST << 2)
 } GstTCPMixSrcFlags;
 
 /**
  * @deprecated
  */
-struct _GstTCPMixSrc {
+struct _GstTCPMixSrc
+{
   GstElement base;
 
   gchar *host;
   int server_port;
-  int bound_port;       /* currently bound-to port, or 0 */ /* ATOMIC */
-  int mode;		/* stream working mode for disconnection */
-  int fill;		/* fill type for disconnected stream */
+  int bound_port;               /* currently bound-to port, or 0 *//* ATOMIC */
+  int mode;                     /* stream working mode for disconnection */
+  int fill;                     /* fill type for disconnected stream */
 
   GCancellable *cancellable;
   GSocket *server_socket;
@@ -63,16 +63,17 @@ struct _GstTCPMixSrc {
   GMutex acceptor_mutex;
 
   GThread *acceptor;
-  gchar * autosink;
+  gchar *autosink;
 };
 
 /**
  * @deprecated
  */
-struct _GstTCPMixSrcClass {
+struct _GstTCPMixSrcClass
+{
   GstElementClass base_class;
 
-  void (*new_client) (GstElement *element, GstPad *pad);
+  void (*new_client) (GstElement * element, GstPad * pad);
 };
 
 /**
@@ -81,5 +82,4 @@ struct _GstTCPMixSrcClass {
 GType gst_tcp_mix_src_get_type (void);
 
 G_END_DECLS
-
 #endif //__GST_TCP_MIX_SRC_H__

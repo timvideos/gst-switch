@@ -24,7 +24,6 @@
 #include <gst/gstbin.h>
 
 G_BEGIN_DECLS
-
 #define GST_TYPE_SWITCH \
   (gst_switch_get_type ())
 #define GST_SWITCH(obj) \
@@ -35,18 +34,19 @@ G_BEGIN_DECLS
   (G_TYPE_CHECK_INSTANCE_TYPE((obj),GST_TYPE_SWITCH))
 #define GST_IS_SWITCH_CLASS(klass) \
   (G_TYPE_CHECK_CLASS_TYPE((klass),GST_TYPE_SWITCH))
-
 typedef struct _GstSwitch GstSwitch;
 typedef struct _GstSwitchClass GstSwitchClass;
 
-typedef enum {
+typedef enum
+{
   GST_SWITCH_FLAG_LAST = (GST_BIN_FLAG_LAST << 2)
 } GstSwitchFlags;
 
 /**
  * @deprecated
  */
-struct _GstSwitch {
+struct _GstSwitch
+{
   GstBin base;
   GMutex lock;
   gchar *cases_string;
@@ -55,12 +55,12 @@ struct _GstSwitch {
 /**
  * @deprecated
  */
-struct _GstSwitchClass {
+struct _GstSwitchClass
+{
   GstBinClass base_class;
 };
 
 GType gst_switch_get_type (void);
 
 G_END_DECLS
-
 #endif //__GST_SWITCH_H__

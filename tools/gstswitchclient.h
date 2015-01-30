@@ -57,16 +57,17 @@ typedef void (*GstSwitchClientNewModeOnlineFunc) (GstSwitchClient * client,
 typedef void (*GstSwitchClientSelectFaceFunc) (GstSwitchClient * client,
     gint x, gint y);
 typedef void (*GstSwitchClientShowFaceMarkerFunc) (GstSwitchClient * client,
-    GVariant *faces);
+    GVariant * faces);
 
 /**
  * @enum GstSwitchClientRole
  * @brief The role of a client.
  */
-typedef enum {
-  CLIENT_ROLE_NONE, /*!< the client is trivial */
-  CLIENT_ROLE_UI, /*!< the client is acting as a UI */
-  CLIENT_ROLE_CAPTURE, /*!< the client is acting as a capture */
+typedef enum
+{
+  CLIENT_ROLE_NONE,             /*!< the client is trivial */
+  CLIENT_ROLE_UI,               /*!< the client is acting as a UI */
+  CLIENT_ROLE_CAPTURE,          /*!< the client is acting as a capture */
 } GstSwitchClientRole;
 
 /**
@@ -102,17 +103,19 @@ struct _GstSwitchClientClass
   void (*set_audio_port) (GstSwitchClient * client, gint port);
   void (*set_compose_port) (GstSwitchClient * client, gint port);
   void (*set_encode_port) (GstSwitchClient * client, gint port);
-  void (*add_preview_port) (GstSwitchClient * client, gint port, gint serve, gint type);
+  void (*add_preview_port) (GstSwitchClient * client, gint port, gint serve,
+      gint type);
   void (*new_mode_online) (GstSwitchClient * client, gint mode);
   void (*select_face) (GstSwitchClient * client, gint x, gint y);
-  void (*show_face_marker) (GstSwitchClient * client, GVariant *faces);
-  void (*show_track_marker) (GstSwitchClient * client, GVariant *faces);
+  void (*show_face_marker) (GstSwitchClient * client, GVariant * faces);
+  void (*show_track_marker) (GstSwitchClient * client, GVariant * faces);
 };
 
 GType gst_switch_client_get_type (void);
 
 gboolean gst_switch_client_is_connected (GstSwitchClient * client);
-gboolean gst_switch_client_connect (GstSwitchClient * client, GstSwitchClientRole role, const gchar* address);
+gboolean gst_switch_client_connect (GstSwitchClient * client,
+    GstSwitchClientRole role, const gchar * address);
 gint gst_switch_client_get_compose_port (GstSwitchClient * client);
 gint gst_switch_client_get_encode_port (GstSwitchClient * client);
 gint gst_switch_client_get_audio_port (GstSwitchClient * client);
@@ -124,9 +127,9 @@ gboolean gst_switch_client_set_composite_mode (GstSwitchClient * client,
 gboolean gst_switch_client_click_video (GstSwitchClient * client,
     gint x, gint y, gint fw, gint fh);
 void gst_switch_client_mark_face_remotely (GstSwitchClient * client,
-    GVariant *faces);
+    GVariant * faces);
 void gst_switch_client_mark_tracking_remotely (GstSwitchClient * client,
-    GVariant *tracking);
+    GVariant * tracking);
 gboolean gst_switch_client_new_record (GstSwitchClient * client);
 guint gst_switch_client_adjust_pip (GstSwitchClient * client, gint dx,
     gint dy, gint dw, gint dh);

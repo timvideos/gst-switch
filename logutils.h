@@ -38,13 +38,13 @@
 #define INFO(S, ...) ((void) FALSE)
 #define WARN(S, ...) ((void) FALSE)
 #define ERROR(S, ...) ((void) FALSE)
-#endif//DEBUG
+#endif //DEBUG
 #if ENABLE_ASSESSMENT
 extern guint assess_number;
 #define ASSESS(name, ...) (g_string_append_printf (desc, "! assess n=%d name="#name " ", assess_number++, ##__VA_ARGS__))
 #else
 #define ASSESS(name, ...) ((void) FALSE);
-#endif//ENABLE_ASSESSMENT
-#define LOW_RES_W 300 /* 100 */ /* 160 */ /* 320 */
-#define LOW_RES_H 200 /* 56 */ /* 120 */ /* 240 */
-#endif//__LOG_UTILS_H__
+#endif //ENABLE_ASSESSMENT
+#define LOW_RES_W 300 /* 100 */ /* 160 */       /* 320 */
+#define LOW_RES_H 200 /* 56 */ /* 120 */        /* 240 */
+#endif //__LOG_UTILS_H__

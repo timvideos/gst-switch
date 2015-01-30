@@ -46,10 +46,10 @@ typedef struct _GstVideoDispClass GstVideoDispClass;
  */
 struct _GstVideoDisp
 {
-  GstWorker base; /*!< The parent object. */
-  gint port; /*!< The port number. */
-  gint type; /*!< The video type. */
-  gulong handle; /*!< The X Window handle for displaying the video. */
+  GstWorker base;               /*!< The parent object. */
+  gint port;                    /*!< The port number. */
+  gint type;                    /*!< The video type. */
+  gulong handle;                /*!< The X Window handle for displaying the video. */
 };
 
 /**
@@ -59,7 +59,7 @@ struct _GstVideoDisp
  */
 struct _GstVideoDispClass
 {
-  GstWorkerClass base_class; /*!< The base class. */
+  GstWorkerClass base_class;    /*!< The base class. */
 };
 
 GType gst_video_disp_get_type (void);

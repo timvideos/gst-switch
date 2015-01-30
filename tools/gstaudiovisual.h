@@ -46,20 +46,20 @@ typedef struct _GstAudioVisualClass GstAudioVisualClass;
  */
 struct _GstAudioVisual
 {
-  GstWorker base; /*!< the parent object */
+  GstWorker base;               /*!< the parent object */
 
-  gint port; /*!< the port number */
-  gulong handle; /*!< the X window handle for displaying the audio visualization */
-  gboolean active; /*!< TRUE if the audio is active. A active audio will be sinked to
-		    *   the real hardware speaker, e.g. ALSA
-		    **/
+  gint port;                    /*!< the port number */
+  gulong handle;                /*!< the X window handle for displaying the audio visualization */
+  gboolean active;              /*!< TRUE if the audio is active. A active audio will be sinked to
+                                 *   the real hardware speaker, e.g. ALSA
+                                 **/
 
-  gboolean renewing; /*!< Used by GstSwitchUI. */
+  gboolean renewing;            /*!< Used by GstSwitchUI. */
 
-  GMutex endtime_lock; /*!< the lock for %endtime */
-  GstClockTime endtime; /*!< the endtime of the last audio sample */
-  GMutex value_lock; /*!< the lock for %value */
-  gdouble value; /*!< the value of the last audio sample */
+  GMutex endtime_lock;          /*!< the lock for %endtime */
+  GstClockTime endtime;         /*!< the endtime of the last audio sample */
+  GMutex value_lock;            /*!< the lock for %value */
+  gdouble value;                /*!< the value of the last audio sample */
 };
 
 /**
@@ -69,7 +69,7 @@ struct _GstAudioVisual
  */
 struct _GstAudioVisualClass
 {
-  GstWorkerClass base_class; /*!< the parent class */
+  GstWorkerClass base_class;    /*!< the parent class */
 };
 
 GType gst_audio_visual_get_type (void);
