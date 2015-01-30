@@ -7,19 +7,18 @@ from __future__ import absolute_import, print_function, unicode_literals
 import sys
 import os
 import pytest
-sys.path.insert(0, os.path.abspath(os.path.join(__file__, "../../../")))
-
-from gstswitch.server import Server
-from gstswitch.helpers import TestSources, PreviewSinks
-from gstswitch.controller import Controller
 import time
 import datetime
+import subprocess
 
 from gi.repository import GLib
 from mock import Mock
 from integrationtests.compare import CompareVideo
 
-import subprocess
+sys.path.insert(0, os.path.abspath(os.path.join(__file__, "../../../")))
+from gstswitch.server import Server
+from gstswitch.helpers import TestSources, PreviewSinks
+from gstswitch.controller import Controller
 
 # PATH = os.getenv("HOME") + '/gst/stage/bin/'
 PATH = '../tools/'
