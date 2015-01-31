@@ -1,4 +1,4 @@
-/* GstSwitch							      -*- c -*-
+/* gst-switch							      -*- c -*-
  * Copyright (C) 2012 Duzy Chan <code@duzy.info>
  *
  * This library is free software; you can redistribute it and/or
