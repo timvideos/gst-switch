@@ -49,7 +49,7 @@ style:
 	git diff-files --quiet || (echo "Can only run make style on clean repo"; git status; git diff; git diff-files; exit 1)
 	@echo "--------------------------------------------------------"
 	@echo "--------------------------------------------------------"
-	for i in $$(find -name \*.c -o -name \*.h | grep -v gstswitchcontrollerintrospection.c); do ./scripts/indent $$i; done
+	for i in $$(find -name \*.c -o -name \*.h); do ./scripts/indent $$i; done
 	git diff
 	@echo "--------------------------------------------------------"
 	@echo "--------------------------------------------------------"

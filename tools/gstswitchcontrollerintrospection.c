@@ -31,6 +31,7 @@
 
 #include "gstswitchcontroller.h"
 
+/* *INDENT-OFF* */
 const gchar gstswitchcontroller_introspection_xml[] =
     "<node>"
     "  <interface name='" SWITCH_CONTROLLER_OBJECT_NAME "'>"
@@ -111,3 +112,4 @@ const gchar gstswitchcontroller_introspection_xml[] =
     "    </signal>"
     "  </interface>"
     "</node>";
+/* *INDENT-ON* */
