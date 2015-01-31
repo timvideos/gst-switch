@@ -17,7 +17,7 @@ from integrationtests.compare import CompareVideo
 
 sys.path.insert(0, os.path.abspath(os.path.join(__file__, "../../../")))
 from gstswitch.server import Server
-from gstswitch.helpers import TestSources, PreviewSinks, assert_no_segfault
+from gstswitch.helpers import TestSources, PreviewSinks
 from gstswitch.controller import Controller
 
 # PATH = os.getenv("HOME") + '/gst/stage/bin/'
@@ -47,7 +47,7 @@ class TestEstablishConnection(object):
                 self.establish_connection()
             serv.terminate(1)
         finally:
-            assert_no_segfault(serv)
+            serv.terminate_and_output_status(cov=True)
 
 
 class TestGetComposePort(object):
@@ -83,7 +83,7 @@ class TestGetComposePort(object):
                 sources.terminate_video()
                 serv.terminate(1)
             finally:
-                assert_no_segfault(serv)
+                serv.terminate_and_output_status(cov=True)
 
         set_expected = [tuple(i) for i in expected_result]
         set_res = [tuple(i) for i in res]
@@ -123,7 +123,7 @@ class TestGetEncodePort(object):
                 sources.terminate_video()
                 serv.terminate(1)
             finally:
-                assert_no_segfault(serv)
+                serv.terminate_and_output_status(cov=True)
 
         set_expected = [tuple(i) for i in expected_result]
         set_res = [tuple(i) for i in res]
@@ -164,7 +164,7 @@ class TestGetAudioPort(object):
                 serv.terminate(1)
 
             finally:
-                assert_no_segfault(serv)
+                serv.terminate_and_output_status(cov=True)
 
         set_expected = [tuple(i) for i in expected_result]
         set_res = [tuple(i) for i in res]
@@ -209,7 +209,7 @@ class TestGetPreviewPorts(object):
                 sources.terminate_audio()
                 serv.terminate(1)
             finally:
-                assert_no_segfault(serv)
+                serv.terminate_and_output_status(cov=True)
 
 
 class TestSignals(object):
@@ -258,7 +258,7 @@ class TestSignals(object):
 
             serv.terminate(1)
         finally:
-            assert_no_segfault(serv)
+            serv.terminate_and_output_status(cov=True)
 
     def test_on_preview_port_added(self):
         """Create a Controller object, call add a source method and
@@ -289,7 +289,7 @@ class TestSignals(object):
 
             serv.terminate(1)
         finally:
-            assert_no_segfault(serv)
+            serv.terminate_and_output_status(cov=True)
 
 
 class VideoFileSink(object):
@@ -358,7 +358,7 @@ class TestSetCompositeMode(object):
                 # assert expected_result == res
 
             finally:
-                assert_no_segfault(serv)
+                serv.terminate_and_output_status(cov=True)
 
     def verify_output(self, mode, video):
         """Verify if the output is correct by comparing key frames"""
@@ -436,7 +436,7 @@ class TestNewRecord(object):
                 serv.terminate(1)
                 assert os.path.exists(test_filename) is True
             finally:
-                assert_no_segfault(serv)
+                serv.terminate_and_output_status(cov=True)
 
 
 class TestAdjustPIP(object):
@@ -478,7 +478,7 @@ class TestAdjustPIP(object):
                     assert self.verify_output(index, out_file) is True
 
             finally:
-                assert_no_segfault(serv)
+                serv.terminate_and_output_status(cov=True)
 
     def verify_output(self, index, video):
         """Verify if the output is correct by comparing key frames"""
@@ -537,7 +537,7 @@ class TestSwitch(object):
                 serv.terminate(1)
 
             finally:
-                assert_no_segfault(serv)
+                serv.terminate_and_output_status(cov=True)
 
     def test_switch(self):
         """Test switch"""
@@ -588,7 +588,7 @@ class TestClickVideo(object):
                     assert self.verify_output(index, out_file) is True
 
             finally:
-                assert_no_segfault(serv)
+                serv.terminate_and_output_status(cov=True)
 
     def verify_output(self, index, video):
         """Verify if the output is correct by comparing key frames"""
@@ -649,7 +649,7 @@ class TestMarkFace(object):
                     assert self.verify_output(index, out_file) is True
 
             finally:
-                assert_no_segfault(serv)
+                serv.terminate_and_output_status(cov=True)
 
     def verify_output(self, index, video):
         """Verify if the output is correct by comparing key frames"""
@@ -704,7 +704,7 @@ class TestMarkTracking(object):
                     assert self.verify_output(index, out_file) is True
 
             finally:
-                assert_no_segfault(serv)
+                serv.terminate_and_output_status(cov=True)
 
     def verify_output(self, index, video):
         """Verify if the output is correct by comparing key frames"""
