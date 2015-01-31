@@ -291,6 +291,7 @@ class TestSignals(object):
         finally:
             assert_no_segfault(serv)
 
+
 class VideoFileSink(object):
 
     """Sink the video to a file
