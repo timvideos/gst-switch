@@ -315,7 +315,7 @@ gst_switch_controller_init (GstSwitchController * controller)
   g_mutex_init (&controller->clients_lock);
   controller->clients = NULL;
 
-  //flags |= G_DBUS_SERVER_FLAGS_RUN_IN_THREAD;
+  flags |= G_DBUS_SERVER_FLAGS_RUN_IN_THREAD;
   flags |= G_DBUS_SERVER_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS;
 
   controller->bus_server =
