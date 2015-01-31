@@ -166,7 +166,6 @@ class Controller(object):
         self.connection.connect_dbus()
         self.connection.signal_subscribe(self.cb_signal_handler)
 
-    # pylint: disable=star-args
     def cb_signal_handler(self, connection, sender_name, object_path,
                           interface_name, signal_name, parameters, user_data):
         """Private Callback passed into Gio's signal_subscribe and called
@@ -182,6 +181,13 @@ class Controller(object):
 
             unpack = parameters.unpack()
             for callback in callbacks:
+                # We're passing the values unpacked from the GVariant as-is
+                # to the callback. The auther of the callback is responsible
+                # to make sure that it's arguments match with the DBus Signal
+                # Specification for the particular Signal he's subscribing for
+                # Disable pylint-warning because we know what we're doing here.
+
+                # pylint: disable=star-args
                 callback(*unpack)
 
         except AttributeError:

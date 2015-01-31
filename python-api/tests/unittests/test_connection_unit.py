@@ -160,7 +160,6 @@ class TestSignalSubscribe(object):
             with pytest.raises(ValueError):
                 conn.signal_subscribe(test_cb)
 
-    # pylint: disable=unpacking-non-sequence
     def test_handler_passed_to_gio(self, monkeypatch):
         """Test if handler is correctly passed to Gio"""
 
@@ -181,6 +180,12 @@ class TestSignalSubscribe(object):
         # test that Gio's signal_subscribe method is called once
         # and passed the callback as-is
         signal_subscribe_mock.assert_called_once()
+
+        # pylint does not recognize Mock.call_args as sequence and won't
+        # allow us to unpack it. Disabling the warning because we know what
+        # we're doing here
+
+        # pylint: disable=unpacking-non-sequence
         args, _ = signal_subscribe_mock.call_args
         assert args[6] == test_cb
 
