@@ -116,7 +116,7 @@ class TestEstablishConnection(object):
         assert controller.connection is not None
 
 
-class TestSiggnalHandler(object):
+class TestSignalHandler(object):
 
     """Test the establish_connection method"""
 
