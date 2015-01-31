@@ -92,7 +92,8 @@ static GOptionEntry options[] = {
   {"protocol", 'p', 0, G_OPTION_ARG_STRING, &protocol,
       "PTZ camera control protocol", "NAME"},
   {"address", 'a', 0, G_OPTION_ARG_STRING, &srv_address,
-      "Server Control-Adress, defaults to " GST_SWITCH_CAPTURE_DEFAULT_ADDRESS, NULL},
+      "Server Control-Adress, defaults to "
+        GST_SWITCH_CAPTURE_DEFAULT_ADDRESS, NULL},
   {NULL}
 };
 

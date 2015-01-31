@@ -48,8 +48,8 @@ typedef struct _GstSwitchServer GstSwitchServer;
  */
 typedef enum
 {
-  GST_WORKER_NR_END,	/*!< The worker is end. */
-  GST_WORKER_NR_REPLAY, /*!< Try to replay the worker pipeline. */
+  GST_WORKER_NR_END,            /*!< The worker is end. */
+  GST_WORKER_NR_REPLAY,         /*!< Try to replay the worker pipeline. */
 } GstWorkerNullReturn;
 
 /**
@@ -77,7 +77,7 @@ typedef gboolean (*GstWorkerPrepareFunc) (GstWorker * worker);
  *  @param worker The GstWorker instance.
  *  @param m the message
  */
-typedef gboolean (*GstWorkerMessageFunc) (GstWorker * worker, GstMessage *m);
+typedef gboolean (*GstWorkerMessageFunc) (GstWorker * worker, GstMessage * m);
 
 /**
  *  @brief worker null state callback function
@@ -105,24 +105,24 @@ typedef void (*GstWorkerCloseFunc) (GstWorker * worker);
  */
 struct _GstWorker
 {
-  GObject base; /*!< The parent object. */
+  GObject base;                 /*!< The parent object. */
 
-  gchar *name; /*!< The name of the worker. */
+  gchar *name;                  /*!< The name of the worker. */
 
-    //GstSwitchServer *server; /*!<  */
+  //GstSwitchServer *server; /*!<  */
 
-  GMutex pipeline_lock; /*!< Mutex for %pipeline */
-  GCond shutdown_cond; /*!< Cond for shutting down pipelines cleanly */
-  GstElement *pipeline; /*!< The pipeline. */
-  GstBus *bus; /*!< The pipeline bus. */
+  GMutex pipeline_lock;         /*!< Mutex for %pipeline */
+  GCond shutdown_cond;          /*!< Cond for shutting down pipelines cleanly */
+  GstElement *pipeline;         /*!< The pipeline. */
+  GstBus *bus;                  /*!< The pipeline bus. */
 
-  GstWorkerGetPipelineString pipeline_func; /*!< Pipeline string function. */
-  gpointer pipeline_func_data; /*!< Caller defined data for %pipeline_func. */
-  GString *pipeline_string; /*!< The pipeline string of the worker. */
+  GstWorkerGetPipelineString pipeline_func;     /*!< Pipeline string function. */
+  gpointer pipeline_func_data;  /*!< Caller defined data for %pipeline_func. */
+  GString *pipeline_string;     /*!< The pipeline string of the worker. */
 
-  gboolean auto_replay; /*!< The worker should replay if it's TRUE */
-  gboolean paused_for_buffering; /*!< Mark for buffering pause. */
-  guint watch; /*!< The watch number of the pipeline bus. */
+  gboolean auto_replay;         /*!< The worker should replay if it's TRUE */
+  gboolean paused_for_buffering;        /*!< Mark for buffering pause. */
+  guint watch;                  /*!< The watch number of the pipeline bus. */
 
   /*!< TRUE if the recording pipeline needs clean shut-down
    * via an EOS event to finish up before stopping
@@ -137,7 +137,7 @@ struct _GstWorker
  */
 struct _GstWorkerClass
 {
-  GObjectClass base_class; /*!< the parent class */
+  GObjectClass base_class;      /*!< the parent class */
 
   /**
    *  @brief Signal handler when "prepare-worker" emitted.
@@ -168,14 +168,14 @@ struct _GstWorkerClass
    *  @param worker The GstWorker instance.
    *  @param elements The name of the missing elements.
    */
-  gboolean (*missing) (GstWorker * worker, gchar ** elements);
+    gboolean (*missing) (GstWorker * worker, gchar ** elements);
 
   /**
    *  @brief virtual function called on per message.
    *  @param worker The GstWorker instance.
    *  @param message The message to be handled.
    */
-  gboolean (*message) (GstWorker * worker, GstMessage * message);
+    gboolean (*message) (GstWorker * worker, GstMessage * message);
 
   /**
    *  @brief Callback function for getting the pipeline
@@ -195,7 +195,7 @@ struct _GstWorkerClass
    *  @brief Virtual function called when the worker is prepared.
    *  @param worker The GstWorker instance.
    */
-  gboolean (*prepare) (GstWorker * worker);
+    gboolean (*prepare) (GstWorker * worker);
 
   /**
    *  @brief Virtual function called when the pipeline is online.
@@ -207,13 +207,13 @@ struct _GstWorkerClass
    *  @brief Virtual function called when the worker is getting null.
    *  @param worker The GstWorker instance.
    */
-  GstWorkerNullReturn (*null) (GstWorker * worker);
+    GstWorkerNullReturn (*null) (GstWorker * worker);
 
   /**
    *  @brief Reset reset the worker's pipeline.
    *  @param worker The GstWorker instance.
    */
-  gboolean (*reset) (GstWorker * worker);
+    gboolean (*reset) (GstWorker * worker);
 
   /*
    * @brief Close the worker, deallocating and closing resources
@@ -274,7 +274,8 @@ gboolean gst_worker_stop_force (GstWorker * worker, gboolean force);
  *  @memberof GstWorker
  *  @see gst_worker_get_element
  */
-GstElement *gst_worker_get_element_unlocked (GstWorker *worker, const gchar *name);
+GstElement *gst_worker_get_element_unlocked (GstWorker * worker,
+    const gchar * name);
 
 /**
  *  @param worker The GstWorker instance.
@@ -288,6 +289,6 @@ GstElement *gst_worker_get_element_unlocked (GstWorker *worker, const gchar *nam
  *  @memberof GstWorker
  *  @see gst_worker_get_element_unlocked
  */
-GstElement *gst_worker_get_element (GstWorker *worker, const gchar * name);
+GstElement *gst_worker_get_element (GstWorker * worker, const gchar * name);
 
 #endif //__GST_WORKER_H__

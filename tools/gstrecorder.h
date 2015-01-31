@@ -47,13 +47,13 @@ typedef struct _GstRecorderClass GstRecorderClass;
  */
 struct _GstRecorder
 {
-  GstWorker base; /*!< the parent object */
+  GstWorker base;               /*!< the parent object */
 
-  gint sink_port; /*!< the encode sink port */
-  guint width; /*!< the video width */
-  guint height; /*!< the video height */
+  gint sink_port;               /*!< the encode sink port */
+  guint width;                  /*!< the video width */
+  guint height;                 /*!< the video height */
 
-  GstCompositeMode mode; /*!< the composite mode which is the same as in GstComposite */
+  GstCompositeMode mode;        /*!< the composite mode which is the same as in GstComposite */
 };
 
 /**
@@ -63,7 +63,7 @@ struct _GstRecorder
  */
 struct _GstRecorderClass
 {
-  GstWorkerClass base_class; /*!< The base class. */
+  GstWorkerClass base_class;    /*!< The base class. */
 };
 
 /**

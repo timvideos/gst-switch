@@ -328,7 +328,7 @@ child_quit (GPid pid, gint status, gpointer data)
   INFO ("quit %d", pid);
   {
     g_mutex_lock (&children_lock);
-    children = g_list_remove (children, (gconstpointer) GINT_TO_POINTER(pid));
+    children = g_list_remove (children, (gconstpointer) GINT_TO_POINTER (pid));
     g_mutex_unlock (&children_lock);
   }
 
@@ -447,7 +447,7 @@ launch (const gchar * name, ...)
 
   if (ok) {
     g_mutex_lock (&children_lock);
-    children = g_list_append (children, (gpointer) GINT_TO_POINTER(pid));
+    children = g_list_append (children, (gpointer) GINT_TO_POINTER (pid));
     g_mutex_unlock (&children_lock);
   }
 
@@ -1032,7 +1032,8 @@ testclient_run (gpointer data)
   client->mainloop = g_main_loop_new (NULL, TRUE);
 
   connect_ok =
-      gst_switch_client_connect (GST_SWITCH_CLIENT (client), CLIENT_ROLE_UI, "tcp:host=127.0.0.1,port=5000");
+      gst_switch_client_connect (GST_SWITCH_CLIENT (client), CLIENT_ROLE_UI,
+      "tcp:host=127.0.0.1,port=5000");
   g_assert (connect_ok);
 
   client->compose_port0 =
@@ -2369,7 +2370,7 @@ kill_children (void)
   GList *child = NULL;
   g_mutex_lock (&children_lock);
   for (child = children; child; child = g_list_next (child)) {
-    GPid pid = (GPid) GPOINTER_TO_INT(child->data);
+    GPid pid = (GPid) GPOINTER_TO_INT (child->data);
     //INFO ("kill %d", pid);
     kill (pid, SIGKILL);
     children = g_list_remove_link (children, child);

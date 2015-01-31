@@ -45,17 +45,17 @@ typedef struct _GstCaseClass GstCaseClass;
  */
 typedef enum
 {
-  GST_CASE_UNKNOWN,           /*!< unknown case */
-  GST_CASE_COMPOSITE_VIDEO_A, /*!< special case for composite channel A */
-  GST_CASE_COMPOSITE_VIDEO_B, /*!< special case for composite channel B */
-  GST_CASE_COMPOSITE_AUDIO,   /*!< special case for composite channel audio */
-  GST_CASE_PREVIEW,           /*!< special case for previews */
-  GST_CASE_INPUT_AUDIO,       /*!< Audio input from TCP socket */
-  GST_CASE_INPUT_VIDEO,       /*!< Video input from TCP socket */
-  GST_CASE_BRANCH_VIDEO_A,    /*!< special case for branching channel A to output */
-  GST_CASE_BRANCH_VIDEO_B,    /*!< special case for branching channel B to output */
-  GST_CASE_BRANCH_AUDIO,      /*!< special case for branching active audio to output */
-  GST_CASE_BRANCH_PREVIEW,    /*!< special case for branching preview to output */
+  GST_CASE_UNKNOWN,             /*!< unknown case */
+  GST_CASE_COMPOSITE_VIDEO_A,   /*!< special case for composite channel A */
+  GST_CASE_COMPOSITE_VIDEO_B,   /*!< special case for composite channel B */
+  GST_CASE_COMPOSITE_AUDIO,     /*!< special case for composite channel audio */
+  GST_CASE_PREVIEW,             /*!< special case for previews */
+  GST_CASE_INPUT_AUDIO,         /*!< Audio input from TCP socket */
+  GST_CASE_INPUT_VIDEO,         /*!< Video input from TCP socket */
+  GST_CASE_BRANCH_VIDEO_A,      /*!< special case for branching channel A to output */
+  GST_CASE_BRANCH_VIDEO_B,      /*!< special case for branching channel B to output */
+  GST_CASE_BRANCH_AUDIO,        /*!< special case for branching active audio to output */
+  GST_CASE_BRANCH_PREVIEW,      /*!< special case for branching preview to output */
   GST_CASE__LAST_TYPE = GST_CASE_BRANCH_PREVIEW
 } GstCaseType;
 
@@ -87,12 +87,12 @@ typedef enum
  */
 typedef struct _GstCase
 {
-  GstWorker base; /*!< The parent object. */
-  GstCaseType type; /*!< Case type @see GstCaseType */
+  GstWorker base;               /*!< The parent object. */
+  GstCaseType type;             /*!< Case type @see GstCaseType */
   GInputStream *stream;
   GstCase *input;
   GstCase *branch;
-  GstSwitchServeStreamType serve_type; /*!< Stream type. @see GstSwitchServeStreamType */
+  GstSwitchServeStreamType serve_type;  /*!< Stream type. @see GstSwitchServeStreamType */
   gboolean switching;
   gint sink_port;
   guint width;
@@ -112,7 +112,7 @@ typedef struct _GstCase
  */
 typedef struct _GstCaseClass
 {
-  GstWorkerClass base_class; /*!< The base class. */
+  GstWorkerClass base_class;    /*!< The base class. */
 } GstCaseClass;
 
 GType gst_case_get_type (void);

@@ -56,8 +56,8 @@ typedef struct _MethodTableEntry MethodTableEntry;
  */
 struct _MethodTableEntry
 {
-  const gchar *name; /*!< the remote method name */
-  MethodFunc func; /*!< the bound function */
+  const gchar *name;            /*!< the remote method name */
+  MethodFunc func;              /*!< the bound function */
 };
 
 /**
@@ -67,13 +67,13 @@ struct _MethodTableEntry
  */
 typedef struct _GstSwitchController
 {
-  GObject base; /*!< the parent object */
-  GstSwitchServer *server; /*!< the GstSwitchServer instance */
-  GDBusServer *bus_server; /*!< the dbus server instance */
-  GMutex uis_lock; /*!< the lock for %uis */
-  GMutex captures_lock; /*!< the lock for %captures */
-  GList *uis; /*!< the client list */
-  GList *captures; /*!< the capture client list */
+  GObject base;                 /*!< the parent object */
+  GstSwitchServer *server;      /*!< the GstSwitchServer instance */
+  GDBusServer *bus_server;      /*!< the dbus server instance */
+  GMutex uis_lock;              /*!< the lock for %uis */
+  GMutex captures_lock;         /*!< the lock for %captures */
+  GList *uis;                   /*!< the client list */
+  GList *captures;              /*!< the capture client list */
 } GstSwitchController;
 
 /**
@@ -83,8 +83,8 @@ typedef struct _GstSwitchController
  */
 typedef struct _GstSwitchControllerClass
 {
-  GObjectClass base_class; /*!< the parent class */
-  GHashTable *methods; /*!< the remote method table */
+  GObjectClass base_class;      /*!< the parent class */
+  GHashTable *methods;          /*!< the remote method table */
 } GstSwitchControllerClass;
 
 GType gst_switch_controller_get_type (void);
@@ -97,12 +97,12 @@ void gst_switch_controller_tell_preview_port (GstSwitchController *,
     gint port, gint serve, gint type);
 void gst_switch_controller_tell_new_mode_onlne (GstSwitchController *,
     gint mode);
-gboolean gst_switch_controller_select_face (GstSwitchController *controller,
+gboolean gst_switch_controller_select_face (GstSwitchController * controller,
     gint x, gint y);
-void gst_switch_controller_show_face_marker (GstSwitchController *controller,
-    GVariant *faces);
-void gst_switch_controller_show_track_marker (GstSwitchController *controller,
-    GVariant *faces);
+void gst_switch_controller_show_face_marker (GstSwitchController * controller,
+    GVariant * faces);
+void gst_switch_controller_show_track_marker (GstSwitchController * controller,
+    GVariant * faces);
 
 extern gint gst_switch_controller_dbus_timeout;
 

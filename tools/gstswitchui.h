@@ -93,7 +93,7 @@ struct _GstSwitchUI
  */
 struct _GstSwitchUIClass
 {
-  GstSwitchClientClass base_class; /*!< The base class. */
+  GstSwitchClientClass base_class;      /*!< The base class. */
 };
 
 GType gst_switch_ui_get_type (void);

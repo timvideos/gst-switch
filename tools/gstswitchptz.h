@@ -38,23 +38,23 @@
 
 typedef struct _GstSwitchPTZ
 {
-    GstWorker base;
+  GstWorker base;
 
-    GtkWidget *window;
-    GtkWidget *video_view;
-    GtkAdjustment *adjust_pan_speed;
-    GtkAdjustment *adjust_pan;
-    GtkAdjustment *adjust_tilt_speed;
-    GtkAdjustment *adjust_tilt;
-    GtkAdjustment *adjust_zoom_speed;
-    GtkAdjustment *adjust_zoom;
+  GtkWidget *window;
+  GtkWidget *video_view;
+  GtkAdjustment *adjust_pan_speed;
+  GtkAdjustment *adjust_pan;
+  GtkAdjustment *adjust_tilt_speed;
+  GtkAdjustment *adjust_tilt;
+  GtkAdjustment *adjust_zoom_speed;
+  GtkAdjustment *adjust_zoom;
 
-    GstCamController *controller;
+  GstCamController *controller;
 } GstSwitchPTZ;
 
 typedef struct _GstSwitchPTZClass
 {
-    GstWorkerClass base_class;
+  GstWorkerClass base_class;
 } GstSwitchPTZClass;
 
 GType gst_switch_ptz_get_type (void);

@@ -22,7 +22,6 @@
 #include <gio/gsocket.h>
 
 G_BEGIN_DECLS
-
 #define G_TYPE_SOCKET_INPUT_STREAM                          (_g_socket_input_stream_get_type ())
 #define G_SOCKET_INPUT_STREAM(inst)                         (G_TYPE_CHECK_INSTANCE_CAST ((inst),                     \
                                                              G_TYPE_SOCKET_INPUT_STREAM, GSocketInputStreamX))
@@ -34,10 +33,9 @@ G_BEGIN_DECLS
                                                              G_TYPE_SOCKET_INPUT_STREAM))
 #define G_SOCKET_INPUT_STREAM_GET_CLASS(inst)               (G_TYPE_INSTANCE_GET_CLASS ((inst),                      \
                                                              G_TYPE_SOCKET_INPUT_STREAM, GSocketInputStreamXClass))
-
-typedef struct _GSocketInputStreamXPrivate                   GSocketInputStreamXPrivate;
-typedef struct _GSocketInputStreamXClass                     GSocketInputStreamXClass;
-typedef struct _GSocketInputStreamX                          GSocketInputStreamX;
+typedef struct _GSocketInputStreamXPrivate GSocketInputStreamXPrivate;
+typedef struct _GSocketInputStreamXClass GSocketInputStreamXClass;
+typedef struct _GSocketInputStreamX GSocketInputStreamX;
 
 /**
  * @brief Upward comatible with GSocketInputStreamClass
@@ -56,10 +54,11 @@ struct _GSocketInputStreamX
   GSocketInputStreamXPrivate *priv;
 };
 
-GType                   _g_socket_input_stream_get_type                  (void) G_GNUC_CONST;
-GSocketInputStreamX *    _g_socket_input_stream_new                      (GSocket *socket);
+GType
+_g_socket_input_stream_get_type (void)
+    G_GNUC_CONST;
+     GSocketInputStreamX *_g_socket_input_stream_new (GSocket * socket);
 
 G_END_DECLS
-
 #undef __GIO_GIO_H_INSIDE__
 #endif //__G_SOCKET_INPUT_STREAM_H__

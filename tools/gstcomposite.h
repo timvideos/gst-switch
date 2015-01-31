@@ -37,15 +37,15 @@
 #define GST_IS_COMPOSITE_CLASS(class) (G_TYPE_CHECK_CLASS_TYPE ((class), GST_TYPE_COMPOSITE))
 
 //#if ENABLE_LOW_RESOLUTION
-//#define GST_SWITCH_COMPOSITE_DEFAULT_WIDTH	LOW_RES_W       /* 640 */
-//#define GST_SWITCH_COMPOSITE_DEFAULT_HEIGHT	LOW_RES_H       /* 480 */
-//#define GST_SWITCH_COMPOSITE_MIN_PIP_W		13
-//#define GST_SWITCH_COMPOSITE_MIN_PIP_H		7
+//#define GST_SWITCH_COMPOSITE_DEFAULT_WIDTH    LOW_RES_W       /* 640 */
+//#define GST_SWITCH_COMPOSITE_DEFAULT_HEIGHT   LOW_RES_H       /* 480 */
+//#define GST_SWITCH_COMPOSITE_MIN_PIP_W                13
+//#define GST_SWITCH_COMPOSITE_MIN_PIP_H                7
 //#else
-//#define GST_SWITCH_COMPOSITE_DEFAULT_WIDTH	1280
-//#define GST_SWITCH_COMPOSITE_DEFAULT_HEIGHT	720
-//#define GST_SWITCH_COMPOSITE_MIN_PIP_W		320
-//#define GST_SWITCH_COMPOSITE_MIN_PIP_H		240
+//#define GST_SWITCH_COMPOSITE_DEFAULT_WIDTH    1280
+//#define GST_SWITCH_COMPOSITE_DEFAULT_HEIGHT   720
+//#define GST_SWITCH_COMPOSITE_MIN_PIP_W                320
+//#define GST_SWITCH_COMPOSITE_MIN_PIP_H                240
 //#endif
 
 #define GST_SWITCH_FACEDETECT_FRAME_WIDTH	150
@@ -65,16 +65,18 @@ typedef enum
   COMPOSE_MODE__LAST = COMPOSE_MODE_DUAL_EQUAL
 } GstCompositeMode;
 
-inline static const char* gst_composite_mode_to_string(GstCompositeMode mode) {
-  switch(mode) {
-  case COMPOSE_MODE_NONE:
-    return "COMPOSE_MODE_NONE";
-  case COMPOSE_MODE_PIP:
-    return "COMPOSE_MODE_PIP";
-  case COMPOSE_MODE_DUAL_PREVIEW:
-    return "COMPOSE_MODE_DUAL_PREVIEW";
-  case COMPOSE_MODE_DUAL_EQUAL:
-    return "COMPOSE_MODE_DUAL_EQUAL";
+inline static const char *
+gst_composite_mode_to_string (GstCompositeMode mode)
+{
+  switch (mode) {
+    case COMPOSE_MODE_NONE:
+      return "COMPOSE_MODE_NONE";
+    case COMPOSE_MODE_PIP:
+      return "COMPOSE_MODE_PIP";
+    case COMPOSE_MODE_DUAL_PREVIEW:
+      return "COMPOSE_MODE_DUAL_PREVIEW";
+    case COMPOSE_MODE_DUAL_EQUAL:
+      return "COMPOSE_MODE_DUAL_EQUAL";
   }
   //ASSERT(false);
   return "COMPOSE_INVALID_VALUE";

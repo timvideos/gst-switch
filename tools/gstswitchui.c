@@ -58,7 +58,8 @@ static GOptionEntry entries[] = {
   {"dbus-timeout", 'd', 0, G_OPTION_ARG_INT, &gst_switch_client_dbus_timeout,
       "DBus timeout in ms (default 5000)", NULL},
   {"address", 'a', 0, G_OPTION_ARG_STRING, &srv_address,
-      "Server Control-Adress, defaults to " GST_SWITCH_UI_DEFAULT_ADDRESS, NULL},
+        "Server Control-Adress, defaults to " GST_SWITCH_UI_DEFAULT_ADDRESS,
+      NULL},
   {NULL}
 };
 
@@ -469,7 +470,8 @@ gst_switch_ui_tick (GstSwitchUI * ui)
 static void
 gst_switch_ui_run (GstSwitchUI * ui)
 {
-  if (!gst_switch_client_connect (GST_SWITCH_CLIENT (ui), CLIENT_ROLE_UI, srv_address)) {
+  if (!gst_switch_client_connect (GST_SWITCH_CLIENT (ui), CLIENT_ROLE_UI,
+          srv_address)) {
     ERROR ("failed to connect to controller");
     return;
   }

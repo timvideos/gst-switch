@@ -24,7 +24,6 @@
 #include <gst/base/gstbasetransform.h>
 
 G_BEGIN_DECLS
-
 #define GST_TYPE_ASSESS \
   (gst_assess_get_type ())
 #define GST_ASSESS(obj) \
@@ -35,14 +34,14 @@ G_BEGIN_DECLS
   (G_TYPE_CHECK_INSTANCE_TYPE((obj),GST_TYPE_ASSESS))
 #define GST_IS_ASSESS_CLASS(klass) \
   (G_TYPE_CHECK_CLASS_TYPE((klass),GST_TYPE_ASSESS))
-
 typedef struct _GstAssess GstAssess;
 typedef struct _GstAssessClass GstAssessClass;
 
 /**
  * @brief Helper class for assessment.
  */
-struct _GstAssess {
+struct _GstAssess
+{
   GstBaseTransform base;
   GMutex lock;
 
@@ -55,12 +54,12 @@ struct _GstAssess {
 /**
  * @brief GstAssessClass
  */
-struct _GstAssessClass {
+struct _GstAssessClass
+{
   GstBaseTransformClass base_class;
 };
 
 GType gst_assess_get_type (void);
 
 G_END_DECLS
-
 #endif //__GST_ASSESS_H__
