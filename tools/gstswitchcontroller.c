@@ -1,4 +1,4 @@
-/* GstSwitch
+/* gst-switch
  * Copyright (C) 2013 Duzy Chan <code@duzy.info>
  *
  * This file is part of gst-switch.

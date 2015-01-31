@@ -1,4 +1,4 @@
-/* GstSwitch							    -*- c -*-
+/* gst-switch							    -*- c -*-
  * Copyright (C) 2015 Tim 'mithro' Ansell <mithro@mithis.com>
  * Copyright (C) 2015 David Nugent <deeprave@gmail.com>
  *

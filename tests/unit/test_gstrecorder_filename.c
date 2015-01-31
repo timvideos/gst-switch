@@ -1,4 +1,4 @@
-/* GstSwitch							    -*- c -*-
+/* gst-switch							    -*- c -*-
  * Copyright (C) 2015 David Nugent <deeprave@gmail.com>
  *
  * This file is part of gst-switch.
