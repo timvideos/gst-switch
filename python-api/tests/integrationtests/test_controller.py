@@ -2,6 +2,8 @@
 Integration Tests for the dbus Controller
 """
 
+from __future__ import absolute_import, print_function, unicode_literals
+
 import sys
 import os
 import pytest
@@ -31,7 +33,7 @@ class TestEstablishConnection(object):
         """Create Controller object and call establish_connection"""
         controller = Controller()
         controller.establish_connection()
-        # print controller.connection
+        # print(controller.connection)
         assert controller.connection is not None
 
     def test_establish(self):
@@ -40,19 +42,19 @@ class TestEstablishConnection(object):
         try:
             serv.run()
             for i in range(self.NUM):
-                print i
+                print(i)
                 self.establish_connection()
             serv.terminate(1)
         finally:
             if serv.proc:
                 poll = serv.proc.poll()
-                print self.__class__
+                print(self.__class__)
                 if poll == -11:
-                    print "SEGMENTATION FAULT OCCURRED"
-                print "ERROR CODE - {0}".format(poll)
+                    print("SEGMENTATION FAULT OCCURRED")
+                print("ERROR CODE - {0}".format(poll))
                 serv.terminate(1)
                 log = open('server.log')
-                print log.read()
+                print(log.read())
 
 
 class TestGetComposePort(object):
@@ -90,13 +92,13 @@ class TestGetComposePort(object):
             finally:
                 if serv.proc:
                     poll = serv.proc.poll()
-                    print self.__class__
+                    print(self.__class__)
                     if poll == -11:
-                        print "SEGMENTATION FAULT OCCURRED"
-                    print "ERROR CODE - {0}".format(poll)
+                        print("SEGMENTATION FAULT OCCURRED")
+                    print("ERROR CODE - {0}".format(poll))
                     serv.terminate(1)
                     log = open('server.log')
-                    print log.read()
+                    print(log.read())
 
         set_expected = [tuple(i) for i in expected_result]
         set_res = [tuple(i) for i in res]
@@ -138,13 +140,13 @@ class TestGetEncodePort(object):
             finally:
                 if serv.proc:
                     poll = serv.proc.poll()
-                    print self.__class__
+                    print(self.__class__)
                     if poll == -11:
-                        print "SEGMENTATION FAULT OCCURRED"
-                    print "ERROR CODE - {0}".format(poll)
+                        print("SEGMENTATION FAULT OCCURRED")
+                    print("ERROR CODE - {0}".format(poll))
                     serv.terminate(1)
                     log = open('server.log')
-                    print log.read()
+                    print(log.read())
 
         set_expected = [tuple(i) for i in expected_result]
         set_res = [tuple(i) for i in res]
@@ -187,15 +189,15 @@ class TestGetAudioPort(object):
             finally:
                 if serv.proc:
                     poll = serv.proc.poll()
-                    print self.__class__
+                    print(self.__class__)
                     if poll == -11:
-                        print "SEGMENTATION FAULT OCCURRED"
-                    print "ERROR CODE - {0}".format(poll)
+                        print("SEGMENTATION FAULT OCCURRED")
+                    print("ERROR CODE - {0}".format(poll))
                     serv.terminate(1)
                     log = open('server.log')
-                    print log.read()
-        # print res
-        # print expected_result
+                    print(log.read())
+        # print(res)
+        # print(expected_result)
         set_expected = [tuple(i) for i in expected_result]
         set_res = [tuple(i) for i in res]
         assert set(set_expected) == set(set_res)
@@ -232,8 +234,8 @@ class TestGetPreviewPorts(object):
                     [[x for x in range(3003, 3004 + self.NUM)]]
                     * self.NUM * self.FACTOR)
                 res = map(tuple, self.get_preview_ports())
-                print '\n', res, '\n'
-                print expected_result
+                print('\n', res, '\n')
+                print(expected_result)
                 assert set(expected_result) == set(res)
                 sources.terminate_video()
                 sources.terminate_audio()
@@ -241,13 +243,13 @@ class TestGetPreviewPorts(object):
             finally:
                 if serv.proc:
                     poll = serv.proc.poll()
-                    print self.__class__
+                    print(self.__class__)
                     if poll == -11:
-                        print "SEGMENTATION FAULT OCCURRED"
-                    print "ERROR CODE - {0}".format(poll)
+                        print("SEGMENTATION FAULT OCCURRED")
+                    print("ERROR CODE - {0}".format(poll))
                     serv.terminate(1)
                     log = open('server.log')
-                    print log.read()
+                    print(log.read())
 
 
 class VideoFileSink(object):
@@ -297,10 +299,10 @@ class TestSetCompositeMode(object):
 
                 time.sleep(3)
                 # expected_result = [mode != 3] * self.FACTOR
-                # print mode, expected_result
+                # print(mode, expected_result)
                 controller = Controller()
                 res = controller.set_composite_mode(mode)
-                print res
+                print(res)
                 time.sleep(3)
                 video_sink.terminate()
                 preview.terminate()
@@ -318,31 +320,31 @@ class TestSetCompositeMode(object):
             finally:
                 if serv.proc:
                     poll = serv.proc.poll()
-                    print self.__class__
+                    print(self.__class__)
                     if poll == -11:
-                        print "SEGMENTATION FAULT OCCURRED"
-                    print "ERROR CODE - {0}".format(poll)
+                        print("SEGMENTATION FAULT OCCURRED")
+                    print("ERROR CODE - {0}".format(poll))
                     serv.terminate(1)
                     log = open('server.log')
-                    print log.read()
+                    print(log.read())
 
     def verify_output(self, mode, video):
         """Verify if the output is correct by comparing key frames"""
         test = 'composite_mode_{0}'.format(mode)
         cmpr = CompareVideo(test, video)
         res1, res2 = cmpr.compare()
-        print "RESULTS", res1, res2
+        print("RESULTS", res1, res2)
 
         # In the CI environment, upload to imgur the results.
         if os.environ.get('CI', "False") == "true":
             folder = cmpr.test_frame_dir
             cmd = "./imgurbash.sh {0}/*.*".format(folder)
-            print cmd
+            print(cmd)
             proc = subprocess.Popen(
                 cmd,
                 bufsize=-1,
                 shell=True)
-            print proc.wait()
+            print(proc.wait())
 
         # Experimental Value
         if res1 <= 0.04 and res2 <= 0.04:
@@ -397,20 +399,20 @@ class TestNewRecord(object):
                 test_filename = "test-{0}.data".format(time_str)
 
                 res = self.new_record()
-                print res
+                print(res)
                 sources.terminate_video()
                 serv.terminate(1)
                 assert os.path.exists(test_filename) is True
             finally:
                 if serv.proc:
                     poll = serv.proc.poll()
-                    print self.__class__
+                    print(self.__class__)
                     if poll == -11:
-                        print "SEGMENTATION FAULT OCCURRED"
-                    print "ERROR CODE - {0}".format(poll)
+                        print("SEGMENTATION FAULT OCCURRED")
+                    print("ERROR CODE - {0}".format(poll))
                     serv.terminate(1)
                     log = open('server.log')
-                    print log.read()
+                    print(log.read())
 
 
 class TestAdjustPIP(object):
@@ -454,20 +456,20 @@ class TestAdjustPIP(object):
             finally:
                 if serv.proc:
                     poll = serv.proc.poll()
-                    print self.__class__
+                    print(self.__class__)
                     if poll == -11:
-                        print "SEGMENTATION FAULT OCCURRED"
-                    print "ERROR CODE - {0}".format(poll)
+                        print("SEGMENTATION FAULT OCCURRED")
+                    print("ERROR CODE - {0}".format(poll))
                     serv.terminate(1)
                     log = open('server.log')
-                    print log.read()
+                    print(log.read())
 
     def verify_output(self, index, video):
         """Verify if the output is correct by comparing key frames"""
         test = 'adjust_pip_{0}'.format(index)
         cmpr = CompareVideo(test, video)
         res1, res2 = cmpr.compare()
-        print "RESULTS", res1, res2
+        print("RESULTS", res1, res2)
         #   Experimental Value
         if res1 <= 0.04 and res2 <= 0.04:
             return True
@@ -511,7 +513,7 @@ class TestSwitch(object):
                 time.sleep(3)
                 controller = Controller()
                 res = controller.switch(channel, port)
-                print res
+                print(res)
                 time.sleep(3)
                 video_sink.terminate()
                 sources.terminate_video()
@@ -521,13 +523,13 @@ class TestSwitch(object):
             finally:
                 if serv.proc:
                     poll = serv.proc.poll()
-                    print self.__class__
+                    print(self.__class__)
                     if poll == -11:
-                        print "SEGMENTATION FAULT OCCURRED"
-                    print "ERROR CODE - {0}".format(poll)
+                        print("SEGMENTATION FAULT OCCURRED")
+                    print("ERROR CODE - {0}".format(poll))
                     serv.terminate(1)
                     log = open('server.log')
-                    print log.read()
+                    print(log.read())
 
     def test_switch(self):
         """Test switch"""
@@ -567,7 +569,7 @@ class TestClickVideo(object):
                 controller = Controller()
                 time.sleep(1)
                 res = controller.click_video(xpos, ypos, width, heigth)
-                print res
+                print(res)
                 time.sleep(1)
                 sources.terminate_video()
                 preview.terminate()
@@ -580,20 +582,20 @@ class TestClickVideo(object):
             finally:
                 if serv.proc:
                     poll = serv.proc.poll()
-                    print self.__class__
+                    print(self.__class__)
                     if poll == -11:
-                        print "SEGMENTATION FAULT OCCURRED"
-                    print "ERROR CODE - {0}".format(poll)
+                        print("SEGMENTATION FAULT OCCURRED")
+                    print("ERROR CODE - {0}".format(poll))
                     serv.terminate(1)
                     log = open('server.log')
-                    print log.read()
+                    print(log.read())
 
     def verify_output(self, index, video):
         """Verify if the output is correct by comparing key frames"""
         test = 'click_video_{0}'.format(index)
         cmpr = CompareVideo(test, video)
         res1, res2 = cmpr.compare()
-        print "RESULTS", res1, res2
+        print("RESULTS", res1, res2)
         #   Experimental Value
         if res1 <= 0.04 and res2 <= 0.04:
             return True
@@ -636,7 +638,7 @@ class TestMarkFace(object):
                 controller = Controller()
                 time.sleep(1)
                 res = controller.mark_face(faces)
-                print res
+                print(res)
                 time.sleep(1)
                 sources.terminate_video()
                 preview.terminate()
@@ -649,20 +651,20 @@ class TestMarkFace(object):
             finally:
                 if serv.proc:
                     poll = serv.proc.poll()
-                    print self.__class__
+                    print(self.__class__)
                     if poll == -11:
-                        print "SEGMENTATION FAULT OCCURRED"
-                    print "ERROR CODE - {0}".format(poll)
+                        print("SEGMENTATION FAULT OCCURRED")
+                    print("ERROR CODE - {0}".format(poll))
                     serv.terminate(1)
                     log = open('server.log')
-                    print log.read()
+                    print(log.read())
 
     def verify_output(self, index, video):
         """Verify if the output is correct by comparing key frames"""
         test = 'mark_face_{0}'.format(index)
         cmpr = CompareVideo(test, video)
         res1, res2 = cmpr.compare()
-        print "RESULTS", res1, res2
+        print("RESULTS", res1, res2)
         #   Experimental Value
         if res1 <= 0.04 and res2 <= 0.04:
             return True
@@ -699,7 +701,7 @@ class TestMarkTracking(object):
                 controller = Controller()
                 time.sleep(1)
                 res = controller.mark_tracking(faces)
-                print res
+                print(res)
                 time.sleep(1)
                 sources.terminate_video()
                 preview.terminate()
@@ -712,20 +714,20 @@ class TestMarkTracking(object):
             finally:
                 if serv.proc:
                     poll = serv.proc.poll()
-                    print self.__class__
+                    print(self.__class__)
                     if poll == -11:
-                        print "SEGMENTATION FAULT OCCURRED"
-                    print "ERROR CODE - {0}".format(poll)
+                        print("SEGMENTATION FAULT OCCURRED")
+                    print("ERROR CODE - {0}".format(poll))
                     serv.terminate(1)
                     log = open('server.log')
-                    print log.read()
+                    print(log.read())
 
     def verify_output(self, index, video):
         """Verify if the output is correct by comparing key frames"""
         test = 'mark_tracking_{0}'.format(index)
         cmpr = CompareVideo(test, video)
         res1, res2 = cmpr.compare()
-        print "RESULTS", res1, res2
+        print("RESULTS", res1, res2)
         #   Experimental Value
         if res1 <= 0.04 and res2 <= 0.04:
             return True

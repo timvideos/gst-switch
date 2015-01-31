@@ -3,6 +3,9 @@ The server deals with all operations controlling gst-switch-srv
 These include all OS related tasks
 """
 
+from __future__ import absolute_import, print_function, unicode_literals
+
+from six import string_types
 import os
 import signal
 import subprocess
@@ -144,7 +147,7 @@ class Server(object):
             raise ValueError("Control Address '{0}' cannot be blank"
                              .format(controller_address))
         else:
-            if not isinstance(controller_address, basestring):
+            if not isinstance(controller_address, string_types):
                 raise TypeError("Control Address must be a string,"
                                 " not '{0}'".format(type(controller_address)))
 
@@ -197,7 +200,7 @@ class Server(object):
         gives a OS based error.
         """
         self.gst_option_string = gst_option
-        print "Starting server"
+        print("Starting server")
         self.proc = self._run_process()
         if self.proc:
             self.pid = self.proc.pid
@@ -241,7 +244,7 @@ class Server(object):
         :param cmd: The command which needs to be executed
         :returns: process created
         """
-        print 'Creating process %s' % (cmd)
+        print('Creating process %s' % (cmd))
         try:
             with open('server.log', 'w') as tempf:
                 process = subprocess.Popen(
@@ -250,7 +253,7 @@ class Server(object):
                     stderr=tempf,
                     bufsize=-1,
                     shell=False)
-                print cmd
+                print(cmd)
                 return process
         except OSError as error:
             if error.errno == ENOENT:
@@ -266,14 +269,14 @@ class Server(object):
         Calls 'make coverage' to generate coverage in .gcov files
         """
         cmd = 'make -C {0} coverage'.format(TOOLS_DIR)
-        print TOOLS_DIR
+        print(TOOLS_DIR)
         with open(os.devnull, 'w'):
             proc = subprocess.Popen(
                 cmd.split(),
                 bufsize=-1,
                 shell=False)
             out, _ = proc.communicate()
-            print out
+            print(out)
 
     def terminate(self, cov=False):
         """Terminate the server.
@@ -284,7 +287,7 @@ class Server(object):
         :raises ServerProcessError: Process does not exist
         :raises ServerProcessError: Cannot terminate process. Try killing it
         """
-        print 'Killing server'
+        print('Killing server')
         proc = self.proc
         if proc is None:
             raise ServerProcessError('Server Process does not exist')
@@ -294,7 +297,7 @@ class Server(object):
                     self.gcov_flush()
                     self.make_coverage()
                 proc.terminate()
-                print 'Server Killed'
+                print('Server Killed')
                 self.proc = None
                 return True
             except OSError:
@@ -338,7 +341,7 @@ class Server(object):
             raise ServerProcessError('Server process does not exist')
         else:
             try:
-                print "GCOV FLUSH"
+                print("GCOV FLUSH")
                 os.kill(self.pid, signal.SIGUSR1)
                 return True
             except OSError:

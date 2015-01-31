@@ -1,5 +1,11 @@
 .PHONY: lint pep8 style-check unittests integration performance test clean
 
+PYTHONVERSION := 3.4
+
+PYTEST := py.test-${PYTHONVERSION}
+PYLINT := python${PYTHONVERSION} $(shell which pylint)
+PEP8 := python${PYTHONVERSION} $(shell which pep8)
+
 lint: export PYTHONWARNINGS := ignore
 lint: export PYTHONPATH := ${PYTHONPATH}:${PWD}
 lint:
@@ -8,17 +14,17 @@ lint:
 	@rm -rf reports
 	@echo PYTHONWARNINGS=$$PYTHONWARNINGS
 	@echo PYTHONPATH=$$PYTHONPATH
-	pylint --rcfile=.pylintrc_gstswitch gstswitch
-	pylint --rcfile=.pylintrc_unittests tests/unittests/*
-	pylint --rcfile=.pylintrc_integrationtests tests/integrationtests/*.py
+	${PYLINT} --rcfile=.pylintrc_gstswitch gstswitch
+	${PYLINT} --rcfile=.pylintrc_unittests tests/unittests/*
+	${PYLINT} --rcfile=.pylintrc_integrationtests tests/integrationtests/*.py
 	@echo "Code style is okay!!"
 
 pep8:
-	pep8 gstswitch
+	${PEP8} gstswitch
 	@echo "gstswitch is pep8 clean!!"
-	pep8 tests/unittests
+	${PEP8} tests/unittests
 	@echo "unittests are pep8 clean!!"
-	pep8 tests/integrationtests
+	${PEP8} tests/integrationtests
 	@echo "integration tests are pep8 clean!!"
 
 style: pep8 lint
@@ -32,7 +38,7 @@ unittests:
 	@rm -f ../tools/*.gcda
 	@rm -rf reports
 	@mkdir -p reports/coverage/unittests
-	py.test --cov gstswitch tests/unittests/ --pep8 -v -s
+	${PYTEST} --cov gstswitch --pep8 -v -s tests/unittests/
 	#-@mv htmlcov/*.* reports/coverage/unittests
 
 integration: imgurbash.sh
@@ -40,11 +46,11 @@ integration: imgurbash.sh
 	@rm -f ../tools/*.gcda
 	@rm -rf reports
 	@mkdir -p reports/coverage/integration
-	py.test --cov gstswitch tests/integrationtests/ --pep8 -s -v 
+	${PYTEST} --cov gstswitch --pep8 -v -s tests/integrationtests/
 	#-@mv htmlcov/*.* reports/coverage/integration
 
 performance:
-	py.test tests/performancetests/*.py -v -s
+	${PYTEST} tests/performancetests/*.py -v -s
 	make clean
 
 test: unittests integration

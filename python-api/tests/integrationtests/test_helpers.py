@@ -1,6 +1,9 @@
 """
 Integartion tests for TestSources, PreviewSinks in helpers.py
 """
+
+from __future__ import absolute_import, print_function, unicode_literals
+
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(__file__, "../../../")))
@@ -24,7 +27,7 @@ class TestTestSourcesPreviews(object):
         sources = TestSources(video_port=video_port)
         for _ in range(num):
             sources.new_test_video(pattern=6)
-        # print "done adding" + str(num)
+        # print("done adding" + str(num))
         time.sleep(2)
         sources.terminate_video()
         time.sleep(2)
@@ -50,8 +53,8 @@ class TestTestSourcesPreviews(object):
         sources = TestSources(audio_port=audio_port)
         for _ in range(num):
             sources.new_test_audio(wave=10)
-        # print "done adding" + str(num)
-        # print sources.get_test_audio()
+        # print("done adding" + str(num))
+        # print(sources.get_test_audio())
         time.sleep(2)
         sources.terminate_audio()
         time.sleep(2)

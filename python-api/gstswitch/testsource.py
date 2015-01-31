@@ -4,6 +4,8 @@ It provides the abse for all the other gstreamer
 components are build upon.
 """
 
+from __future__ import absolute_import, print_function, unicode_literals
+
 import gi
 gi.require_version('Gst', '1.0')
 from gi.repository import GObject, Gst
@@ -17,7 +19,7 @@ import random
 # from pipeline import *
 # IMPORTS
 
-__all__ = ["Preview", "VideoSrc", "AudioSrc"]
+# __all__ = ["Preview", "VideoSrc", "AudioSrc"]
 
 
 class BasePipeline(Gst.Pipeline):
@@ -137,7 +139,7 @@ video/x-raw,
         width = str(width)
         height = str(height)
         capsstring = self.VIDEO_CAPS.format(width, height)
-        print capsstring
+        print(capsstring)
         caps = Gst.Caps.from_string(capsstring)
         element.set_property('caps', caps)
         return element
@@ -213,7 +215,7 @@ audio/x-raw,
         """
         element = self.make("capsfilter", "afilter")
         capsstring = self.AUDIO_CAPS
-        print capsstring
+        print(capsstring)
         caps = Gst.Caps.from_string(capsstring)
         element.set_property('caps', caps)
         return element
