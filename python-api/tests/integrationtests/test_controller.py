@@ -282,7 +282,7 @@ class TestSignals(object):
             GLib.timeout_add_seconds(5, self.quit_mainloop)
             self.run_mainloop()
 
-            print test_cb.call_args_list
+            print(test_cb.call_args_list)
             test_cb.assert_any_call(3003, 1, 7)
             test_cb.assert_any_call(3004, 1, 8)
             assert test_cb.call_count == 2
