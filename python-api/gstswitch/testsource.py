@@ -215,7 +215,7 @@ audio/x-raw,
         """
         element = self.make("capsfilter", "afilter")
         capsstring = self.AUDIO_CAPS
-        print capsstring
+        print(capsstring)
         caps = Gst.Caps.from_string(capsstring)
         element.set_property('caps', caps)
         return element

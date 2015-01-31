@@ -5,6 +5,7 @@ These include all OS related tasks
 
 from __future__ import absolute_import, print_function, unicode_literals
 
+from six import string_types
 import os
 import signal
 import subprocess
@@ -146,7 +147,7 @@ class Server(object):
             raise ValueError("Control Address '{0}' cannot be blank"
                              .format(controller_address))
         else:
-            if not isinstance(controller_address, basestring):
+            if not isinstance(controller_address, string_types):
                 raise TypeError("Control Address must be a string,"
                                 " not '{0}'".format(type(controller_address)))
 
