@@ -1,3 +1,4 @@
+#vim :
 language: 
  - c
 
@@ -6,10 +7,13 @@ compiler:
 
 env:
  matrix:
-  - TEST=python-api TYPE=unittest
+  - TEST=python-api TYPE=style
+  - TEST=python-api TYPE=unittests
   - TEST=python-api TYPE=integration
-  - TEST=module TYPE=python
-  - TEST=module TYPE=c
+
+  - TEST=server TYPE=style
+  - TEST=server TYPE=unittests
+  - TEST=server TYPE=integration
 
 install:
  - wget -q -O- https://raw.githubusercontent.com/mithro/travis-trusty/master/setup.sh | bash
@@ -18,6 +22,9 @@ install:
 
 script:
  - /trusty/run.py $PWD/.travis-run.sh
+
+after_script:
+ - /trusty/run.py $PWD/.travis-after.sh
 
 notifications:
   email:

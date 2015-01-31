@@ -19,4 +19,5 @@ function main()
 	--leave-preprocessor-space"
 
     $INDENT ${INDENT_PARAMETERS} "$@"
+    $INDENT ${INDENT_PARAMETERS} "$@"
 }

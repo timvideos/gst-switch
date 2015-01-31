@@ -6,6 +6,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 import sys
 import os
+import pytest
 sys.path.insert(0, os.path.abspath(os.path.join(__file__, "../../../")))
 
 from gstswitch.server import Server
@@ -37,7 +38,7 @@ class TestEstablishConnection(object):
 
     def test_establish(self):
         """Test for establish_connection"""
-        serv = Server(path=PATH)
+        serv = Server(path=PATH, video_format="debug")
         try:
             serv.run()
             for i in range(self.NUM):
@@ -221,7 +222,7 @@ class TestGetPreviewPorts(object):
         """Test get_preview_ports"""
 
         for _ in range(self.NUM):
-            serv = Server(path=PATH)
+            serv = Server(path=PATH, video_format="debug")
             try:
                 serv.run()
                 sources = TestSources(video_port=3000, audio_port=4000)
@@ -282,7 +283,7 @@ class TestSetCompositeMode(object):
         """Create Controller object and call set_composite_mode method"""
         for _ in range(self.NUM):
 
-            serv = Server(path=PATH)
+            serv = Server(path=PATH, video_format="debug")
             try:
                 serv.run()
 
@@ -333,14 +334,18 @@ class TestSetCompositeMode(object):
         cmpr = CompareVideo(test, video)
         res1, res2 = cmpr.compare()
         print("RESULTS", res1, res2)
-        folder = cmpr.test_frame_dir
-        cmd = "./imgurbash.sh {0}/*.*".format(folder)
-        print(cmd)
-        proc = subprocess.Popen(
-            cmd,
-            bufsize=-1,
-            shell=True)
-        print(proc.wait())
+
+        # In the CI environment, upload to imgur the results.
+        if os.environ.get('CI', "False") == "true":
+            folder = cmpr.test_frame_dir
+            cmd = "./imgurbash.sh {0}/*.*".format(folder)
+            print(cmd)
+            proc = subprocess.Popen(
+                cmd,
+                bufsize=-1,
+                shell=True)
+            print(proc.wait())
+
         # Experimental Value
         if res1 <= 0.04 and res2 <= 0.04:
             return True
@@ -380,7 +385,8 @@ class TestNewRecord(object):
     def test_new_record(self):
         """Test new_record"""
         for _ in range(self.NUM):
-            serv = Server(path=PATH, record_file="test-%Y.data")
+            serv = Server(path=PATH, record_file="test-%Y.data",
+                          video_format="debug")
             try:
                 serv.run()
 
@@ -424,7 +430,7 @@ class TestAdjustPIP(object):
                    generate_frames=False):
         """Create Controller object and call adjust_pip"""
         for _ in range(self.NUM):
-            serv = Server(path=PATH)
+            serv = Server(path=PATH, video_format="debug")
             try:
                 serv.run()
                 sources = TestSources(video_port=3000)
@@ -469,6 +475,7 @@ class TestAdjustPIP(object):
             return True
         return False
 
+    @pytest.mark.xfail
     def test_adjust_pip(self):
         """Test adjust_pip"""
         dic = [
@@ -492,7 +499,7 @@ class TestSwitch(object):
     def switch(self, channel, port, index):
         """Create Controller object and call switch method"""
         for _ in range(self.NUM):
-            serv = Server(path=PATH)
+            serv = Server(path=PATH, video_format="debug")
             try:
                 serv.run()
 
@@ -549,7 +556,7 @@ class TestClickVideo(object):
                     generate_frames=False):
         """Create Controller object and call click_video method"""
         for _ in range(self.NUM):
-            serv = Server(path=PATH)
+            serv = Server(path=PATH, video_format="debug")
             try:
                 serv.run()
                 sources = TestSources(video_port=3000)
@@ -618,7 +625,7 @@ class TestMarkFace(object):
     def mark_face(self, faces, index, generate_frames=False):
         """Create the Controller object and call mark_face method"""
         for _ in range(self.NUM):
-            serv = Server(path=PATH)
+            serv = Server(path=PATH, video_format="debug")
             try:
                 serv.run()
                 sources = TestSources(video_port=3000)
@@ -681,7 +688,7 @@ class TestMarkTracking(object):
     def mark_tracking(self, faces, index, generate_frames=False):
         """Create Controller object and call mark_tracking method"""
         for _ in range(self.NUM):
-            serv = Server(path=PATH)
+            serv = Server(path=PATH, video_format="debug")
             try:
                 serv.run()
                 sources = TestSources(video_port=3000)

@@ -1,26 +1,20 @@
-/* GstSwitch							    -*- c -*-
+/* gst-switch							    -*- c -*-
  * Copyright (C) 2012,2013 Duzy Chan <code@duzy.info>
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ * This file is part of gst-switch.
  *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
- * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * gst-switch is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free
+ * Software Foundation, either version 3 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 /*! @file */
@@ -45,17 +39,17 @@ typedef struct _GstCaseClass GstCaseClass;
  */
 typedef enum
 {
-  GST_CASE_UNKNOWN,           /*!< unknown case */
-  GST_CASE_COMPOSITE_VIDEO_A, /*!< special case for composite channel A */
-  GST_CASE_COMPOSITE_VIDEO_B, /*!< special case for composite channel B */
-  GST_CASE_COMPOSITE_AUDIO,   /*!< special case for composite channel audio */
-  GST_CASE_PREVIEW,           /*!< special case for previews */
-  GST_CASE_INPUT_AUDIO,       /*!< Audio input from TCP socket */
-  GST_CASE_INPUT_VIDEO,       /*!< Video input from TCP socket */
-  GST_CASE_BRANCH_VIDEO_A,    /*!< special case for branching channel A to output */
-  GST_CASE_BRANCH_VIDEO_B,    /*!< special case for branching channel B to output */
-  GST_CASE_BRANCH_AUDIO,      /*!< special case for branching active audio to output */
-  GST_CASE_BRANCH_PREVIEW,    /*!< special case for branching preview to output */
+  GST_CASE_UNKNOWN,             /*!< unknown case */
+  GST_CASE_COMPOSITE_VIDEO_A,   /*!< special case for composite channel A */
+  GST_CASE_COMPOSITE_VIDEO_B,   /*!< special case for composite channel B */
+  GST_CASE_COMPOSITE_AUDIO,     /*!< special case for composite channel audio */
+  GST_CASE_PREVIEW,             /*!< special case for previews */
+  GST_CASE_INPUT_AUDIO,         /*!< Audio input from TCP socket */
+  GST_CASE_INPUT_VIDEO,         /*!< Video input from TCP socket */
+  GST_CASE_BRANCH_VIDEO_A,      /*!< special case for branching channel A to output */
+  GST_CASE_BRANCH_VIDEO_B,      /*!< special case for branching channel B to output */
+  GST_CASE_BRANCH_AUDIO,        /*!< special case for branching active audio to output */
+  GST_CASE_BRANCH_PREVIEW,      /*!< special case for branching preview to output */
   GST_CASE__LAST_TYPE = GST_CASE_BRANCH_PREVIEW
 } GstCaseType;
 
@@ -87,12 +81,12 @@ typedef enum
  */
 typedef struct _GstCase
 {
-  GstWorker base; /*!< The parent object. */
-  GstCaseType type; /*!< Case type @see GstCaseType */
+  GstWorker base;               /*!< The parent object. */
+  GstCaseType type;             /*!< Case type @see GstCaseType */
   GInputStream *stream;
   GstCase *input;
   GstCase *branch;
-  GstSwitchServeStreamType serve_type; /*!< Stream type. @see GstSwitchServeStreamType */
+  GstSwitchServeStreamType serve_type;  /*!< Stream type. @see GstSwitchServeStreamType */
   gboolean switching;
   gint sink_port;
   guint width;
@@ -112,7 +106,7 @@ typedef struct _GstCase
  */
 typedef struct _GstCaseClass
 {
-  GstWorkerClass base_class; /*!< The base class. */
+  GstWorkerClass base_class;    /*!< The base class. */
 } GstCaseClass;
 
 GType gst_case_get_type (void);

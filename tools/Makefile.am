@@ -61,5 +61,5 @@ gst_switch_ptz_LDADD = $(GST_LIBS) $(X_LIBS) $(LIBM) $(GTK_LIBS) \
 
 if GCOV_ENABLED
 coverage:
-	gcov gst_switch_srv-*.o
+	gcov -d gst_switch_srv-*.o
 endif

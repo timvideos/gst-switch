@@ -9,5 +9,5 @@
     --gst-debug="multiqueue:0" \
     --video-input-port="3000" \
     --audio-input-port="4000" \
-    --control-port="5000" \
+    --controller-address="tcp:host=0.0.0.0,port=5000" \
     --record="record.dat"

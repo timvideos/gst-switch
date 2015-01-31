@@ -24,7 +24,6 @@
 #include <gst/gstbin.h>
 
 G_BEGIN_DECLS
-
 #define GST_TYPE_CONV_BIN			\
   (gst_conv_bin_get_type ())
 #define GST_CONV_BIN(obj)						\
@@ -35,11 +34,11 @@ G_BEGIN_DECLS
   (G_TYPE_CHECK_INSTANCE_TYPE ((obj),GST_TYPE_CONV_BIN))
 #define GST_IS_CONV_BIN_CLASS(klass)			\
   (G_TYPE_CHECK_CLASS_TYPE ((klass),GST_TYPE_CONV_BIN))
-
 typedef struct _GstConvBin GstConvBin;
 typedef struct _GstConvBinClass GstConvBinClass;
 
-typedef enum {
+typedef enum
+{
   GST_CONV_BIN_PAD_FLAG_GHOSTED = (GST_BIN_FLAG_LAST << 1),
   GST_CONV_BIN_PAD_FLAG_LAST = (GST_BIN_FLAG_LAST << 2),
 } GstConvBinFlags;
@@ -47,23 +46,24 @@ typedef enum {
 /**
  * @deprecated
  */
-struct _GstConvBin {
+struct _GstConvBin
+{
   GstBin base;
 
   GMutex lock;
-  gchar * converter;
-  gchar * autosink;
+  gchar *converter;
+  gchar *autosink;
 };
 
 /**
  * @deprecated
  */
-struct _GstConvBinClass {
+struct _GstConvBinClass
+{
   GstBinClass base_class;
 };
 
 GType gst_conv_bin_get_type (void);
 
 G_END_DECLS
-
 #endif //__GST_CONV_BIN_H__
