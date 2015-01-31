@@ -72,7 +72,7 @@ class TestObjectPath(object):
 
     def test_object_path_normal(self):
         """Test of object_path is valid"""
-        object_path = "/info/duzy/gst/switch/SwitchController"
+        object_path = "/us/timvideos/gstswitch/SwitchController"
         conn = Connection(object_path=object_path)
         assert conn.object_path == object_path
 
@@ -97,7 +97,7 @@ class TestInterface(object):
 
     def test_interface_normal(self):
         """Test if default_interface is valid"""
-        default_interface = "info.duzy.gst.switch.SwitchControllerInterface"
+        default_interface = "us.timvideos.gstswitch.SwitchControllerInterface"
         conn = Connection(default_interface=default_interface)
         assert default_interface == conn.default_interface
 
@@ -238,7 +238,8 @@ class MockConnection(object):
             cancellable):
         """Mock of call_sync method,
         raises GLib.GError if interface_name invalid"""
-        if interface_name == "info.duzy.gst.switch.SwitchControllerInterface":
+        if interface_name == ("us.timvideos.gstswitch."
+                              "SwitchControllerInterface"):
             return self.return_result
         else:
             raise GLib.GError('{0}: Test Failed'.format(self.method))
@@ -246,13 +247,13 @@ class MockConnection(object):
 
 def test_get_compose_port():
     """Test the get_compose_port method"""
-    default_interface = "info.duzy.gst.switch"
+    default_interface = "us.timvideos.gstswitch"
     conn = Connection(default_interface=default_interface)
     conn.connection = MockConnection('get_compose_port')
     with pytest.raises(ConnectionError):
         conn.get_compose_port()
 
-    default_interface = "info.duzy.gst.switch.SwitchControllerInterface"
+    default_interface = "us.timvideos.gstswitch.SwitchControllerInterface"
     conn = Connection(default_interface=default_interface)
     conn.connection = MockConnection('get_compose_port')
     assert conn.get_compose_port() == (3001,)
@@ -260,13 +261,13 @@ def test_get_compose_port():
 
 def test_get_encode_port():
     """Test the get_encode_port method"""
-    default_interface = "info.duzy.gst.switch"
+    default_interface = "us.timvideos.gstswitch"
     conn = Connection(default_interface=default_interface)
     conn.connection = MockConnection('get_encode_port')
     with pytest.raises(ConnectionError):
         conn.get_encode_port()
 
-    default_interface = "info.duzy.gst.switch.SwitchControllerInterface"
+    default_interface = "us.timvideos.gstswitch.SwitchControllerInterface"
     conn = Connection(default_interface=default_interface)
     conn.connection = MockConnection('get_encode_port')
     assert conn.get_encode_port() == (3002,)
@@ -274,13 +275,13 @@ def test_get_encode_port():
 
 def test_get_audio_port():
     """Test the get_audio_port method"""
-    default_interface = "info.duzy.gst.switch"
+    default_interface = "us.timvideos.gstswitch"
     conn = Connection(default_interface=default_interface)
     conn.connection = MockConnection('get_audio_port')
     with pytest.raises(ConnectionError):
         conn.get_audio_port()
 
-    default_interface = "info.duzy.gst.switch.SwitchControllerInterface"
+    default_interface = "us.timvideos.gstswitch.SwitchControllerInterface"
     conn = Connection(default_interface=default_interface)
     conn.connection = MockConnection('get_audio_port')
     assert conn.get_audio_port() == (4000,)
@@ -288,13 +289,13 @@ def test_get_audio_port():
 
 def test_get_preview_ports():
     """Test the get_preview_ports method"""
-    default_interface = "info.duzy.gst.switch"
+    default_interface = "us.timvideos.gstswitch"
     conn = Connection(default_interface=default_interface)
     conn.connection = MockConnection('get_preview_ports')
     with pytest.raises(ConnectionError):
         conn.get_preview_ports()
 
-    default_interface = "info.duzy.gst.switch.SwitchControllerInterface"
+    default_interface = "us.timvideos.gstswitch.SwitchControllerInterface"
     conn = Connection(default_interface=default_interface)
     conn.connection = MockConnection('get_preview_ports')
     assert conn.get_preview_ports() == ('[(3002, 1, 7), (3003, 1, 8)]',)
@@ -302,13 +303,13 @@ def test_get_preview_ports():
 
 def test_set_composite_mode():
     """Test the set_composite_mode method"""
-    default_interface = "info.duzy.gst.switch"
+    default_interface = "us.timvideos.gstswitch"
     conn = Connection(default_interface=default_interface)
     conn.connection = MockConnection('set_composite_mode')
     with pytest.raises(ConnectionError):
         conn.set_composite_mode(2)
 
-    default_interface = "info.duzy.gst.switch.SwitchControllerInterface"
+    default_interface = "us.timvideos.gstswitch.SwitchControllerInterface"
     conn = Connection(default_interface=default_interface)
     conn.connection = MockConnection('set_composite_mode')
     assert conn.set_composite_mode(2) == (False,)
@@ -316,13 +317,13 @@ def test_set_composite_mode():
 
 def test_get_composite_mode():
     """Test the set_composite_mode method"""
-    default_interface = "info.duzy.gst.switch"
+    default_interface = "us.timvideos.gstswitch"
     conn = Connection(default_interface=default_interface)
     conn.connection = MockConnection('get_composite_mode')
     with pytest.raises(ConnectionError):
         conn.get_composite_mode()
 
-    default_interface = "info.duzy.gst.switch.SwitchControllerInterface"
+    default_interface = "us.timvideos.gstswitch.SwitchControllerInterface"
     conn = Connection(default_interface=default_interface)
     conn.connection = MockConnection('get_composite_mode')
     assert conn.get_composite_mode() == (0,)
@@ -330,13 +331,13 @@ def test_get_composite_mode():
 
 def test_set_encode_mode():
     """Test the set_encode_mode method"""
-    default_interface = "info.duzy.gst.switch"
+    default_interface = "us.timvideos.gstswitch"
     conn = Connection(default_interface=default_interface)
     conn.connection = MockConnection('set_encode_mode')
     with pytest.raises(ConnectionError):
         conn.set_encode_mode(2)
 
-    default_interface = "info.duzy.gst.switch.SwitchControllerInterface"
+    default_interface = "us.timvideos.gstswitch.SwitchControllerInterface"
     conn = Connection(default_interface=default_interface)
     conn.connection = MockConnection('set_encode_mode')
     assert conn.set_encode_mode(2) == (False,)
@@ -344,13 +345,13 @@ def test_set_encode_mode():
 
 def test_new_record():
     """Test the new_record method"""
-    default_interface = "info.duzy.gst.switch"
+    default_interface = "us.timvideos.gstswitch"
     conn = Connection(default_interface=default_interface)
     conn.connection = MockConnection('new_record')
     with pytest.raises(ConnectionError):
         conn.new_record()
 
-    default_interface = "info.duzy.gst.switch.SwitchControllerInterface"
+    default_interface = "us.timvideos.gstswitch.SwitchControllerInterface"
     conn = Connection(default_interface=default_interface)
     conn.connection = MockConnection('new_record')
     assert conn.new_record() == (False,)
@@ -358,13 +359,13 @@ def test_new_record():
 
 def test_adjust_pip():
     """Test the adjust_pip method"""
-    default_interface = "info.duzy.gst.switch"
+    default_interface = "us.timvideos.gstswitch"
     conn = Connection(default_interface=default_interface)
     conn.connection = MockConnection('adjust_pip')
     with pytest.raises(ConnectionError):
         conn.adjust_pip(1, 2, 3, 4)
 
-    default_interface = "info.duzy.gst.switch.SwitchControllerInterface"
+    default_interface = "us.timvideos.gstswitch.SwitchControllerInterface"
     conn = Connection(default_interface=default_interface)
     conn.connection = MockConnection('adjust_pip')
     assert conn.adjust_pip(1, 2, 3, 4) == (1,)
@@ -372,13 +373,13 @@ def test_adjust_pip():
 
 def test_switch():
     """Test the switch method"""
-    default_interface = "info.duzy.gst.switch"
+    default_interface = "us.timvideos.gstswitch"
     conn = Connection(default_interface=default_interface)
     conn.connection = MockConnection('switch')
     with pytest.raises(ConnectionError):
         conn.switch(1, 2)
 
-    default_interface = "info.duzy.gst.switch.SwitchControllerInterface"
+    default_interface = "us.timvideos.gstswitch.SwitchControllerInterface"
     conn = Connection(default_interface=default_interface)
     conn.connection = MockConnection('switch')
     assert conn.switch(1, 2) == (True,)
@@ -386,13 +387,13 @@ def test_switch():
 
 def test_click_video():
     """Test the click_video method"""
-    default_interface = "info.duzy.gst.switch"
+    default_interface = "us.timvideos.gstswitch"
     conn = Connection(default_interface=default_interface)
     conn.connection = MockConnection('click_video')
     with pytest.raises(ConnectionError):
         conn.click_video(1, 2, 3, 4)
 
-    default_interface = "info.duzy.gst.switch.SwitchControllerInterface"
+    default_interface = "us.timvideos.gstswitch.SwitchControllerInterface"
     conn = Connection(default_interface=default_interface)
     conn.connection = MockConnection('click_video')
     assert conn.click_video(1, 2, 3, 4) == (True,)
@@ -400,14 +401,14 @@ def test_click_video():
 
 def test_mark_face():
     """Test the mark_face method"""
-    default_interface = "info.duzy.gst.switch"
+    default_interface = "us.timvideos.gstswitch"
     conn = Connection(default_interface=default_interface)
     conn.connection = MockConnection('mark_face')
     with pytest.raises(ConnectionError):
         face = [(1, 1, 1, 1), (2, 2, 2, 2)]
         conn.mark_face(face)
 
-    default_interface = "info.duzy.gst.switch.SwitchControllerInterface"
+    default_interface = "us.timvideos.gstswitch.SwitchControllerInterface"
     conn = Connection(default_interface=default_interface)
     conn.connection = MockConnection('mark_face')
     face = [(1, 1, 1, 1), (2, 2, 2, 2)]
@@ -416,14 +417,14 @@ def test_mark_face():
 
 def test_mark_tracking():
     """Test the mark_tracking method"""
-    default_interface = "info.duzy.gst.switch"
+    default_interface = "us.timvideos.gstswitch"
     conn = Connection(default_interface=default_interface)
     conn.connection = MockConnection('mark_tracking')
     with pytest.raises(ConnectionError):
         face = [(1, 1, 1, 1), (2, 2, 2, 2)]
         conn.mark_tracking(face)
 
-    default_interface = "info.duzy.gst.switch.SwitchControllerInterface"
+    default_interface = "us.timvideos.gstswitch.SwitchControllerInterface"
     conn = Connection(default_interface=default_interface)
     conn.connection = MockConnection('mark_tracking')
     face = [(1, 1, 1, 1), (2, 2, 2, 2)]

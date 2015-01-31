@@ -73,7 +73,7 @@ class TestObjectPath(object):
 
     def test_object_path_normal(self):
         """Test when object_path is valid"""
-        object_path = "/info/duzy/gst/switch/SwitchController"
+        object_path = "/us/timvideos/gstswitch/SwitchController"
         conn = Controller(object_path=object_path)
         assert conn.object_path == object_path
 
@@ -98,7 +98,7 @@ class TestInterface(object):
 
     def test_interface_normal(self):
         """Test when the interface is valid"""
-        default_interface = "info.duzy.gst.switch.SwitchControllerInterface"
+        default_interface = "us.timvideos.gstswitch.SwitchControllerInterface"
         conn = Controller(default_interface=default_interface)
         assert default_interface == conn.default_interface
 
@@ -141,8 +141,8 @@ class TestSiggnalHandler(object):
             controller.cb_signal_handler(
                 None,
                 ':0',
-                '/info/duzy/gst/switch/SwitchControllerInterface',
-                'info.duzy.gst.switch.SwitchControllerInterface',
+                '/us/timvideos/gstswitch/SwitchControllerInterface',
+                'us.timvideos.gstswitch.SwitchControllerInterface',
                 signal,
                 GLib.Variant('(iii)', (5, 10, 20,)),
                 None)
@@ -167,8 +167,8 @@ class TestSiggnalHandler(object):
             controller.cb_signal_handler(
                 None,
                 ':0',
-                '/info/duzy/gst/switch/SwitchControllerInterface',
-                'info.duzy.gst.switch.SwitchControllerInterface',
+                '/us/timvideos/gstswitch/SwitchControllerInterface',
+                'us.timvideos.gstswitch.SwitchControllerInterface',
                 signal,
                 GLib.Variant('(i)', (123,)),
                 None)

@@ -31,9 +31,10 @@ class Controller(object):
     def __init__(
             self,
             address="tcp:host=127.0.0.1,port=5000",
-            bus_name='info.duzy.gst.switch.SwitchController',
-            object_path="/info/duzy/gst/switch/SwitchController",
-            default_interface="info.duzy.gst.switch.SwitchControllerInterface"
+            bus_name='us.timvideos.gstswitch.SwitchController',
+            object_path="/us/timvideos/gstswitch/SwitchController",
+            default_interface=("us.timvideos.gstswitch."
+                               "SwitchControllerInterface")
     ):
 
         super(Controller, self).__init__()
