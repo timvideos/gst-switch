@@ -156,7 +156,7 @@ class Connection(object):
 
     def signal_subscribe(self, signal_handler):
         """Subscribe to Signals on the bus"""
-        if not hasattr(signal_handler, '__call__'):
+        if not callable(signal_handler):
             raise ValueError('Provided signal_handler is not callable')
 
         try:
