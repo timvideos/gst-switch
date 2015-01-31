@@ -20,6 +20,9 @@ sudo pip install pylint --upgrade
 # Needed for tests
 sudo apt-get -y install wget libav-tools
 
+# Needed for style checks
+sudo apt-get -y install indent
+
 # Needed to get coverage output
 sudo apt-get -y install libyaml-dev
 if [[ $TEST == "server" ]]; then
