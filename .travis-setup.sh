@@ -20,11 +20,15 @@ sudo pip install pylint --upgrade
 # Needed for tests
 sudo apt-get -y install wget libav-tools
 
+# Needed for style checks
+sudo apt-get -y install indent
+
 # Needed to get coverage output
-if [ $TYPE == 'c' ]; then
-	sudo pip install cpp-coveralls
+sudo apt-get -y install libyaml-dev
+if [[ $TEST == "server" ]]; then
+	sudo pip install cpp-coveralls --upgrade
 else
-	sudo pip install python-coveralls
+	sudo pip install python-coveralls --upgrade
 fi
 
 # Start an X server so the GUI works
