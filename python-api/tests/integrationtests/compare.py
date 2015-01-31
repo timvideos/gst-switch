@@ -7,7 +7,11 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 import os
 
-from scipy.misc import imread
+try:
+    from scipy.misc import imread
+except ImportError:
+    from scipy.ndimage import imread
+
 from scipy.linalg import norm
 
 import tempfile
