@@ -435,6 +435,18 @@ class Controller(object):
 
     def on_preview_port_added(self, callback):
         """Register a Callback for the preview_port_added Signal
+        which is fired, when a new Video or Audio-Source is connected
+        to the Server and the Server opens a new Port where the Signal
+        of this Source can be previewed.
+
+        The Callback takes the following Arguments:
+           int port  - The TCP-Port on the Server where the
+                       Preview-Stream can be obtained from
+           int serve - Type of Material served
+                       0 = GST_SERVE_NOTHING
+                       1 = GST_SERVE_VIDEO_STREAM
+                       2 = GST_SERVE_VIDEO_AUDIO
+           int type  - Type of Branch serving the Video
         """
 
         if not callable(callback):
@@ -444,6 +456,18 @@ class Controller(object):
 
     def on_preview_port_removed(self, callback):
         """Register a Callback for the preview_port_removed Signal
+        which is fired, when a Video or Audio-Source is disconnected
+        from the Server and the Server closes its Port where the Signal
+        of this Source was provided.
+
+        The Callback takes the following Arguments:
+            int port  - The TCP-Port on the Server where the
+                        Preview-Stream was provided
+            int serve - Type of Material served
+                        0 = GST_SERVE_NOTHING
+                        1 = GST_SERVE_VIDEO_STREAM
+                        2 = GST_SERVE_VIDEO_AUDIO
+            int type  - Type of Branch serving the Video
         """
 
         if not callable(callback):
@@ -453,6 +477,14 @@ class Controller(object):
 
     def on_new_mode_online(self, callback):
         """Register a Callback for the new_mode_online Signal
+        which is fired, when the Composition-Mode was changed successfully.
+
+        The Callback takes the following Argument:
+            int mode  - The new Mode
+                        0 = COMPOSE_MODE_NONE
+                        1 = COMPOSE_MODE_PIP
+                        2 = COMPOSE_MODE_DUAL_PREVIEW
+                        3 = COMPOSE_MODE_DUAL_EQUAL
         """
 
         if not callable(callback):
@@ -462,6 +494,12 @@ class Controller(object):
 
     def on_show_face_marker(self, callback):
         """Register a Callback for the show_face_marker Signal
+        which is fired, when a Client has successfully set a face-marker
+        by calling mark_face.
+
+        The Callback takes the following Argument:
+            array faces  - An Array of Tuples of 4 ints, each specifying
+                           x, y, w, and h of a tracked region
         """
 
         if not callable(callback):
@@ -471,6 +509,12 @@ class Controller(object):
 
     def on_show_track_marker(self, callback):
         """Register a Callback for the show_track_marker Signal
+        which is fired, when a Client has successfully set a track-marker
+        by calling mark_tracking.
+
+        The Callback takes the following Argument:
+            array faces  - An Array of Tuples of 4 ints, each specifying
+                           x, y, w, and h of a tracked region
         """
 
         if not callable(callback):
@@ -480,6 +524,12 @@ class Controller(object):
 
     def on_select_face(self, callback):
         """Register a Callback for the select_face Signal
+        which is fired, when a Client has successfully selected a face
+        by calling click_video.
+
+        The Callback takes the following Argument:
+            int x  - X-Coordinate of the Click
+            int y  - Y-Coordinate of the Click
         """
 
         if not callable(callback):
