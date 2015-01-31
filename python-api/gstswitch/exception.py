@@ -41,6 +41,7 @@ else:
     # Python 3; so just use the builtin
     from builtins import ConnectionError
 
+
 class ConnectionReturnError(BaseError):
 
     """docstring for ConnectionReturnError"""
