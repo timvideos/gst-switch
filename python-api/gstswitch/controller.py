@@ -33,8 +33,8 @@ class Controller(object):
             address="tcp:host=127.0.0.1,port=5000",
             bus_name='us.timvideos.gstswitch.SwitchController',
             object_path="/us/timvideos/gstswitch/SwitchController",
-            default_interface=("us.timvideos.gstswitch."
-                               "SwitchControllerInterface")
+            default_interface=(
+                "us.timvideos.gstswitch.SwitchControllerInterface")
     ):
 
         super(Controller, self).__init__()

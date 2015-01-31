@@ -238,8 +238,8 @@ class MockConnection(object):
             cancellable):
         """Mock of call_sync method,
         raises GLib.GError if interface_name invalid"""
-        if interface_name == ("us.timvideos.gstswitch."
-                              "SwitchControllerInterface"):
+        if interface_name == (
+                "us.timvideos.gstswitch.SwitchControllerInterface"):
             return self.return_result
         else:
             raise GLib.GError('{0}: Test Failed'.format(self.method))
