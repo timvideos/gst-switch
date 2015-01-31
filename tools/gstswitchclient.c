@@ -81,18 +81,15 @@ gst_switch_client_call_controller (GstSwitchClient * client,
 
   //INFO ("calling: %s/%s", SWITCH_CONTROLLER_OBJECT_NAME, method_name);
 
-  value = g_dbus_connection_call_sync (
-    client->controller,
-    /* bus_name */ NULL,
-    SWITCH_CONTROLLER_OBJECT_PATH,
-    SWITCH_CONTROLLER_OBJECT_NAME,
-    method_name,
-    parameters,
-    reply_type,
-    G_DBUS_CALL_FLAGS_NONE,
-    gst_switch_client_dbus_timeout,
-    /* cancellable */NULL,
-    &error);
+  value = g_dbus_connection_call_sync (client->controller,
+      /* bus_name */ NULL,
+      SWITCH_CONTROLLER_OBJECT_PATH,
+      SWITCH_CONTROLLER_OBJECT_NAME,
+      method_name,
+      parameters,
+      reply_type, G_DBUS_CALL_FLAGS_NONE, gst_switch_client_dbus_timeout,
+      /* cancellable */ NULL,
+      &error);
 
   if (!value)
     goto error_call_sync;
@@ -402,10 +399,10 @@ gst_switch_client_on_controller_closed (GDBusConnection * connection,
 }
 
 void
-gst_switch_client_on_signal_received (GDBusConnection *connection,
-    const gchar *sender_name, const gchar *object_path,
-    const gchar *interface_name, const gchar *signal_name,
-    GVariant *parameters, gpointer user_data);
+gst_switch_client_on_signal_received (GDBusConnection * connection,
+    const gchar * sender_name, const gchar * object_path,
+    const gchar * interface_name, const gchar * signal_name,
+    GVariant * parameters, gpointer user_data);
 
 /**
  * @brief Connect to the GstSwitchServer controller.
@@ -426,7 +423,7 @@ gst_switch_client_connect_controller (GstSwitchClient * client,
   flags |= G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT;
 
   client->controller = g_dbus_connection_new_for_address_sync (address, flags,
-      /* GDBusAuthObserver */NULL, /* GCancellable */ NULL, &error);
+      /* GDBusAuthObserver */ NULL, /* GCancellable */ NULL, &error);
 
   if (client->controller == NULL)
     goto error_new_connection;
@@ -435,15 +432,13 @@ gst_switch_client_connect_controller (GstSwitchClient * client,
       G_CALLBACK (gst_switch_client_on_controller_closed), client);
 
   g_dbus_connection_signal_subscribe (client->controller,
-      /*sender*/ NULL,
+      /*sender */ NULL,
       SWITCH_CONTROLLER_OBJECT_NAME,
-      /*member*/ NULL,
+      /*member */ NULL,
       SWITCH_CONTROLLER_OBJECT_PATH,
-      /*arg0*/ NULL,
-      G_DBUS_SIGNAL_FLAGS_NONE,
-      &gst_switch_client_on_signal_received,
-      client,
-      /*user_data_free_func*/ NULL);
+      /*arg0 */ NULL,
+      G_DBUS_SIGNAL_FLAGS_NONE, &gst_switch_client_on_signal_received, client,
+      /*user_data_free_func */ NULL);
 
   GST_SWITCH_CLIENT_UNLOCK_CONTROLLER (client);
   return;
@@ -484,7 +479,7 @@ gst_switch_client_is_connected (GstSwitchClient * client)
  *
  */
 gboolean
-gst_switch_client_connect (GstSwitchClient * client, const gchar *address)
+gst_switch_client_connect (GstSwitchClient * client, const gchar * address)
 {
   if (gst_switch_client_is_connected (client)) {
     ERROR ("already connected");
@@ -551,46 +546,35 @@ gst_switch_client_select_face (GstSwitchClient * client, gint x, gint y)
 }
 
 void
-gst_switch_client_on_signal_received (GDBusConnection *connection,
-    const gchar *sender_name, const gchar *object_path,
-    const gchar *interface_name, const gchar *signal_name,
-    GVariant *parameters, gpointer user_data)
+gst_switch_client_on_signal_received (GDBusConnection * connection,
+    const gchar * sender_name, const gchar * object_path,
+    const gchar * interface_name, const gchar * signal_name,
+    GVariant * parameters, gpointer user_data)
 {
-  GstSwitchClient *client = GST_SWITCH_CLIENT(user_data);
-  INFO("Signal received: %s", signal_name);
+  GstSwitchClient *client = GST_SWITCH_CLIENT (user_data);
+  INFO ("Signal received: %s", signal_name);
 
-  if(g_strcmp0("new_mode_online", signal_name) == 0)
-  {
+  if (g_strcmp0 ("new_mode_online", signal_name) == 0) {
     gint mode = 0;
     g_variant_get (parameters, "(i)", &mode);
 
     gst_switch_client_new_mode_online (client, mode);
-  }
-  else if(g_strcmp0("preview_port_added", signal_name) == 0)
-  {
+  } else if (g_strcmp0 ("preview_port_added", signal_name) == 0) {
     gint port = 0, serve = 0, type = 0;
     g_variant_get (parameters, "(iii)", &port, &serve, &type);
 
     gst_switch_client_add_preview_port (client, port, serve, type);
-  }
-  else if(g_strcmp0("show_face_marker", signal_name) == 0)
-  {
+  } else if (g_strcmp0 ("show_face_marker", signal_name) == 0) {
     gst_switch_client_show_face_marker (client, parameters);
-  }
-  else if(g_strcmp0("show_track_marker", signal_name) == 0)
-  {
+  } else if (g_strcmp0 ("show_track_marker", signal_name) == 0) {
     gst_switch_client_show_track_marker (client, parameters);
-  }
-  else if(g_strcmp0("select_face", signal_name) == 0)
-  {
+  } else if (g_strcmp0 ("select_face", signal_name) == 0) {
     gint x = 0, y = 0;
     g_variant_get (parameters, "(ii)", &x, &y);
 
     gst_switch_client_select_face (client, x, y);
-  }
-  else
-  {
-    INFO("unhandled signal on bus: %s", signal_name);
+  } else {
+    INFO ("unhandled signal on bus: %s", signal_name);
   }
 }
 

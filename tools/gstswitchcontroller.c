@@ -211,16 +211,13 @@ gst_switch_controller_emit_signal (GstSwitchController * controller,
   g_assert (parameters);
   g_variant_ref_sink (parameters);
 
-  for (client = controller->clients, num = 0; client; client = g_list_next (client)) {
+  for (client = controller->clients, num = 0; client;
+      client = g_list_next (client)) {
     error = NULL;
-    res = g_dbus_connection_emit_signal (
-      G_DBUS_CONNECTION (client->data),
-      /*destination_bus_name*/ NULL,
-      SWITCH_CONTROLLER_OBJECT_PATH,
-      SWITCH_CONTROLLER_OBJECT_NAME,
-      signame,
-      parameters,
-      &error);
+    res = g_dbus_connection_emit_signal (G_DBUS_CONNECTION (client->data),
+        /*destination_bus_name */ NULL,
+        SWITCH_CONTROLLER_OBJECT_PATH,
+        SWITCH_CONTROLLER_OBJECT_NAME, signame, parameters, &error);
 
     if (!res) {
       g_assert (error != NULL);
@@ -323,7 +320,7 @@ gst_switch_controller_init (GstSwitchController * controller)
 
   controller->bus_server =
       g_dbus_server_new_sync (opts.controller_address, flags, guid,
-      /* GDBusAuthObserver */NULL, /* GCancellable */ NULL, &error);
+      /* GDBusAuthObserver */ NULL, /* GCancellable */ NULL, &error);
 
   if (error != NULL) {
     g_error ("failed to register controller: %s", error->message);
@@ -336,8 +333,7 @@ gst_switch_controller_init (GstSwitchController * controller)
       g_dbus_server_get_client_address (controller->bus_server));
 
   g_signal_connect (controller->bus_server, "new-connection",
-      G_CALLBACK (gst_switch_controller_on_new_connection),
-      controller);
+      G_CALLBACK (gst_switch_controller_on_new_connection), controller);
 
   g_dbus_server_start (controller->bus_server);
 
@@ -437,8 +433,8 @@ gst_switch_controller_tell_preview_port_added (GstSwitchController * controller,
 }
 
 void
-gst_switch_controller_tell_preview_port_removed (GstSwitchController * controller,
-    gint port, gint serve, gint type)
+gst_switch_controller_tell_preview_port_removed (GstSwitchController *
+    controller, gint port, gint serve, gint type)
 {
   gst_switch_controller_emit_signal (controller, "preview_port_removed",
       g_variant_new ("(iii)", port, serve, type));
@@ -771,6 +767,8 @@ gst_switch_controller_class_init (GstSwitchControllerClass * klass)
         (gpointer) entry->func);
   }
 
-  introspection_data = g_dbus_node_info_new_for_xml (gstswitchcontroller_introspection_xml, NULL);
+  introspection_data =
+      g_dbus_node_info_new_for_xml (gstswitchcontroller_introspection_xml,
+      NULL);
   g_assert (introspection_data != NULL);
 }
