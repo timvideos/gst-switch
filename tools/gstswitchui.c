@@ -464,8 +464,7 @@ gst_switch_ui_tick (GstSwitchUI * ui)
 static void
 gst_switch_ui_run (GstSwitchUI * ui)
 {
-  if (!gst_switch_client_connect (GST_SWITCH_CLIENT (ui), CLIENT_ROLE_UI,
-          srv_address)) {
+  if (!gst_switch_client_connect (GST_SWITCH_CLIENT (ui), srv_address)) {
     ERROR ("failed to connect to controller");
     return;
   }

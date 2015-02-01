@@ -7,17 +7,18 @@ from __future__ import absolute_import, print_function, unicode_literals
 import sys
 import os
 import pytest
-sys.path.insert(0, os.path.abspath(os.path.join(__file__, "../../../")))
+import time
+import datetime
+import subprocess
 
+from gi.repository import GLib
+from mock import Mock
+from integrationtests.compare import CompareVideo
+
+sys.path.insert(0, os.path.abspath(os.path.join(__file__, "../../../")))
 from gstswitch.server import Server
 from gstswitch.helpers import TestSources, PreviewSinks
 from gstswitch.controller import Controller
-import time
-import datetime
-
-from integrationtests.compare import CompareVideo
-
-import subprocess
 
 # PATH = os.getenv("HOME") + '/gst/stage/bin/'
 PATH = '../tools/'
@@ -46,15 +47,7 @@ class TestEstablishConnection(object):
                 self.establish_connection()
             serv.terminate(1)
         finally:
-            if serv.proc:
-                poll = serv.proc.poll()
-                print(self.__class__)
-                if poll == -11:
-                    print("SEGMENTATION FAULT OCCURRED")
-                print("ERROR CODE - {0}".format(poll))
-                serv.terminate(1)
-                log = open('server.log')
-                print(log.read())
+            serv.terminate_and_output_status(cov=True)
 
 
 class TestGetComposePort(object):
@@ -90,15 +83,7 @@ class TestGetComposePort(object):
                 sources.terminate_video()
                 serv.terminate(1)
             finally:
-                if serv.proc:
-                    poll = serv.proc.poll()
-                    print(self.__class__)
-                    if poll == -11:
-                        print("SEGMENTATION FAULT OCCURRED")
-                    print("ERROR CODE - {0}".format(poll))
-                    serv.terminate(1)
-                    log = open('server.log')
-                    print(log.read())
+                serv.terminate_and_output_status(cov=True)
 
         set_expected = [tuple(i) for i in expected_result]
         set_res = [tuple(i) for i in res]
@@ -138,15 +123,7 @@ class TestGetEncodePort(object):
                 sources.terminate_video()
                 serv.terminate(1)
             finally:
-                if serv.proc:
-                    poll = serv.proc.poll()
-                    print(self.__class__)
-                    if poll == -11:
-                        print("SEGMENTATION FAULT OCCURRED")
-                    print("ERROR CODE - {0}".format(poll))
-                    serv.terminate(1)
-                    log = open('server.log')
-                    print(log.read())
+                serv.terminate_and_output_status(cov=True)
 
         set_expected = [tuple(i) for i in expected_result]
         set_res = [tuple(i) for i in res]
@@ -187,17 +164,8 @@ class TestGetAudioPort(object):
                 serv.terminate(1)
 
             finally:
-                if serv.proc:
-                    poll = serv.proc.poll()
-                    print(self.__class__)
-                    if poll == -11:
-                        print("SEGMENTATION FAULT OCCURRED")
-                    print("ERROR CODE - {0}".format(poll))
-                    serv.terminate(1)
-                    log = open('server.log')
-                    print(log.read())
-        # print(res)
-        # print(expected_result)
+                serv.terminate_and_output_status(cov=True)
+
         set_expected = [tuple(i) for i in expected_result]
         set_res = [tuple(i) for i in res]
         assert set(set_expected) == set(set_res)
@@ -241,15 +209,87 @@ class TestGetPreviewPorts(object):
                 sources.terminate_audio()
                 serv.terminate(1)
             finally:
-                if serv.proc:
-                    poll = serv.proc.poll()
-                    print(self.__class__)
-                    if poll == -11:
-                        print("SEGMENTATION FAULT OCCURRED")
-                    print("ERROR CODE - {0}".format(poll))
-                    serv.terminate(1)
-                    log = open('server.log')
-                    print(log.read())
+                serv.terminate_and_output_status(cov=True)
+
+
+class TestSignals(object):
+
+    """Test on_*() methods"""
+
+    def __init__(self):
+        self.mainloop = GLib.MainLoop()
+        self.quit_count = 0
+
+    def run_mainloop(self):
+        """Start the MainLoop, set Quit-Counter to Zero"""
+        self.quit_count = 0
+        self.mainloop.run()
+
+    def quit_mainloop(self, *_):
+        """Quit the MainLoop, set Quit-Counter to Zero"""
+        self.mainloop.quit()
+        self.quit_count = 0
+
+    def quit_mainloop_after(self, num):
+        """Increment Quit-Counter, if it reaches num, Quit the MainLoop"""
+        self.quit_count += 1
+        if self.quit_count == num:
+            self.quit_mainloop()
+
+    def test_on_new_mode_online(self):
+        """Create a Controller object, call on_new_mode_online method and
+        check that the callback fires
+        """
+        serv = Server(path=PATH)
+        try:
+            serv.run()
+
+            controller = Controller()
+            controller.establish_connection()
+
+            test_cb = Mock(side_effect=self.quit_mainloop)
+            controller.on_new_mode_online(test_cb)
+            controller.set_composite_mode(0)
+
+            GLib.timeout_add_seconds(5, self.quit_mainloop)
+            self.run_mainloop()
+
+            test_cb.assert_called_once_with(0)
+
+            serv.terminate(1)
+        finally:
+            serv.terminate_and_output_status(cov=True)
+
+    def test_on_preview_port_added(self):
+        """Create a Controller object, call add a source method and
+        check that the callback fires
+        """
+        serv = Server(path=PATH, video_port=3000)
+        try:
+            serv.run()
+
+            controller = Controller()
+            controller.establish_connection()
+
+            test_cb = Mock(side_effect=lambda mode, serve, type:
+                           self.quit_mainloop_after(2))
+            controller.on_preview_port_added(test_cb)
+
+            sources = TestSources(video_port=3000)
+            sources.new_test_video()
+            sources.new_test_video()
+
+            GLib.timeout_add_seconds(5, self.quit_mainloop)
+            self.run_mainloop()
+
+            print(test_cb.call_args_list)
+            test_cb.assert_any_call(3003, 1, 7)
+            test_cb.assert_any_call(3004, 1, 8)
+            assert test_cb.call_count == 2
+
+            serv.terminate(1)
+        finally:
+            serv.terminate_and_output_status(cov=True)
 
 
 class VideoFileSink(object):
@@ -318,15 +358,7 @@ class TestSetCompositeMode(object):
                 # assert expected_result == res
 
             finally:
-                if serv.proc:
-                    poll = serv.proc.poll()
-                    print(self.__class__)
-                    if poll == -11:
-                        print("SEGMENTATION FAULT OCCURRED")
-                    print("ERROR CODE - {0}".format(poll))
-                    serv.terminate(1)
-                    log = open('server.log')
-                    print(log.read())
+                serv.terminate_and_output_status(cov=True)
 
     def verify_output(self, mode, video):
         """Verify if the output is correct by comparing key frames"""
@@ -404,15 +436,7 @@ class TestNewRecord(object):
                 serv.terminate(1)
                 assert os.path.exists(test_filename) is True
             finally:
-                if serv.proc:
-                    poll = serv.proc.poll()
-                    print(self.__class__)
-                    if poll == -11:
-                        print("SEGMENTATION FAULT OCCURRED")
-                    print("ERROR CODE - {0}".format(poll))
-                    serv.terminate(1)
-                    log = open('server.log')
-                    print(log.read())
+                serv.terminate_and_output_status(cov=True)
 
 
 class TestAdjustPIP(object):
@@ -454,15 +478,7 @@ class TestAdjustPIP(object):
                     assert self.verify_output(index, out_file) is True
 
             finally:
-                if serv.proc:
-                    poll = serv.proc.poll()
-                    print(self.__class__)
-                    if poll == -11:
-                        print("SEGMENTATION FAULT OCCURRED")
-                    print("ERROR CODE - {0}".format(poll))
-                    serv.terminate(1)
-                    log = open('server.log')
-                    print(log.read())
+                serv.terminate_and_output_status(cov=True)
 
     def verify_output(self, index, video):
         """Verify if the output is correct by comparing key frames"""
@@ -521,15 +537,7 @@ class TestSwitch(object):
                 serv.terminate(1)
 
             finally:
-                if serv.proc:
-                    poll = serv.proc.poll()
-                    print(self.__class__)
-                    if poll == -11:
-                        print("SEGMENTATION FAULT OCCURRED")
-                    print("ERROR CODE - {0}".format(poll))
-                    serv.terminate(1)
-                    log = open('server.log')
-                    print(log.read())
+                serv.terminate_and_output_status(cov=True)
 
     def test_switch(self):
         """Test switch"""
@@ -580,15 +588,7 @@ class TestClickVideo(object):
                     assert self.verify_output(index, out_file) is True
 
             finally:
-                if serv.proc:
-                    poll = serv.proc.poll()
-                    print(self.__class__)
-                    if poll == -11:
-                        print("SEGMENTATION FAULT OCCURRED")
-                    print("ERROR CODE - {0}".format(poll))
-                    serv.terminate(1)
-                    log = open('server.log')
-                    print(log.read())
+                serv.terminate_and_output_status(cov=True)
 
     def verify_output(self, index, video):
         """Verify if the output is correct by comparing key frames"""
@@ -649,15 +649,7 @@ class TestMarkFace(object):
                     assert self.verify_output(index, out_file) is True
 
             finally:
-                if serv.proc:
-                    poll = serv.proc.poll()
-                    print(self.__class__)
-                    if poll == -11:
-                        print("SEGMENTATION FAULT OCCURRED")
-                    print("ERROR CODE - {0}".format(poll))
-                    serv.terminate(1)
-                    log = open('server.log')
-                    print(log.read())
+                serv.terminate_and_output_status(cov=True)
 
     def verify_output(self, index, video):
         """Verify if the output is correct by comparing key frames"""
@@ -712,15 +704,7 @@ class TestMarkTracking(object):
                     assert self.verify_output(index, out_file) is True
 
             finally:
-                if serv.proc:
-                    poll = serv.proc.poll()
-                    print(self.__class__)
-                    if poll == -11:
-                        print("SEGMENTATION FAULT OCCURRED")
-                    print("ERROR CODE - {0}".format(poll))
-                    serv.terminate(1)
-                    log = open('server.log')
-                    print(log.read())
+                serv.terminate_and_output_status(cov=True)
 
     def verify_output(self, index, video):
         """Verify if the output is correct by comparing key frames"""

@@ -1026,7 +1026,7 @@ testclient_run (gpointer data)
   client->mainloop = g_main_loop_new (NULL, TRUE);
 
   connect_ok =
-      gst_switch_client_connect (GST_SWITCH_CLIENT (client), CLIENT_ROLE_UI,
+      gst_switch_client_connect (GST_SWITCH_CLIENT (client),
       "tcp:host=127.0.0.1,port=5000");
   g_assert (connect_ok);
 

@@ -226,8 +226,7 @@ gst_switch_capture_end (GstWorker * worker, GstSwitchCapture * capture)
 static void
 gst_switch_capture_run (GstSwitchCapture * capture)
 {
-  if (!gst_switch_client_connect (GST_SWITCH_CLIENT (capture),
-          CLIENT_ROLE_CAPTURE, srv_address)) {
+  if (!gst_switch_client_connect (GST_SWITCH_CLIENT (capture), srv_address)) {
     ERROR ("failed to connect to controller");
     return;
   }

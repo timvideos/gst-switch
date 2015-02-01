@@ -304,6 +304,21 @@ class Server(object):
                 raise ServerProcessError("Cannot terminate server process. "
                                          "Try killing it")
 
+    def terminate_and_output_status(self, cov=False):
+        """Test is a closed Server-Processed died because of a SEGMENTATION
+        FAULT and print its Log if it did
+        """
+
+        if self.proc:
+            poll = self.proc.poll()
+            if poll == -11:
+                print("SEGMENTATION FAULT OCCURRED")
+            print("ERROR CODE - {0}".format(poll))
+
+            self.terminate(cov)
+            with open('server.log') as log:
+                print(log.read())
+
     def kill(self, cov=False):
         """Kill the server process by sending signal.SIGKILL
         self.proc is made None on success

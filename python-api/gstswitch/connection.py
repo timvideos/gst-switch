@@ -27,9 +27,9 @@ class Connection(object):
     def __init__(
             self,
             address="tcp:host=127.0.0.1,port=5000",
-            bus_name='info.duzy.gst.switch.SwitchController',
-            object_path="/info/duzy/gst/switch/SwitchController",
-            default_interface=("info.duzy.gst.switch."
+            bus_name='us.timvideos.gstswitch.SwitchController',
+            object_path="/us/timvideos/gstswitch/SwitchController",
+            default_interface=("us.timvideos.gstswitch."
                                "SwitchControllerInterface")):
 
         super(Connection, self).__init__()
@@ -149,6 +149,26 @@ class Connection(object):
                 None,
                 None)
             self.connection = connection
+        except GLib.GError as error:
+            message = error.message
+            new_message = "{1} ({0})".format(message, self.address)
+            raise ConnectionError(new_message)
+
+    def signal_subscribe(self, signal_handler):
+        """Subscribe to Signals on the bus"""
+        if not callable(signal_handler):
+            raise ValueError('Provided signal_handler is not callable')
+
+        try:
+            self.connection.signal_subscribe(
+                None,  # sender
+                self.default_interface,
+                None,  # member
+                self.object_path,
+                None,  # arg0
+                Gio.DBusSignalFlags.NONE,
+                signal_handler,
+                None)  # user_data
         except GLib.GError as error:
             message = error.message
             new_message = "{1} ({0})".format(message, self.address)

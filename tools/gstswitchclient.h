@@ -54,17 +54,6 @@ typedef void (*GstSwitchClientShowFaceMarkerFunc) (GstSwitchClient * client,
     GVariant * faces);
 
 /**
- * @enum GstSwitchClientRole
- * @brief The role of a client.
- */
-typedef enum
-{
-  CLIENT_ROLE_NONE,             /*!< the client is trivial */
-  CLIENT_ROLE_UI,               /*!< the client is acting as a UI */
-  CLIENT_ROLE_CAPTURE,          /*!< the client is acting as a capture */
-} GstSwitchClientRole;
-
-/**
  *  @class GstSwitchClient
  *  @struct _GstSwitchClient
  *  @brief The GstSwitch client.
@@ -72,8 +61,6 @@ typedef enum
 struct _GstSwitchClient
 {
   GObject base;
-
-  GstSwitchClientRole role;
 
   GMutex controller_lock;
   GDBusConnection *controller;
@@ -109,7 +96,7 @@ GType gst_switch_client_get_type (void);
 
 gboolean gst_switch_client_is_connected (GstSwitchClient * client);
 gboolean gst_switch_client_connect (GstSwitchClient * client,
-    GstSwitchClientRole role, const gchar * address);
+    const gchar * address);
 gint gst_switch_client_get_compose_port (GstSwitchClient * client);
 gint gst_switch_client_get_encode_port (GstSwitchClient * client);
 gint gst_switch_client_get_audio_port (GstSwitchClient * client);

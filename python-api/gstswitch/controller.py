@@ -31,9 +31,10 @@ class Controller(object):
     def __init__(
             self,
             address="tcp:host=127.0.0.1,port=5000",
-            bus_name='info.duzy.gst.switch.SwitchController',
-            object_path="/info/duzy/gst/switch/SwitchController",
-            default_interface="info.duzy.gst.switch.SwitchControllerInterface"
+            bus_name='us.timvideos.gstswitch.SwitchController',
+            object_path="/us/timvideos/gstswitch/SwitchController",
+            default_interface=(
+                "us.timvideos.gstswitch.SwitchControllerInterface")
     ):
 
         super(Controller, self).__init__()
@@ -48,6 +49,13 @@ class Controller(object):
         self.bus_name = bus_name
         self.object_path = object_path
         self.default_interface = default_interface
+
+        self.callbacks_preview_port_added = []
+        self.callbacks_preview_port_removed = []
+        self.callbacks_new_mode_online = []
+        self.callbacks_show_face_marker = []
+        self.callbacks_show_track_marker = []
+        self.callbacks_select_face = []
 
     @property
     def address(self):
@@ -156,6 +164,34 @@ class Controller(object):
             default_interface=self.default_interface)
 
         self.connection.connect_dbus()
+        self.connection.signal_subscribe(self.cb_signal_handler)
+
+    def cb_signal_handler(self, connection, sender_name, object_path,
+                          interface_name, signal_name, parameters, user_data):
+        """Private Callback passed into Gio's signal_subscribe and called
+        for every signal arriving on the bus.
+
+        For params see Gio-Docs: <https://lazka.github.io/pgi-docs/#Gio-2.0/
+        classes/DBusConnection.html#Gio.DBusConnection.signal_subscribe>
+        """
+        try:
+            callbacks = getattr(self, 'callbacks_'+signal_name)
+            if not isinstance(callbacks, list):
+                raise AttributeError()
+
+            unpack = parameters.unpack()
+            for callback in callbacks:
+                # We're passing the values unpacked from the GVariant as-is
+                # to the callback. The auther of the callback is responsible
+                # to make sure that it's arguments match with the DBus Signal
+                # Specification for the particular Signal he's subscribing for
+                # Disable pylint-warning because we know what we're doing here.
+
+                # pylint: disable=star-args
+                callback(*unpack)
+
+        except AttributeError:
+            pass
 
     def get_compose_port(self):
         """Get the compose port number
@@ -396,3 +432,107 @@ class Controller(object):
         for tupl in liststr:
             preview_ports.append(int(tupl[0]))
         return preview_ports
+
+    def on_preview_port_added(self, callback):
+        """Register a Callback for the preview_port_added Signal
+        which is fired, when a new Video or Audio-Source is connected
+        to the Server and the Server opens a new Port where the Signal
+        of this Source can be previewed.
+
+        The Callback takes the following Arguments:
+           int port  - The TCP-Port on the Server where the
+                       Preview-Stream can be obtained from
+           int serve - Type of Material served
+                       0 = GST_SERVE_NOTHING
+                       1 = GST_SERVE_VIDEO_STREAM
+                       2 = GST_SERVE_VIDEO_AUDIO
+           int type  - Type of Branch serving the Video
+        """
+
+        if not callable(callback):
+            raise ValueError('Provided argument callback is not callable')
+
+        self.callbacks_preview_port_added.append(callback)
+
+    def on_preview_port_removed(self, callback):
+        """Register a Callback for the preview_port_removed Signal
+        which is fired, when a Video or Audio-Source is disconnected
+        from the Server and the Server closes its Port where the Signal
+        of this Source was provided.
+
+        The Callback takes the following Arguments:
+            int port  - The TCP-Port on the Server where the
+                        Preview-Stream was provided
+            int serve - Type of Material served
+                        0 = GST_SERVE_NOTHING
+                        1 = GST_SERVE_VIDEO_STREAM
+                        2 = GST_SERVE_VIDEO_AUDIO
+            int type  - Type of Branch serving the Video
+        """
+
+        if not callable(callback):
+            raise ValueError('Provided argument callback is not callable')
+
+        self.callbacks_preview_port_removed.append(callback)
+
+    def on_new_mode_online(self, callback):
+        """Register a Callback for the new_mode_online Signal
+        which is fired, when the Composition-Mode was changed successfully.
+
+        The Callback takes the following Argument:
+            int mode  - The new Mode
+                        0 = COMPOSE_MODE_NONE
+                        1 = COMPOSE_MODE_PIP
+                        2 = COMPOSE_MODE_DUAL_PREVIEW
+                        3 = COMPOSE_MODE_DUAL_EQUAL
+        """
+
+        if not callable(callback):
+            raise ValueError('Provided argument callback is not callable')
+
+        self.callbacks_new_mode_online.append(callback)
+
+    def on_show_face_marker(self, callback):
+        """Register a Callback for the show_face_marker Signal
+        which is fired, when a Client has successfully set a face-marker
+        by calling mark_face.
+
+        The Callback takes the following Argument:
+            array faces  - An Array of Tuples of 4 ints, each specifying
+                           x, y, w, and h of a tracked region
+        """
+
+        if not callable(callback):
+            raise ValueError('Provided argument callback is not callable')
+
+        self.callbacks_show_face_marker.append(callback)
+
+    def on_show_track_marker(self, callback):
+        """Register a Callback for the show_track_marker Signal
+        which is fired, when a Client has successfully set a track-marker
+        by calling mark_tracking.
+
+        The Callback takes the following Argument:
+            array faces  - An Array of Tuples of 4 ints, each specifying
+                           x, y, w, and h of a tracked region
+        """
+
+        if not callable(callback):
+            raise ValueError('Provided argument callback is not callable')
+
+        self.callbacks_show_track_marker.append(callback)
+
+    def on_select_face(self, callback):
+        """Register a Callback for the select_face Signal
+        which is fired, when a Client has successfully selected a face
+        by calling click_video.
+
+        The Callback takes the following Argument:
+            int x  - X-Coordinate of the Click
+            int y  - Y-Coordinate of the Click
+        """
+
+        if not callable(callback):
+            raise ValueError('Provided argument callback is not callable')
+
+        self.callbacks_select_face.append(callback)

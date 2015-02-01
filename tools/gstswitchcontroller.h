@@ -32,12 +32,8 @@
 #define GST_IS_SWITCH_CONTROLLER(object) (G_TYPE_CHECK_INSTANCE_TYPE ((object), GST_TYPE_SWITCH_CONTROLLER))
 #define GST_IS_SWITCH_CONTROLLER_CLASS(class) (G_TYPE_CHECK_CLASS_TYPE ((class), GST_TYPE_SWITCH_CONTROLLER))
 
-#define SWITCH_CONTROLLER_OBJECT_NAME	 "info.duzy.gst.switch.SwitchControllerInterface"
-#define SWITCH_CONTROLLER_OBJECT_PATH	"/info/duzy/gst/switch/SwitchController"
-#define SWITCH_UI_OBJECT_NAME		 "info.duzy.gst.switch.SwitchUIInterface"
-#define SWITCH_UI_OBJECT_PATH		"/info/duzy/gst/switch/SwitchUI"
-#define SWITCH_CAPTURE_OBJECT_NAME	 "info.duzy.gst.switch.SwitchCaptureInterface"
-#define SWITCH_CAPTURE_OBJECT_PATH	"/info/duzy/gst/switch/SwitchCapture"
+#define SWITCH_CONTROLLER_OBJECT_NAME "us.timvideos.gstswitch.SwitchControllerInterface"
+#define SWITCH_CONTROLLER_OBJECT_PATH "/us/timvideos/gstswitch/SwitchController"
 
 typedef struct _GstSwitchController GstSwitchController;
 typedef struct _GstSwitchControllerClass GstSwitchControllerClass;
@@ -64,10 +60,8 @@ typedef struct _GstSwitchController
   GObject base;                 /*!< the parent object */
   GstSwitchServer *server;      /*!< the GstSwitchServer instance */
   GDBusServer *bus_server;      /*!< the dbus server instance */
-  GMutex uis_lock;              /*!< the lock for %uis */
-  GMutex captures_lock;         /*!< the lock for %captures */
-  GList *uis;                   /*!< the client list */
-  GList *captures;              /*!< the capture client list */
+  GMutex clients_lock;          /*!< the lock for %clients */
+  GList *clients;               /*!< the client list */
 } GstSwitchController;
 
 /**
@@ -84,10 +78,9 @@ typedef struct _GstSwitchControllerClass
 GType gst_switch_controller_get_type (void);
 
 gboolean gst_switch_controller_is_valid (GstSwitchController *);
-void gst_switch_controller_tell_audio_port (GstSwitchController *, gint port);
-void gst_switch_controller_tell_compose_port (GstSwitchController *, gint port);
-void gst_switch_controller_tell_encode_port (GstSwitchController *, gint port);
-void gst_switch_controller_tell_preview_port (GstSwitchController *,
+void gst_switch_controller_tell_preview_port_added (GstSwitchController *,
+    gint port, gint serve, gint type);
+void gst_switch_controller_tell_preview_port_removed (GstSwitchController *,
     gint port, gint serve, gint type);
 void gst_switch_controller_tell_new_mode_onlne (GstSwitchController *,
     gint mode);
@@ -98,6 +91,7 @@ void gst_switch_controller_show_face_marker (GstSwitchController * controller,
 void gst_switch_controller_show_track_marker (GstSwitchController * controller,
     GVariant * faces);
 
+extern const gchar gstswitchcontroller_introspection_xml[];
 extern gint gst_switch_controller_dbus_timeout;
 
 #endif //__GST_SWITCH_CONTROLLER_H__
