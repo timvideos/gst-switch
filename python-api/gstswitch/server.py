@@ -9,6 +9,7 @@ from six import string_types
 import os
 import signal
 import subprocess
+import logging
 from distutils import spawn
 
 from errno import ENOENT
@@ -50,6 +51,8 @@ class Server(object):
             log_to_file=True):
 
         super(Server, self).__init__()
+
+        self.log = logging.getLogger('server')
 
         self._path = None
         self._video_port = None
@@ -203,7 +206,7 @@ class Server(object):
         gives a OS based error.
         """
         self.gst_option_string = gst_option
-        print("Starting server")
+        self.log.debug("Starting server")
         self.proc = self._run_process()
         if self.proc:
             self.pid = self.proc.pid
@@ -247,7 +250,7 @@ class Server(object):
         :param cmd: The command which needs to be executed
         :returns: process created
         """
-        print('Creating process %s' % (cmd))
+        self.log.info('Starting process %s' % (cmd))
         try:
             if self.log_to_file:
                 with open('server.log', 'w') as tempf:
@@ -283,7 +286,7 @@ class Server(object):
         Calls 'make coverage' to generate coverage in .gcov files
         """
         cmd = 'make -C {0} coverage'.format(TOOLS_DIR)
-        print(TOOLS_DIR)
+        print('Starting process %s' % (cmd))
         with open(os.devnull, 'w'):
             proc = subprocess.Popen(
                 cmd.split(),
@@ -301,7 +304,7 @@ class Server(object):
         :raises ServerProcessError: Process does not exist
         :raises ServerProcessError: Cannot terminate process. Try killing it
         """
-        print('Killing server')
+        self.log.debug('Killing server')
         proc = self.proc
         if proc is None:
             raise ServerProcessError('Server Process does not exist')
@@ -311,7 +314,7 @@ class Server(object):
                     self.gcov_flush()
                     self.make_coverage()
                 proc.terminate()
-                print('Server Killed')
+                self.log.info('Killing server')
                 self.proc = None
                 return True
             except OSError:
@@ -326,8 +329,9 @@ class Server(object):
         if self.proc:
             poll = self.proc.poll()
             if poll == -11:
-                print("SEGMENTATION FAULT OCCURRED")
-            print("ERROR CODE - {0}".format(poll))
+                self.log.error("Server exited with Segmentation Fault")
+            if poll != 0:
+                self.log.error("Server exited Error Eode {0}".format(poll))
 
             self.terminate(cov)
             with open('server.log') as log:
@@ -370,7 +374,7 @@ class Server(object):
             raise ServerProcessError('Server process does not exist')
         else:
             try:
-                print("GCOV FLUSH")
+                self.log.debug("Signaling GCOV Flush")
                 os.kill(self.pid, signal.SIGUSR1)
                 return True
             except OSError:
