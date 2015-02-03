@@ -46,7 +46,8 @@ class Server(object):
             audio_port=4000,
             controller_address='tcp:host=0.0.0.0,port=5000',
             record_file=False,
-            video_format=None):
+            video_format=None,
+            log_to_file=True):
 
         super(Server, self).__init__()
 
@@ -63,6 +64,8 @@ class Server(object):
         self.controller_address = controller_address
         self.record_file = record_file
         self.video_format = video_format
+
+        self.log_to_file = log_to_file
 
         self.proc = None
         self.pid = -1
@@ -246,15 +249,12 @@ class Server(object):
         """
         print('Creating process %s' % (cmd))
         try:
-            with open('server.log', 'w') as tempf:
-                process = subprocess.Popen(
-                    cmd,
-                    stdout=tempf,
-                    stderr=tempf,
-                    bufsize=-1,
-                    shell=False)
-                print(cmd)
-                return process
+            if self.log_to_file:
+                with open('server.log', 'w') as tempf:
+                    return self._start_process_log_file(cmd, tempf, tempf)
+            else:
+                from sys import stdout, stderr
+                return self._start_process_log_file(cmd, stdout, stderr)
         except OSError as error:
             if error.errno == ENOENT:
                 raise PathError("Cannot find gst-switch-srv at path:"
@@ -262,6 +262,20 @@ class Server(object):
             else:
                 raise ServerProcessError("Internal error "
                                          "while launching process")
+
+    @staticmethod
+    def _start_process_log_file(cmd, stdout_file, stderr_file):
+        """
+        Start a process with the specified file like objects.
+        """
+        process = subprocess.Popen(
+            cmd,
+            stdout=stdout_file,
+            stderr=stderr_file,
+            bufsize=-1,
+            shell=False)
+        print(cmd)
+        return process
 
     @classmethod
     def make_coverage(cls):
