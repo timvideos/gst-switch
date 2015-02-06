@@ -1,26 +1,31 @@
+"""
+Contains the Base class for integration tests.
+"""
+
 import sys
 import os
-import pytest
 import logging
-import subprocess
 
 sys.path.insert(0, os.path.abspath(os.path.join(__file__, "../../../")))
 from gstswitch.server import Server
-from gstswitch.helpers import TestSources, PreviewSinks
+from gstswitch.helpers import TestSources  # PreviewSinks
 from gstswitch.controller import Controller
 
 # PATH = os.getenv("HOME") + '/gst/stage/bin/'
 PATH = '../tools/'
 
+
 class IntegrationTestbase(object):
     """Base class for integration tests."""
 
+    # Tests are not allowed to have an __init__ method
     # pylint: disable=attribute-defined-outside-init
     def setup_method(self, _):
         """Set up called automatically before every test_XXXX method."""
         self.log = logging.getLogger()
         self.log.setLevel(logging.DEBUG)
-        logging.basicConfig(format='%(filename)s:%(lineno)d (%(funcName)s): %(message)s')
+        logging.basicConfig(
+            format="%(filename)s:%(lineno)d (%(funcName)s): %(message)s")
 
         self.serv = None
         self.sources = None
@@ -36,6 +41,9 @@ class IntegrationTestbase(object):
         self.log.info("running Server")
         self.serv.run()
         assert self.serv.pid
+
+        self.log.info("waiting for Server to open Controller-Port")
+        self.serv.wait_for_output('tcp:host=0.0.0.0,port=5000')
 
         self.log.info("setting up TestSources")
         self.sources = TestSources(
@@ -74,7 +82,7 @@ class IntegrationTestbase(object):
                 if poll == -11:
                     self.log.error("Server exited with Segmentation Fault")
                 if poll != 0:
-                    self.log.error("Server exited Error Eode {0}".format(poll))
+                    self.log.error("Server exited Error Eode %s", poll)
 
             log = open('server.log')
             print(log.read())

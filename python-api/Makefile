@@ -17,6 +17,7 @@ lint:
 	${PYLINT} --rcfile=.pylintrc_gstswitch gstswitch
 	${PYLINT} --rcfile=.pylintrc_unittests tests/unittests/*
 	${PYLINT} --rcfile=.pylintrc_integrationtests tests/integrationtests/*.py
+	${PYLINT} --rcfile=.pylintrc_integrationtests2 tests/integrationtests2/*.py
 	@echo "Code style is okay!!"
 
 pep8:
@@ -26,6 +27,8 @@ pep8:
 	@echo "unittests are pep8 clean!!"
 	${PEP8} tests/integrationtests
 	@echo "integration tests are pep8 clean!!"
+	${PEP8} tests/integrationtests2
+	@echo "integration tests 2 are pep8 clean!!"
 
 style: pep8 lint
 
