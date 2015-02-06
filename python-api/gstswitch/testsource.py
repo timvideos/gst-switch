@@ -139,7 +139,6 @@ video/x-raw,
         width = str(width)
         height = str(height)
         capsstring = self.VIDEO_CAPS.format(width, height)
-        print(capsstring)
         caps = Gst.Caps.from_string(capsstring)
         element.set_property('caps', caps)
         return element
@@ -215,7 +214,6 @@ audio/x-raw,
         """
         element = self.make("capsfilter", "afilter")
         capsstring = self.AUDIO_CAPS
-        print(capsstring)
         caps = Gst.Caps.from_string(capsstring)
         element.set_property('caps', caps)
         return element

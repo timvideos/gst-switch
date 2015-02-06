@@ -6,6 +6,7 @@ compose port output.
 
 from __future__ import absolute_import, print_function, unicode_literals
 
+import logging
 from gstswitch import testsource
 from .exception import RangeError, InvalidIndexError
 
@@ -30,6 +31,8 @@ class TestSources(object):
         self._running_tests_audio = []
         self._audio_port = None
         self._video_port = None
+
+        self.log = logging.getLogger('testsources')
 
         if video_port:
             self.video_port = video_port
@@ -134,10 +137,6 @@ class TestSources(object):
         """Returns a list of processes acting as video test sources running
         :returns: A list containing all video test sources running
         """
-        i = 0
-        for test in self._running_tests_video:
-            print(i, "pattern:", test.pattern)
-            i += 1
         return self._running_tests_video
 
     def terminate_index_video(self, index):
@@ -157,14 +156,15 @@ class TestSources(object):
         except TypeError:
             raise InvalidIndexError("Index should be a valid integer")
 
-        print('End source with pattern %s' % (str(testsrc.pattern)))
+        self.log.debug('terminating video-source'
+                       'with pattern %s', testsrc.pattern)
+
         testsrc.end()
         self._running_tests_video.remove(self._running_tests_video[index])
 
     def terminate_video(self):
         """Terminate all test video sources
         """
-        print('TESTS:', self._running_tests_video)
         for _ in range(len(self._running_tests_video)):
             self.terminate_index_video(0)
 
@@ -183,18 +183,12 @@ class TestSources(object):
             freq,
             wave)
         testsrc.run()
-        # print(testsrc)
         self._running_tests_audio.append(testsrc)
-        # print(self._running_tests_audio)
 
     def get_test_audio(self):
         """Returns a list of processes acting as audio test sources running
         :returns: A list containing all audio test sources running
         """
-        i = 0
-        for test in self._running_tests_audio:
-            print(i, "wave:", test.wave)
-            i += 1
         return self._running_tests_audio
 
     def terminate_index_audio(self, index):
@@ -214,14 +208,13 @@ class TestSources(object):
         except TypeError:
             raise InvalidIndexError("Index should be a valid integer")
 
-        print('End source with wave %s' % (str(testsrc.wave)))
+        self.log.debug('terminating audio-source with wave %s', testsrc.wave)
         testsrc.end()
         self._running_tests_audio.remove(self._running_tests_audio[index])
 
     def terminate_audio(self):
         """Terminate all test audio sources
         """
-        print('TESTS:', self._running_tests_audio)
         for _ in range(len(self._running_tests_audio)):
             self.terminate_index_audio(0)
 
@@ -236,6 +229,8 @@ class PreviewSinks(object):
         super(PreviewSinks, self).__init__()
         self._preview_port = None
         self.preview = None
+
+        self.log = logging.getLogger('previewsinks')
 
         self.preview_port = preview_port
 
@@ -271,14 +266,14 @@ class PreviewSinks(object):
     def run(self):
         """Run the Preview Sink"""
         self.preview = testsource.Preview(self.preview_port)
+        self.log.debug('starting preview')
         self.preview.run()
-        print('start preview')
 
     def terminate(self):
         """End/Terminate the Preview Sink"""
         try:
+            self.log.debug('ending preview')
             self.preview.end()
             self.preview = None
-            print('end preview')
         except AttributeError:
             raise AttributeError("No preview Sink to terminate")
