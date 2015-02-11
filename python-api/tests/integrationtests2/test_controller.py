@@ -93,26 +93,42 @@ class TestGetAudioPort(object):
 class TestGetPreviewPorts(object):
     """ Test get_preview_ports method
     """
-    def wait_until_ready(self):
-        """ Blocks until the Server has reported, that it's
-        encoding-output is started
+    def wait_until_ready(self, count):
+        """ Blocks until the Server has reported, that the right number of
+        preview-ports are is started
         """
         self.log.info("waiting for Server to start preview-port-outputs")
-        self.serv.wait_for_output('tcpserversink')
+        self.serv.wait_for_output('tcpserversink name=sink', count=count)
 
     def test_preview_ports(self):
         """Test get_preview_ports method returning the expected port"""
         self.setup_server()
         self.setup_controller()
 
-        self.log.info("starting 2 test-video sources")
-        self.sources.new_test_video()
+        self.log.info("starting 1 test-video source")
         self.sources.new_test_video()
 
-        self.wait_until_ready()
+        self.wait_until_ready(1)
 
         self.log.info("calling get_preview_ports")
-        assert self.controller.get_preview_ports() == [3003, 3004]
+        assert self.controller.get_preview_ports() == [3003]
+
+    def test_five_preview_ports(self):
+        """Test get_preview_ports method returning the expected port"""
+        self.setup_server()
+        self.setup_controller()
+
+        self.log.info("starting 5 test-video sources")
+        self.sources.new_test_video()
+        self.sources.new_test_video()
+        self.sources.new_test_video()
+        self.sources.new_test_video()
+        self.sources.new_test_video()
+
+        self.wait_until_ready(5)
+
+        self.log.info("calling get_preview_ports")
+        assert self.controller.get_preview_ports() == [3003, 3004, 3005, 3006, 3007]
 
 
 class TestSignals(object):

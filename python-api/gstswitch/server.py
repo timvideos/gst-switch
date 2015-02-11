@@ -39,6 +39,7 @@ class OutputMonitoringBackgroundProcess(object):
         # While wait_for_output is waiting for a match, _match contains the
         # string it is looking for
         self._match = None
+        self._match_count = 1
 
         # threading.Event instance used in wait_for_output to block until the
         # Server prints something that matches self._match
@@ -101,7 +102,7 @@ class OutputMonitoringBackgroundProcess(object):
                 logtarget.write(chunk)
 
                 if self._match:
-                    if self._buffer.find(self._match) > 0:
+                    if self._buffer.count(self._match) >= self._match_count:
                         self.log.debug("match found, "
                                        "signaling wait_for_output")
                         self._match = None
@@ -137,7 +138,7 @@ class OutputMonitoringBackgroundProcess(object):
 
         return None
 
-    def wait_for_output(self, match, timeout=None):
+    def wait_for_output(self, match, timeout=None, count=1):
         """Searches the output already captured from the running process for
         match and returns immediatly if match has already been captured.
 
@@ -147,16 +148,18 @@ class OutputMonitoringBackgroundProcess(object):
         is raised.
         """
 
-        self.log.debug("testing for '%s' in buffer", match)
-        if self._buffer.find(match) > 0:
+        self.log.debug("testing for %dx '%s' in buffer", count, match)
+        if self._buffer.count(match) >= count:
             self.log.debug("match found, returnung instantly")
             return
 
         self.log.debug("waiting for match event")
         self._match = match
+        self._match_count = count
         if not self._match_event.wait(timeout):
             raise TimeoutError("Server-Monitor-Thread did not find the match "
-                               "%s in the Server's output in time." % match)
+                               "'%s' %dx in the Server's output in time."
+                               % (match, count,))
 
         self.log.debug("match event fired")
         self._match_event.clear()
@@ -349,10 +352,10 @@ class Server(object):
         if self.proc:
             self.pid = self.proc.pid
 
-    def wait_for_output(self, match, timeout=5):
+    def wait_for_output(self, match, timeout=5, count=1):
         """Calls wait_for_output with the given parameters on the underlying
         OutputMonitoringBackgroundProcess"""
-        self.proc.wait_for_output(match, timeout)
+        self.proc.wait_for_output(match, timeout, count)
 
     def _run_process(self):
         """Non-public method: Runs the gst-switch-srv process
