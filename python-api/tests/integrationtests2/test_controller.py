@@ -43,12 +43,6 @@ class TestGetComposePort(IntegrationTestbase):
         self.log.info("calling get_compose_port")
         assert self.controller.get_compose_port() == 3001
 
-    def test_compose_caps(self):
-        """ Test if the compose-port is sending a video-stream with the
-        expected caps
-        """
-        pass
-
 
 class TestGetEncodePort(IntegrationTestbase):
     """ Test get_encode_port method
@@ -69,12 +63,6 @@ class TestGetEncodePort(IntegrationTestbase):
 
         self.log.info("calling get_encode_port")
         assert self.controller.get_encode_port() == 3002
-
-    def test_encode_caps(self):
-        """ Test if the encode-port is sending a video-stream with the
-        expected caps
-        """
-        pass
 
 
 class TestGetAudioPort(object):
