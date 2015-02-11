@@ -68,13 +68,51 @@ class TestGetEncodePort(IntegrationTestbase):
 class TestGetAudioPort(object):
     """ Test get_audio_port method
     """
-    pass
+    def wait_until_ready(self):
+        """ Blocks until the Server has reported, that it's
+        encoding-output is started
+        """
+        self.log.info("waiting for Server to start preview-port-outputs")
+        self.serv.wait_for_output('tcpserversink')
+
+    def test_preview_ports(self):
+        """Test get_audio_port method returning the expected port"""
+        self.setup_server()
+        self.setup_controller()
+
+        self.log.info("starting 2 test-audio sources")
+        self.sources.new_test_audio()
+        self.sources.new_test_audio()
+
+        self.wait_until_ready()
+
+        self.log.info("calling get_audio_port")
+        assert self.controller.get_audio_port() == 3003
 
 
 class TestGetPreviewPorts(object):
     """ Test get_preview_ports method
     """
-    pass
+    def wait_until_ready(self):
+        """ Blocks until the Server has reported, that it's
+        encoding-output is started
+        """
+        self.log.info("waiting for Server to start preview-port-outputs")
+        self.serv.wait_for_output('tcpserversink')
+
+    def test_preview_ports(self):
+        """Test get_preview_ports method returning the expected port"""
+        self.setup_server()
+        self.setup_controller()
+
+        self.log.info("starting 2 test-video sources")
+        self.sources.new_test_video()
+        self.sources.new_test_video()
+
+        self.wait_until_ready()
+
+        self.log.info("calling get_preview_ports")
+        assert self.controller.get_preview_ports() == [3003, 3004]
 
 
 class TestSignals(object):
