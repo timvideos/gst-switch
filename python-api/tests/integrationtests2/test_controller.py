@@ -75,7 +75,7 @@ class TestGetAudioPort(IntegrationTestbase):
         audio-output has started
         """
         self.log.info("waiting for Server to start preview-port-outputs")
-        self.serv.wait_for_output('tcpserversink')
+        self.serv.wait_for_output('tcpserversink name=sink')
 
     def test_preview_ports(self):
         """Test get_audio_port method returning the expected port"""
