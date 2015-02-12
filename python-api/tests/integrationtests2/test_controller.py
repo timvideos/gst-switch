@@ -65,12 +65,12 @@ class TestGetEncodePort(IntegrationTestbase):
         assert self.controller.get_encode_port() == 3002
 
 
-class TestGetAudioPort(object):
+class TestGetAudioPort(IntegrationTestbase):
     """ Test get_audio_port method
     """
     def wait_until_ready(self):
         """ Blocks until the Server has reported, that it's
-        encoding-output is started
+        audio-output has started
         """
         self.log.info("waiting for Server to start preview-port-outputs")
         self.serv.wait_for_output('tcpserversink')
@@ -90,7 +90,7 @@ class TestGetAudioPort(object):
         assert self.controller.get_audio_port() == 3003
 
 
-class TestGetPreviewPorts(object):
+class TestGetPreviewPorts(IntegrationTestbase):
     """ Test get_preview_ports method
     """
     def wait_until_ready(self, count):
@@ -131,13 +131,13 @@ class TestGetPreviewPorts(object):
         assert self.controller.get_preview_ports() == [3003, 3004, 3005, 3006, 3007]
 
 
-class TestSignals(object):
+class TestSignals(IntegrationTestbase):
     """ Test the various on_* signal-handler methods
     """
     pass
 
 
-class TestNewRecord(object):
+class TestNewRecord(IntegrationTestbase):
     """ Test new_record method
     """
     pass

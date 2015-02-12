@@ -6,19 +6,19 @@ from __future__ import absolute_import, print_function, unicode_literals
 from .baseclass import IntegrationTestbase
 
 
-class TestCompositeModes(object):
+class TestCompositeModes(IntegrationTestbase):
     """ Test the various composition modes and their results
     """
     pass
 
 
-class TestSwitch(object):
+class TestSwitch(IntegrationTestbase):
     """ Test switching between the available input sources
     """
     pass
 
 
-class TestAdjustPIP(object):
+class TestAdjustPIP(IntegrationTestbase):
     """ Test adjusting the PIP Position via DBus API
     """
     pass
