@@ -4,6 +4,8 @@ Integration Tests for the dbus Controller
 
 from __future__ import absolute_import, print_function, unicode_literals
 from .baseclass import IntegrationTestbase
+from mock import Mock
+from gi.repository import GLib
 
 
 class TestEstablishConnection(IntegrationTestbase):
@@ -100,7 +102,7 @@ class TestGetPreviewPorts(IntegrationTestbase):
         self.log.info("waiting for Server to start preview-port-outputs")
         self.serv.wait_for_output('tcpserversink name=sink', count=count)
 
-    def test_preview_ports(self):
+    def test_one_preview_port(self):
         """Test get_preview_ports method returning the expected port"""
         self.setup_server()
         self.setup_controller()
@@ -125,6 +127,7 @@ class TestGetPreviewPorts(IntegrationTestbase):
         self.sources.new_test_video()
         self.sources.new_test_video()
 
+        self.log.info("waiting for the test-video sources to come up")
         self.wait_until_ready(5)
 
         self.log.info("calling get_preview_ports")
@@ -134,7 +137,136 @@ class TestGetPreviewPorts(IntegrationTestbase):
 class TestSignals(IntegrationTestbase):
     """ Test the various on_* signal-handler methods
     """
-    pass
+    def run_mainloop(self, timeout=5):
+        """Start the MainLoop, set Quit-Counter to Zero"""
+        self.quit_count = 0
+        GLib.timeout_add_seconds(timeout, self.quit_mainloop)
+        self.mainloop = GLib.MainLoop()
+        self.mainloop.run()
+
+    def quit_mainloop(self, *_):
+        """Quit the MainLoop, set Quit-Counter to Zero"""
+        self.mainloop.quit()
+        self.mainloop = None
+        self.quit_count = 0
+
+    def quit_mainloop_after(self, num):
+        """Increment Quit-Counter, if it reaches num, Quit the MainLoop"""
+        self.quit_count += 1
+        if self.quit_count == num:
+            self.quit_mainloop()
+
+    def wait_until_ready(self, count):
+        """ Blocks until the Server has reported, that the right number of
+        preview-ports are is started
+        """
+        self.log.info("waiting for Server to start preview-port-outputs")
+        self.serv.wait_for_output('tcpserversink name=sink', count=count)
+
+    def setup_sources(self):
+        self.log.info("starting 2 test-video sources")
+        self.sources.new_test_video()
+        self.sources.new_test_video()
+
+        self.log.info("waiting for the test-video sources to come up")
+        self.wait_until_ready(2)
+
+
+    def test_initial_mode_callback(self):
+        self.setup_server()
+        self.setup_controller()
+
+        self.log.info("setting callback")
+        test_cb = Mock(side_effect=self.quit_mainloop)
+        self.controller.on_new_mode_online(test_cb)
+
+        self.setup_sources()
+
+
+        self.log.info("waiting for initial callback with default-mode 3")
+        self.run_mainloop(timeout=5)
+        test_cb.assert_called_once_with(3)
+
+    def test_new_mode_callback(self):
+        """Create a Controller object, call on_new_mode_online method and
+        check that the callback fires
+        """
+        self.setup_server()
+        self.setup_controller()
+
+        self.log.info("setting callback")
+        test_cb = Mock(side_effect=self.quit_mainloop)
+        self.controller.on_new_mode_online(test_cb)
+
+        self.setup_sources()
+
+
+        self.log.info("waiting for initial callback with default-mode 3")
+        self.run_mainloop(timeout=5)
+        test_cb.assert_called_once_with(3)
+        test_cb.reset_mock()
+
+
+        self.log.info("setting new composite mode")
+        self.controller.set_composite_mode(0)
+        self.run_mainloop(timeout=5)
+
+        self.log.info("waiting for callback with new mode 0")
+        test_cb.assert_called_once_with(0)
+
+
+    def test_same_mode_no_callback(self):
+        """Create a Controller object, call on_new_mode_online method and
+        check that the callback fires
+        """
+        self.setup_server()
+        self.setup_controller()
+
+        self.log.info("setting callback")
+        test_cb = Mock(side_effect=self.quit_mainloop)
+        self.controller.on_new_mode_online(test_cb)
+
+        self.setup_sources()
+
+
+        self.log.info("waiting for initial callback with default-mode 3")
+        self.run_mainloop(timeout=5)
+        test_cb.assert_called_once_with(3)
+        test_cb.reset_mock()
+
+        self.log.info("setting the same composite mode (3) again")
+        self.controller.set_composite_mode(3)
+
+        self.log.info("setting a new composite-mode 1")
+        self.controller.set_composite_mode(1)
+        self.run_mainloop(timeout=5)
+
+        # just waiting for the timeout to verify no incoming call
+        # would slow down the tests remarebly, so we send another
+        # mode-change, knowing that when it arrives without an
+        # intermediate call, there was no duplicate callback
+
+        self.log.info("waiting for callback with new mode 1")
+        test_cb.assert_called_once_with(1)  # no second call with mode 3
+
+    def test_preview_port_added_callback(self):
+        """Create a Controller object, call on_new_mode_online method and
+        check that the callback fires
+        """
+        self.setup_server()
+        self.setup_controller()
+
+        test_cb = Mock(side_effect=lambda mode, serve, type:
+                       self.quit_mainloop_after(2))
+        self.controller.on_preview_port_added(test_cb)
+
+        self.setup_sources()
+        self.run_mainloop(timeout=5)
+
+        self.log.info("test_cb called with: %s", test_cb.call_args_list)
+        test_cb.assert_any_call(3003, 1, 7)
+        test_cb.assert_any_call(3004, 1, 8)
+        assert test_cb.call_count == 2
 
 
 class TestNewRecord(IntegrationTestbase):
