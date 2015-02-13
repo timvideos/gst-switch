@@ -147,7 +147,6 @@ class TestSignals(IntegrationTestbase):
     def quit_mainloop(self, *_):
         """Quit the MainLoop, set Quit-Counter to Zero"""
         self.mainloop.quit()
-        self.mainloop = None
         self.quit_count = 0
 
     def quit_mainloop_after(self, num):
