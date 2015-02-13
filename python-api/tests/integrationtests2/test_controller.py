@@ -188,7 +188,7 @@ class TestSignals(IntegrationTestbase):
 
 
         self.log.info("setting new composite mode")
-        self.controller.set_composite_mode(0)
+        assert self.controller.set_composite_mode(0)
         self.run_mainloop(timeout=5)
 
         self.log.info("waiting for callback with new mode 0")
@@ -215,10 +215,10 @@ class TestSignals(IntegrationTestbase):
         test_cb.reset_mock()
 
         self.log.info("setting the same composite mode (3) again")
-        self.controller.set_composite_mode(3)
+        assert not self.controller.set_composite_mode(3)
 
         self.log.info("setting a new composite-mode 1")
-        self.controller.set_composite_mode(1)
+        assert self.controller.set_composite_mode(1)
         self.run_mainloop(timeout=5)
 
         # just waiting for the timeout to verify no incoming call
