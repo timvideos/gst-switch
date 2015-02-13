@@ -10,6 +10,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(__file__, "../../../")))
 from gstswitch.server import Server
 from gstswitch.helpers import TestSources  # PreviewSinks
 from gstswitch.controller import Controller
+from gi.repository import GLib
 
 # PATH = os.getenv("HOME") + '/gst/stage/bin/'
 PATH = '../tools/'
@@ -59,6 +60,24 @@ class IntegrationTestbase(object):
         self.controller.establish_connection()
 
         assert self.controller.connection is not None
+
+    def run_mainloop(self, timeout=5):
+        """Start the MainLoop, set Quit-Counter to Zero"""
+        self.quit_count = 0
+        GLib.timeout_add_seconds(timeout, self.quit_mainloop)
+        self.mainloop = GLib.MainLoop()
+        self.mainloop.run()
+
+    def quit_mainloop(self, *_):
+        """Quit the MainLoop, set Quit-Counter to Zero"""
+        self.mainloop.quit()
+        self.quit_count = 0
+
+    def quit_mainloop_after(self, num):
+        """Increment Quit-Counter, if it reaches num, Quit the MainLoop"""
+        self.quit_count += 1
+        if self.quit_count == num:
+            self.quit_mainloop()
 
     def teardown_method(self, _):
         """Tear down called automatically after every test_XXXX method."""

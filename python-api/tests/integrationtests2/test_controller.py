@@ -5,8 +5,6 @@ Integration Tests for the dbus Controller
 from __future__ import absolute_import, print_function, unicode_literals
 from .baseclass import IntegrationTestbase
 from mock import Mock
-from gi.repository import GLib
-
 
 class TestEstablishConnection(IntegrationTestbase):
     """ Test starting and connecting to the Server
@@ -137,24 +135,6 @@ class TestGetPreviewPorts(IntegrationTestbase):
 class TestSignals(IntegrationTestbase):
     """ Test the various on_* signal-handler methods
     """
-    def run_mainloop(self, timeout=5):
-        """Start the MainLoop, set Quit-Counter to Zero"""
-        self.quit_count = 0
-        GLib.timeout_add_seconds(timeout, self.quit_mainloop)
-        self.mainloop = GLib.MainLoop()
-        self.mainloop.run()
-
-    def quit_mainloop(self, *_):
-        """Quit the MainLoop, set Quit-Counter to Zero"""
-        self.mainloop.quit()
-        self.quit_count = 0
-
-    def quit_mainloop_after(self, num):
-        """Increment Quit-Counter, if it reaches num, Quit the MainLoop"""
-        self.quit_count += 1
-        if self.quit_count == num:
-            self.quit_mainloop()
-
     def wait_until_ready(self, count):
         """ Blocks until the Server has reported, that the right number of
         preview-ports are is started
