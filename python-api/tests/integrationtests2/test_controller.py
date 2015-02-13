@@ -3,6 +3,7 @@ Integration Tests for the dbus Controller
 """
 
 from __future__ import absolute_import, print_function, unicode_literals
+import os, sys, datetime, random
 from .baseclass import IntegrationTestbase
 from mock import Mock
 
@@ -251,4 +252,63 @@ class TestSignals(IntegrationTestbase):
 class TestNewRecord(IntegrationTestbase):
     """ Test new_record method
     """
-    pass
+
+    def wait_until_ready(self, count):
+        """ Blocks until the Server has reported, that the right number of
+        preview-ports are is started
+        """
+        self.log.info("waiting for Server to start preview-port-outputs")
+        self.serv.wait_for_output('tcpserversink name=sink', count=count)
+
+    def setup_sources(self):
+        self.log.info("starting 2 test-video sources")
+        self.sources.new_test_video()
+        self.sources.new_test_video()
+
+        self.log.info("waiting for the test-video sources to come up")
+        self.wait_until_ready(2)
+
+    def test_filename_changes(self):
+        test_filename = "gst-test-{0}.data".format(random.randint(0, sys.maxint))
+
+        self.log.info("asserting recording-file are not aready existing"
+                      "(test_filename=%s)", test_filename)
+        assert not os.path.exists(test_filename)
+        assert not os.path.exists(test_filename+'.000')
+
+        self.setup_server(record_file=test_filename)
+        self.setup_controller()
+        self.setup_sources()
+
+        self.log.info("asserting server created a recording-file")
+        assert os.path.exists(test_filename)
+        assert not os.path.exists(test_filename+'.000')
+
+        self.log.info("starting a new recording")
+        assert self.controller.new_record()
+
+        self.log.info("asserting server created a new recording-file")
+        assert os.path.exists(test_filename)
+        assert os.path.exists(test_filename+'.000')
+
+    def test_record_file_grows(self):
+        test_filename = "gst-test-{0}.data".format(random.randint(0, sys.maxint))
+
+        self.log.info("asserting recording-file are not aready existing"
+                      "(test_filename=%s)", test_filename)
+        assert not os.path.exists(test_filename)
+
+        self.setup_server(record_file=test_filename)
+        self.setup_controller()
+        self.setup_sources()
+
+        self.log.info("asserting server created a recording-file")
+        assert os.path.exists(test_filename)
+
+        self.log.info("starting a new recording")
+        assert self.controller.new_record()
+
+        self.log.info("asserting the old recording-file was flushed"
+                      "and is >0 bytes")
+        sz = os.path.getsize(test_filename)
+        assert sz > 0

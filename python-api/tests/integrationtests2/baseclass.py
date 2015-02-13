@@ -32,12 +32,12 @@ class IntegrationTestbase(object):
         self.sources = None
         self.controller = None
 
-    def setup_server(self):
+    def setup_server(self, record_file=False):
         """Set up a gst-switch server for testing."""
         assert self.serv is None
 
         self.log.info("setting up Server")
-        self.serv = Server(path=PATH, video_format="debug")
+        self.serv = Server(path=PATH, video_format="debug", record_file=record_file)
 
         self.log.info("running Server")
         self.serv.run()
