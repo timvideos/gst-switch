@@ -144,6 +144,8 @@ class TestSignals(IntegrationTestbase):
         self.serv.wait_for_output('tcpserversink name=sink', count=count)
 
     def setup_sources(self):
+        """ Starts some Test-Video streams and waits until they are ready
+        """
         self.log.info("starting 2 test-video sources")
         self.sources.new_test_video()
         self.sources.new_test_video()
@@ -153,6 +155,9 @@ class TestSignals(IntegrationTestbase):
 
 
     def test_initial_mode_callback(self):
+        """Create a Controller object, call on_new_mode_online method and
+        check that the callback fires initially when the sources are set up
+        """
         self.setup_server()
         self.setup_controller()
 
@@ -169,7 +174,7 @@ class TestSignals(IntegrationTestbase):
 
     def test_new_mode_callback(self):
         """Create a Controller object, call on_new_mode_online method and
-        check that the callback fires
+        check that the callback fires when set_composite_mode is called
         """
         self.setup_server()
         self.setup_controller()
@@ -197,7 +202,8 @@ class TestSignals(IntegrationTestbase):
 
     def test_same_mode_no_callback(self):
         """Create a Controller object, call on_new_mode_online method and
-        check that the callback fires
+        check that the callback fires, but does not fire when set_composite_mode
+        is called multiple times with the same format
         """
         self.setup_server()
         self.setup_controller()
@@ -230,8 +236,9 @@ class TestSignals(IntegrationTestbase):
         test_cb.assert_called_once_with(1)  # no second call with mode 3
 
     def test_preview_port_added_callback(self):
-        """Create a Controller object, call on_new_mode_online method and
-        check that the callback fires
+        """Create a Controller object, call on_preview_port_added method and
+        check that the callback fires correctly when new video-sources
+        are added
         """
         self.setup_server()
         self.setup_controller()
@@ -261,6 +268,8 @@ class TestNewRecord(IntegrationTestbase):
         self.serv.wait_for_output('tcpserversink name=sink', count=count)
 
     def setup_sources(self):
+        """ Starts some Test-Video streams and waits until they are ready
+        """
         self.log.info("starting 2 test-video sources")
         self.sources.new_test_video()
         self.sources.new_test_video()
@@ -269,6 +278,9 @@ class TestNewRecord(IntegrationTestbase):
         self.wait_until_ready(2)
 
     def test_filename_changes(self):
+        """ Tests, that the Server creates a new File each time
+        new_record is called
+        """
         test_filename = "gst-test-{0}.data".format(random.randint(0, sys.maxint))
 
         self.log.info("asserting recording-file are not aready existing"
@@ -292,6 +304,8 @@ class TestNewRecord(IntegrationTestbase):
         assert os.path.exists(test_filename+'.000')
 
     def test_record_file_grows(self):
+        """ Tests, that the Server actually writes Data into the record-file
+        """
         test_filename = "gst-test-{0}.data".format(random.randint(0, sys.maxint))
 
         self.log.info("asserting recording-file are not aready existing"
