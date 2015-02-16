@@ -96,8 +96,10 @@ class OutputMonitoringBackgroundProcess(object):
             self._control_event.set()
 
             self.log.debug("entering server read-loop")
-            while self._proc.poll() is None:
-                chunk = self._proc.stdout.read(16).decode('utf-8')
+            while True:
+                chunk = self._proc.stdout.read(1).decode('ascii')
+                if not chunk:
+                    break
                 self._buffer += chunk
                 logtarget.write(chunk)
 
