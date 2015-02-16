@@ -116,7 +116,7 @@ class OutputMonitoringBackgroundProcess(object):
         self.log.debug("killing the server, waiting for worker to exit")
         self._proc.terminate()
         if not self._control_event.wait(timeout=5):
-            raise TimeoutError("Server-Monitor-Thread did not exit in time.")
+            raise RuntimeError("Server-Monitor-Thread did not exit in time.")
 
         self.log.debug("worker did exit cleanly")
         self._control_event.clear()
@@ -144,7 +144,7 @@ class OutputMonitoringBackgroundProcess(object):
 
         Sets up a match-request for the stdout/stderr-reader and blocks until
         match emerges in the processes stdout/stderr but not longer then
-        timeout. If no match is found until timeout is passed, a TimeoutError
+        timeout. If no match is found until timeout is passed, a RuntimeError
         is raised.
         """
 
@@ -157,7 +157,7 @@ class OutputMonitoringBackgroundProcess(object):
         self._match = match
         self._match_count = count
         if not self._match_event.wait(timeout):
-            raise TimeoutError("Server-Monitor-Thread did not find the match "
+            raise RuntimeError("Server-Monitor-Thread did not find the match "
                                "'%s' %dx in the Server's output in time."
                                % (match, count,))
 

@@ -281,7 +281,7 @@ class TestNewRecord(IntegrationTestbase):
         """ Tests, that the Server creates a new File each time
         new_record is called
         """
-        test_filename = "gst-test-{0}.data".format(random.randint(0, sys.maxint))
+        test_filename = "gst-test-{0}.data".format(random.randint(0, sys.maxsize))
 
         self.log.info("asserting recording-file are not aready existing"
                       "(test_filename=%s)", test_filename)
@@ -306,7 +306,7 @@ class TestNewRecord(IntegrationTestbase):
     def test_record_file_grows(self):
         """ Tests, that the Server actually writes Data into the record-file
         """
-        test_filename = "gst-test-{0}.data".format(random.randint(0, sys.maxint))
+        test_filename = "gst-test-{0}.data".format(random.randint(0, sys.maxsize))
 
         self.log.info("asserting recording-file are not aready existing"
                       "(test_filename=%s)", test_filename)
