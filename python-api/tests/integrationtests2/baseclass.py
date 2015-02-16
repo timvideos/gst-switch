@@ -58,6 +58,7 @@ class IntegrationTestbase(object):
 
         self.log.info("connecting Controller to Server")
         self.controller.establish_connection()
+        self.serv.wait_for_output('registered: ')
 
         assert self.controller.connection is not None
 

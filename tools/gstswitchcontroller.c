@@ -283,9 +283,6 @@ gst_switch_controller_on_new_connection (GDBusServer * server,
   } else if (register_id <= 0) {
     ERROR ("register_id invalid (<= 0): %d", register_id);
     return FALSE;
-  } else {
-    INFO ("registered: %d, %s, %s", register_id,
-        SWITCH_CONTROLLER_OBJECT_PATH, introspection_data->interfaces[0]->name);
   }
 
   g_signal_connect (connection, "closed",
@@ -294,6 +291,10 @@ gst_switch_controller_on_new_connection (GDBusServer * server,
   GST_SWITCH_CONTROLLER_LOCK_CLIENTS (controller);
   controller->clients = g_list_append (controller->clients, connection);
   GST_SWITCH_CONTROLLER_UNLOCK_CLIENTS (controller);
+
+  INFO ("registered: %d, %s, %s", register_id,
+    SWITCH_CONTROLLER_OBJECT_PATH, introspection_data->interfaces[0]->name);
+
 
   g_object_ref (connection);
 
