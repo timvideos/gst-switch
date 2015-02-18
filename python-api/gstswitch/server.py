@@ -7,11 +7,11 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 from six import string_types
 import os
+import sys
+import select
 import signal
 import subprocess
 import logging
-import threading
-from distutils import spawn
 
 from errno import ENOENT
 from .exception import PathError, ServerProcessError
@@ -23,31 +23,18 @@ __all__ = ["Server", ]
 TOOLS_DIR = '/'.join(os.getcwd().split('/')[:-1]) + '/tools/'
 
 
-class OutputMonitoringBackgroundProcess(object):
+class ProcessMonitor(object):
     """Runs a Command in a Background-Thread and monitors it's output
 
     Can block until the Command prints a certain string and log the full
     output into a file
     """
 
-    def __init__(self, cmd, logtarget='/dev/stderr'):
+    def __init__(self, cmd, logtarget=sys.stderr):
         self.log = logging.getLogger('server-output-monitor')
 
         # After calling start(), _proc contains a subprocess.Popen instance
         self._proc = None
-
-        # While wait_for_output is waiting for a match, _match contains the
-        # string it is looking for
-        self._match = None
-        self._match_count = 1
-
-        # threading.Event instance used in wait_for_output to block until the
-        # Server prints something that matches self._match
-        self._match_event = threading.Event()
-
-        # threading.Event instance that is used to synchronize the main thread
-        # with the Server-Monitor-Thread during start and termination
-        self._control_event = threading.Event()
 
         # Command to run (Array passed to subprocess.Popen)
         self._cmd = cmd
@@ -65,63 +52,23 @@ class OutputMonitoringBackgroundProcess(object):
         """
 
         assert self._proc is None
+        self.log.debug("starting subprocess")
 
-        self.log.debug("starting worker-thread")
-        worker = threading.Thread(target=self._worker)
-        worker.start()
-        self.log.debug("worker-thread started, "
-                       "waiting for the server to start")
-
-        self._control_event.wait(0.5)
-        self._control_event.clear()
+        self._proc = subprocess.Popen(
+            self._cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            bufsize=0,
+            shell=False)
 
         assert self._proc is not None
-        self.log.debug("server started successfully")
-
-    def _worker(self):
-        """Private Worker-Method that runs the process, reads its
-        stdout/stderr and performs pattern matching on it
-        when told to do so via wait_for_output.
-        """
-        with open(self._logtarget, 'w') as logtarget:
-            self.log.debug("starting subprocess")
-            self._proc = subprocess.Popen(
-                self._cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                bufsize=0,
-                shell=False)
-
-            self.log.debug("signaling that the server started")
-            self._control_event.set()
-
-            self.log.debug("entering server read-loop")
-            while True:
-                chunk = self._proc.stdout.read(1).decode('ascii')
-                if not chunk:
-                    break
-                self._buffer += chunk
-                logtarget.write(chunk)
-
-                if self._match:
-                    if self._buffer.count(self._match) >= self._match_count:
-                        self.log.debug("match found, "
-                                       "signaling wait_for_output")
-                        self._match = None
-                        self._match_event.set()
-
-            self.log.debug("exiting")
-            self._control_event.set()
+        self.log.debug("subprocess successfully")
 
     def terminate(self):
         """Kills the process and waits for the thread to exit"""
-        self.log.debug("killing the server, waiting for worker to exit")
-        self._proc.terminate()
-        if not self._control_event.wait(timeout=5):
-            raise RuntimeError("Server-Monitor-Thread did not exit in time.")
-
-        self.log.debug("worker did exit cleanly")
-        self._control_event.clear()
+        self.log.debug("killing the subprocess")
+        if self._proc:
+            self._proc.terminate()
 
     def poll(self):
         """Calls poll() on the running process and returns its result or None
@@ -140,7 +87,7 @@ class OutputMonitoringBackgroundProcess(object):
 
         return None
 
-    def wait_for_output(self, match, timeout=None, count=1):
+    def wait_for_output(self, match, timeout=5, count=1):
         """Searches the output already captured from the running process for
         match and returns immediatly if match has already been captured.
 
@@ -152,19 +99,28 @@ class OutputMonitoringBackgroundProcess(object):
 
         self.log.debug("testing for %dx '%s' in buffer", count, match)
         if self._buffer.count(match) >= count:
-            self.log.debug("match found, returnung instantly")
+            self.log.debug("match found, returning without reading more data")
             return
 
-        self.log.debug("waiting for match event")
-        self._match = match
-        self._match_count = count
-        if not self._match_event.wait(timeout):
-            raise RuntimeError("Server-Monitor-Thread did not find the match "
-                               "'%s' %dx in the Server's output in time."
-                               % (match, count,))
+        # TODO global timeout
+        while True:
+            self.log.debug("waiting for data output by subprocess")
+            (r, w, e) = select.select([self._proc.stdout], [], [], timeout)
+            if self._proc.stdout not in r:
+                raise RuntimeError("Timeout while waiting for match "
+                                   "'%s' %dx in the subprocess output."
+                                   % (match, count,))
 
-        self.log.debug("match event fired")
-        self._match_event.clear()
+            self.log.debug("reading data from subprocess")
+            chunk = os.read(self._proc.stdout.fileno(), 2000).decode('utf-8')
+            self.log.debug("read %d bytes, appending to buffer", len(chunk))
+            self._buffer += chunk
+            self._logtarget.write(chunk)
+
+            self.log.debug("testing again for %dx '%s' in buffer", count, match)
+            if self._buffer.count(match) >= count:
+                self.log.debug("match found, returning")
+                return
 
 
 class Server(object):
@@ -356,7 +312,7 @@ class Server(object):
 
     def wait_for_output(self, match, timeout=5, count=1):
         """Calls wait_for_output with the given parameters on the underlying
-        OutputMonitoringBackgroundProcess"""
+        ProcessMonitor"""
         self.proc.wait_for_output(match, timeout, count)
 
     def _run_process(self):
@@ -400,9 +356,9 @@ class Server(object):
         self.log.info('Starting process %s', cmd)
         try:
             if self.log_to_file:
-                process = OutputMonitoringBackgroundProcess(cmd, 'server.log')
+                process = ProcessMonitor(cmd, open('server.log', 'w'))
             else:
-                process = OutputMonitoringBackgroundProcess(cmd)
+                process = ProcessMonitor(cmd)
 
             process.start()
             return process
