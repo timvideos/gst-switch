@@ -303,6 +303,9 @@ class TestNewRecord(IntegrationTestbase):
         assert os.path.exists(test_filename)
         assert os.path.exists(test_filename+'.000')
 
+        os.remove(test_filename)
+        os.remove(test_filename+'.000')
+
     def test_record_file_grows(self):
         """ Tests, that the Server actually writes Data into the record-file
         """
@@ -329,3 +332,6 @@ class TestNewRecord(IntegrationTestbase):
                       "and is >0 bytes")
         sz = os.path.getsize(test_filename)
         assert sz > 0
+
+        os.remove(test_filename)
+        os.remove(test_filename+'.000')
