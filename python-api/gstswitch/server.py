@@ -8,6 +8,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 from six import string_types
 import os
 import sys
+import time
 import select
 import signal
 import subprocess
@@ -102,9 +103,10 @@ class ProcessMonitor(object):
             self.log.debug("match found, returning without reading more data")
             return
 
-        # TODO global timeout
+        endtime = time.time() + timeout
         while True:
-            self.log.debug("waiting for data output by subprocess")
+            timeout = endtime - time.time()
+            self.log.debug("waiting for data output by subprocess (remaining time to timeout = %fs)", timeout)
             (r, w, e) = select.select([self._proc.stdout], [], [], timeout)
             if self._proc.stdout not in r:
                 raise RuntimeError("Timeout while waiting for match "
