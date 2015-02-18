@@ -29,7 +29,7 @@ class IntegrationTestbase(object):
             format="%(filename)s:%(lineno)d (%(funcName)s): %(message)s")
 
         self.serv = None
-        self.sources = None
+        self._sources = None
         self.controller = None
 
     def setup_server(self, record_file=False):
@@ -47,7 +47,7 @@ class IntegrationTestbase(object):
         self.serv.wait_for_output('tcp:host=0.0.0.0,port=5000')
 
         self.log.info("setting up TestSources")
-        self.sources = TestSources(
+        self._sources = TestSources(
             video_port=self.serv.video_port,
             audio_port=self.serv.audio_port)
 
@@ -61,6 +61,14 @@ class IntegrationTestbase(object):
         self.serv.wait_for_output('registered: ')
 
         assert self.controller.connection is not None
+
+    def new_test_video(self):
+        self.serv.wait_for_output('0.0.0.0:3000')
+        self._sources.new_test_video()
+
+    def new_test_audio(self):
+        self.serv.wait_for_output('0.0.0.0:4000')
+        self._sources.new_test_audio()
 
     def run_mainloop(self, timeout=5):
         """Start the MainLoop, set Quit-Counter to Zero"""
@@ -85,13 +93,13 @@ class IntegrationTestbase(object):
         self.controller = None
 
         # Kill all the sources
-        if self.sources is not None:
+        if self._sources is not None:
             self.log.info("terminating Video-TestSource")
-            self.sources.terminate_video()
+            self._sources.terminate_video()
 
             self.log.info("terminating Audio-TestSource")
-            self.sources.terminate_audio()
-        self.sources = None
+            self._sources.terminate_audio()
+        self._sources = None
 
         if self.serv is not None:
             self.log.info("terminating Server")

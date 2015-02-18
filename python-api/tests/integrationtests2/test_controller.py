@@ -82,8 +82,8 @@ class TestGetAudioPort(IntegrationTestbase):
         self.setup_controller()
 
         self.log.info("starting 2 test-audio sources")
-        self.sources.new_test_audio()
-        self.sources.new_test_audio()
+        self.new_test_audio()
+        self.new_test_audio()
 
         self.wait_until_ready()
 
@@ -107,7 +107,7 @@ class TestGetPreviewPorts(IntegrationTestbase):
         self.setup_controller()
 
         self.log.info("starting 1 test-video source")
-        self.sources.new_test_video()
+        self.new_test_video()
 
         self.wait_until_ready(1)
 
@@ -120,11 +120,11 @@ class TestGetPreviewPorts(IntegrationTestbase):
         self.setup_controller()
 
         self.log.info("starting 5 test-video sources")
-        self.sources.new_test_video()
-        self.sources.new_test_video()
-        self.sources.new_test_video()
-        self.sources.new_test_video()
-        self.sources.new_test_video()
+        self.new_test_video()
+        self.new_test_video()
+        self.new_test_video()
+        self.new_test_video()
+        self.new_test_video()
 
         self.log.info("waiting for the test-video sources to come up")
         self.wait_until_ready(5)
@@ -147,8 +147,8 @@ class TestSignals(IntegrationTestbase):
         """ Starts some Test-Video streams and waits until they are ready
         """
         self.log.info("starting 2 test-video sources")
-        self.sources.new_test_video()
-        self.sources.new_test_video()
+        self.new_test_video()
+        self.new_test_video()
 
         self.log.info("waiting for the test-video sources to come up")
         self.wait_until_ready(2)
@@ -271,8 +271,8 @@ class TestNewRecord(IntegrationTestbase):
         """ Starts some Test-Video streams and waits until they are ready
         """
         self.log.info("starting 2 test-video sources")
-        self.sources.new_test_video()
-        self.sources.new_test_video()
+        self.new_test_video()
+        self.new_test_video()
 
         self.log.info("waiting for the test-video sources to come up")
         self.wait_until_ready(2)
