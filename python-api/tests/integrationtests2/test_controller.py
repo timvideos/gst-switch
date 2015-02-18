@@ -3,7 +3,7 @@ Integration Tests for the dbus Controller
 """
 
 from __future__ import absolute_import, print_function, unicode_literals
-import os, sys, datetime, random
+import os, sys, datetime, time, random
 from .baseclass import IntegrationTestbase
 from mock import Mock
 
@@ -318,6 +318,9 @@ class TestNewRecord(IntegrationTestbase):
 
         self.log.info("asserting server created a recording-file")
         assert os.path.exists(test_filename)
+
+        self.log.info("sleeping for 5 frames")
+        time.sleep(5/25)
 
         self.log.info("starting a new recording")
         assert self.controller.new_record()
