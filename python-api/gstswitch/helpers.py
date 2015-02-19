@@ -90,7 +90,7 @@ class TestSources(object):
     @property
     def running_tests_video(self):
         """Get the currently running test video list"""
-        return self._running_tests_video
+        return list(self._running_tests_video)
 
     @running_tests_video.setter
     def running_tests_video(self, tests):
@@ -101,7 +101,7 @@ class TestSources(object):
     @property
     def running_tests_audio(self):
         """Get the currently running test audio list"""
-        return self._running_tests_audio
+        return list(self._running_tests_audio)
 
     @running_tests_audio.setter
     def running_tests_audio(self, tests):
