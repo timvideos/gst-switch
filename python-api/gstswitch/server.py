@@ -12,6 +12,7 @@ import time
 import select
 import signal
 import subprocess
+from distutils import spawn
 import logging
 
 from errno import ENOENT
