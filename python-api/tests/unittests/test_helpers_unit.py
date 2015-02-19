@@ -100,16 +100,6 @@ class TestTestSources(object):
             """End the test"""
             pass
 
-    def test_get_test_video(self):
-        """Test for get_test_video"""
-        test = TestSources(video_port=3000)
-        test.running_tests_video = [
-            self.MockTest(1),
-            self.MockTest(2),
-            self.MockTest(3),
-            self.MockTest(19)]
-        test.get_test_video()
-
     def test_terminate_index_error_video(self):
         """Test for terminate_video"""
         testsrc = TestSources(video_port=3000)

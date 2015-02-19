@@ -133,12 +133,6 @@ class TestSources(object):
         testsrc.run()
         self._running_tests_video.append(testsrc)
 
-    def get_test_video(self):
-        """Returns a list of processes acting as video test sources running
-        :returns: A list containing all video test sources running
-        """
-        return self._running_tests_video
-
     def terminate_index_video(self, index):
         """Terminate video test source specified by index
         :param index: The index of the video source to terminate
