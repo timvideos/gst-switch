@@ -92,6 +92,14 @@ class ProcessMonitor(object):
 
         return None
 
+    def check_for_output(self, match, count=1):
+        """Searches the output already captured from the running process for
+        match and returns a boolean indicating if the match has already been
+        captured.
+        """
+        self.log.debug("testing for %dx '%s' in buffer", count, match)
+        return self._buffer.count(match) >= count
+
     def wait_for_output(self, match, timeout=5, count=1):
         """Searches the output already captured from the running process for
         match and returns immediatly if match has already been captured.
@@ -102,8 +110,7 @@ class ProcessMonitor(object):
         is raised.
         """
 
-        self.log.debug("testing for %dx '%s' in buffer", count, match)
-        if self._buffer.count(match) >= count:
+        if self.check_for_output(match, count):
             self.log.debug("match found, returning without reading more data")
             return
 
