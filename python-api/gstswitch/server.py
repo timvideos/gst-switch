@@ -126,6 +126,12 @@ class ProcessMonitor(object):
 
             self.log.debug("reading data from subprocess")
             chunk = os.read(self._proc.stdout.fileno(), 2000).decode('utf-8')
+
+            if len(chunk) == 0:
+                raise RuntimeError("Subprocess died while waiting for match "
+                                   "'%s' %dx in the subprocess output."
+                                   % (match, count,))
+
             self.log.debug("read %d bytes, appending to buffer", len(chunk))
             self._buffer += chunk
             self._logtarget.write(chunk)
