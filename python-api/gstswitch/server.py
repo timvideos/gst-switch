@@ -68,9 +68,12 @@ class ProcessMonitor(object):
 
     def terminate(self):
         """Kills the process and waits for the thread to exit"""
-        self.log.debug("killing the subprocess")
+        self.log.debug("terminating the subprocess")
         if self._proc:
             self._proc.terminate()
+            self.log.debug("waiting for the subprocess to die")
+            while self._proc.poll() is not None:
+                time.sleep(0.1)
 
     def poll(self):
         """Calls poll() on the running process and returns its result or None
