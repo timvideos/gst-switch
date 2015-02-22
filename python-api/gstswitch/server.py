@@ -475,8 +475,8 @@ class Server(object):
         else:
             try:
                 self.log.debug("Signaling GCOV Flush to %s", self.pid)
-                if self.pid:
-                    os.kill(self.pid, signal.SIGUSR1)
+                if self.proc:
+                    self.proc.send_signal(signal.SIGUSR1)
                 return True
             except OSError:
                 raise ServerProcessError('Unable to send signal')
