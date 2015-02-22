@@ -25,7 +25,7 @@ __all__ = ["Server", ]
 TOOLS_DIR = '/'.join(os.getcwd().split('/')[:-1]) + '/tools/'
 
 
-class ProcessMonitor(object):
+class ProcessMonitor(subprocess.Popen):
     """Runs a Command in a Background-Thread and monitors it's output
 
     Can block until the Command prints a certain string and log the full
@@ -35,61 +35,29 @@ class ProcessMonitor(object):
     def __init__(self, cmd, logtarget=sys.stderr):
         self.log = logging.getLogger('server-output-monitor')
 
-        # After calling start(), _proc contains a subprocess.Popen instance
-        self._proc = None
-
-        # Command to run (Array passed to subprocess.Popen)
-        self._cmd = cmd
-
         # Logfile to write to
         self._logtarget = logtarget
 
         # Internal Buffer to search for matched when wait_for_output is called
         self._buffer = ""
 
-    def start(self):
-        """Starts up the process specified in the constructor in a thread.
-        Blocks until the process is started and has a pid assigned, but not
-        longer then 0.5s.
-        """
-
-        assert self._proc is None
         self.log.debug("starting subprocess")
 
-        self._proc = subprocess.Popen(
-            self._cmd,
+        super().__init__(
+            cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             bufsize=0,
             shell=False)
 
-        assert self._proc is not None
-        self.log.debug("subprocess successfully")
+        self.log.debug("subprocess successfully started")
 
     def terminate(self):
         """Kills the process and waits for the thread to exit"""
         self.log.debug("terminating the subprocess")
-        if self._proc:
-            self._proc.terminate()
-            self.log.debug("waiting for the subprocess to die")
-            self._proc.communicate()
-
-    def poll(self):
-        """Calls poll() on the running process and returns its result or None
-        if no process is running"""
-        if self._proc:
-            return self._proc.poll()
-
-        return None
-
-    @property
-    def pid(self):
-        """Returns the pid of the running process or None
-        if no process is running"""
-        if self._proc:
-            return self._proc.pid
-
-        return None
+        super().terminate()
+        self.log.debug("waiting for the subprocess to die")
+        super().communicate()
 
     def check_for_output(self, match, count=1):
         """Searches the output already captured from the running process for
@@ -117,8 +85,8 @@ class ProcessMonitor(object):
         while True:
             timeout = endtime - time.time()
             self.log.debug("waiting for data output by subprocess (remaining time to timeout = %fs)", timeout)
-            (r, w, e) = select.select([self._proc.stdout], [], [], timeout)
-            if self._proc.stdout not in r:
+            (r, w, e) = select.select([self.stdout], [], [], timeout)
+            if self.stdout not in r:
                 remaining = endtime - time.time()
                 if remaining < 0.001:
                     raise RuntimeError("Timeout while waiting for match "
@@ -131,7 +99,7 @@ class ProcessMonitor(object):
                                    " readable, assuming an exception")
 
             self.log.debug("reading data from subprocess")
-            chunk = os.read(self._proc.stdout.fileno(), 2000).decode('utf-8')
+            chunk = os.read(self.stdout.fileno(), 2000).decode('utf-8')
 
             if len(chunk) == 0:
                 raise RuntimeError("Subprocess died while waiting for match "
@@ -388,7 +356,6 @@ class Server(object):
             else:
                 process = ProcessMonitor(cmd)
 
-            process.start()
             return process
 
         except OSError as error:
