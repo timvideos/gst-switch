@@ -3,10 +3,14 @@ Integration Tests for the dbus Controller
 """
 
 from __future__ import absolute_import, print_function, unicode_literals
-import os, sys, datetime, time, random
+import os
+import sys
+import time
+import random
 from .baseclass import IntegrationTestbase, IntegrationTestbaseMainloop
 from gstswitch.controller import Controller
 from mock import Mock
+
 
 class TestEstablishConnection(IntegrationTestbase):
     """ Test starting and connecting to the Server
@@ -22,6 +26,7 @@ class TestEstablishConnection(IntegrationTestbase):
 
         self.setup_controller()
         assert self.controller.connection is not None
+
 
 class TestGetComposePort(IntegrationTestbase):
     """ Test get_compose_port method
@@ -131,7 +136,8 @@ class TestGetPreviewPorts(IntegrationTestbase):
         self.wait_for_sources(count=5)
 
         self.log.info("calling get_preview_ports")
-        assert self.controller.get_preview_ports() == [3003, 3004, 3005, 3006, 3007]
+        assert self.controller.get_preview_ports() == [
+            3003, 3004, 3005, 3006, 3007]
 
 
 class TestSignals(IntegrationTestbaseMainloop):
@@ -154,7 +160,6 @@ class TestSignals(IntegrationTestbaseMainloop):
         self.log.info("waiting for the test-video sources to come up")
         self.wait_for_sources(count=2)
 
-
     def test_initial_mode_callback(self):
         """Create a Controller object, call on_new_mode_online method and
         check that the callback fires initially when the sources are set up
@@ -166,10 +171,11 @@ class TestSignals(IntegrationTestbaseMainloop):
         test_cb = Mock(side_effect=self.quit_mainloop)
         self.controller.on_new_mode_online(test_cb)
 
+        self.log.info("starting test-sources")
         self.setup_sources()
 
-
-        self.log.info("waiting for initial callback with default-mode COMPOSITE_DUAL_EQUAL")
+        self.log.info("waiting for initial callback with"
+                      "default-mode COMPOSITE_DUAL_EQUAL")
         self.run_mainloop(timeout=5)
         test_cb.assert_called_once_with(Controller.COMPOSITE_DUAL_EQUAL)
 
@@ -191,7 +197,6 @@ class TestSignals(IntegrationTestbaseMainloop):
         test_cb.assert_called_once_with(Controller.COMPOSITE_DUAL_EQUAL)
         test_cb.reset_mock()
 
-
         self.log.info("setting new composite mode")
         assert self.controller.set_composite_mode(Controller.COMPOSITE_NONE)
         self.run_mainloop(timeout=5)
@@ -199,11 +204,10 @@ class TestSignals(IntegrationTestbaseMainloop):
         self.log.info("waiting for callback with new mode 0")
         test_cb.assert_called_once_with(Controller.COMPOSITE_NONE)
 
-
     def test_same_mode_no_callback(self):
         """Create a Controller object, call on_new_mode_online method and
-        check that the callback fires, but does not fire when set_composite_mode
-        is called multiple times with the same format
+        check that the callback fires, but does not fire when
+        set_composite_mode is called multiple times with the same format
         """
         self.setup_server()
         self.setup_controller()
@@ -214,13 +218,16 @@ class TestSignals(IntegrationTestbaseMainloop):
 
         self.setup_sources()
 
-        self.log.info("waiting for initial callback with default-mode COMPOSITE_DUAL_EQUAL")
+        self.log.info("waiting for initial callback with"
+                      "default-mode COMPOSITE_DUAL_EQUAL")
         self.run_mainloop(timeout=5)
         test_cb.assert_called_once_with(Controller.COMPOSITE_DUAL_EQUAL)
         test_cb.reset_mock()
 
-        self.log.info("setting the same composite mode (COMPOSITE_DUAL_EQUAL) again")
-        assert not self.controller.set_composite_mode(Controller.COMPOSITE_DUAL_EQUAL)
+        self.log.info("setting the same composite mode"
+                      "(COMPOSITE_DUAL_EQUAL) again")
+        assert not self.controller.set_composite_mode(
+            Controller.COMPOSITE_DUAL_EQUAL)
 
         self.log.info("setting a new composite-mode COMPOSITE_PIP")
         assert self.controller.set_composite_mode(Controller.COMPOSITE_PIP)
@@ -234,7 +241,7 @@ class TestSignals(IntegrationTestbaseMainloop):
         self.log.info("waiting for callback with new mode COMPOSITE_PIP")
         test_cb.assert_called_once_with(Controller.COMPOSITE_PIP)
 
-    def test_preview_port_added_callback(self):
+    def test_preview_port_added_cb(self):
         """Create a Controller object, call on_preview_port_added method and
         check that the callback fires correctly when new video-sources
         are added
@@ -280,7 +287,8 @@ class TestNewRecord(IntegrationTestbase):
         """ Tests, that the Server creates a new File each time
         new_record is called
         """
-        test_filename = "gst-test-{0}.data".format(random.randint(0, sys.maxsize))
+        test_filename = "gst-test-{0}.data".format(
+            random.randint(0, sys.maxsize))
 
         self.log.info("asserting recording-file are not aready existing"
                       "(test_filename=%s)", test_filename)
@@ -308,7 +316,8 @@ class TestNewRecord(IntegrationTestbase):
     def test_record_file_grows(self):
         """ Tests, that the Server actually writes Data into the record-file
         """
-        test_filename = "gst-test-{0}.data".format(random.randint(0, sys.maxsize))
+        test_filename = "gst-test-{0}.data".format(
+            random.randint(0, sys.maxsize))
 
         self.log.info("asserting recording-file are not aready existing"
                       "(test_filename=%s)", test_filename)
@@ -329,8 +338,8 @@ class TestNewRecord(IntegrationTestbase):
 
         self.log.info("asserting the old recording-file was flushed"
                       "and is >0 bytes")
-        sz = os.path.getsize(test_filename)
-        assert sz > 0
+        size = os.path.getsize(test_filename)
+        assert size > 0
 
         os.remove(test_filename)
         os.remove(test_filename+'.000')

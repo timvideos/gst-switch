@@ -37,7 +37,8 @@ class IntegrationTestbase(object):
         assert self.serv is None
 
         self.log.info("setting up Server")
-        self.serv = Server(path=PATH, video_format="debug", record_file=record_file)
+        self.serv = Server(path=PATH, video_format="debug",
+                           record_file=record_file)
 
         self.log.info("running Server")
         self.serv.run()
@@ -63,10 +64,12 @@ class IntegrationTestbase(object):
         assert self.controller.connection is not None
 
     def new_test_video(self):
+        """Start a new Video-Testsource and wait until it's ready"""
         self.serv.wait_for_output('0.0.0.0:3000')
         self._sources.new_test_video()
 
     def new_test_audio(self):
+        """Start a new Audio-Testsource and wait until it's ready"""
         self.serv.wait_for_output('0.0.0.0:4000')
         self._sources.new_test_audio()
 
@@ -101,15 +104,19 @@ class IntegrationTestbase(object):
 
 
 class IntegrationTestbaseMainloop(IntegrationTestbase):
-    """Base class for integration tests for Tests that require a GLib-Mainloop.
+    """Base class for integration tests that require a GLib-Mainloop.
     Used for Tests that register and wait for signals.
     """
+    def setup_method(self, method):
+        """Set up called automatically before every test_XXXX method."""
+        super(IntegrationTestbaseMainloop, self).setup_method(method)
+        self.mainloop = GLib.MainLoop()
+        self.quit_count = 0
 
     def run_mainloop(self, timeout=5):
         """Start the MainLoop, set Quit-Counter to Zero"""
         self.quit_count = 0
         GLib.timeout_add_seconds(timeout, self.quit_mainloop)
-        self.mainloop = GLib.MainLoop()
         self.mainloop.run()
 
     def quit_mainloop(self, *_):
@@ -118,7 +125,15 @@ class IntegrationTestbaseMainloop(IntegrationTestbase):
         self.quit_count = 0
 
     def quit_mainloop_after(self, call_count):
-        """Increment Quit-Counter, if it reaches call_count, Quit the MainLoop"""
+        """Increment Quit-Counter, if it reaches call_count,
+        Quit the MainLoop"""
         self.quit_count += 1
         if self.quit_count == call_count:
             self.quit_mainloop()
+
+
+class IntegrationTestbaseCompare(IntegrationTestbase):
+    """Base class for integration tests that require image capture
+    and comparison. Used for Video- and Audio-Tests.
+    """
+    pass

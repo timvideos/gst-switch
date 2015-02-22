@@ -302,7 +302,7 @@ class TestRun(object):
     def test_start_process_error(self, monkeypatch):
         """Test _start_process method"""
         with patch('subprocess.Popen.__init__') as mock:
-            mock.side_effect=OSError
+            mock.side_effect = OSError
             serv = Server(path='abc')
             with pytest.raises(ServerProcessError):
                 serv._start_process('def')
@@ -310,6 +310,7 @@ class TestRun(object):
     def test_start_process_normal(self, monkeypatch):
         """Test _start_process normally"""
         with patch('subprocess.Popen.__init__') as mock:
+            mock.return_value = MockProcess()
             serv = Server(path='abc')
             serv._start_process('def')
 

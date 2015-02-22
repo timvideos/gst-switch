@@ -50,8 +50,8 @@ class ProcessMonitor(subprocess.Popen):
                 stderr=subprocess.STDOUT,
                 bufsize=0,
                 shell=False)
-        except Exception as e:
-            raise ServerProcessError(e)
+        except Exception as err:
+            raise ServerProcessError(err)
 
         self.log.debug("subprocess successfully started")
 
@@ -87,9 +87,10 @@ class ProcessMonitor(subprocess.Popen):
         endtime = time.time() + timeout
         while True:
             timeout = endtime - time.time()
-            self.log.debug("waiting for data output by subprocess (remaining time to timeout = %fs)", timeout)
-            (r, w, e) = select.select([self.stdout], [], [], timeout)
-            if self.stdout not in r:
+            self.log.debug("waiting for data output by subprocess"
+                           "(remaining time to timeout = %fs)", timeout)
+            (read, _, _) = select.select([self.stdout], [], [], timeout)
+            if self.stdout not in read:
                 remaining = endtime - time.time()
                 if remaining < 0.001:
                     raise RuntimeError("Timeout while waiting for match "
@@ -113,7 +114,8 @@ class ProcessMonitor(subprocess.Popen):
             self._buffer += chunk
             self._logtarget.write(chunk)
 
-            self.log.debug("testing again for %dx '%s' in buffer", count, match)
+            self.log.debug("testing again for %dx '%s' in buffer",
+                           count, match)
             if self._buffer.count(match) >= count:
                 self.log.debug("match found, returning")
                 return
@@ -307,6 +309,7 @@ class Server(object):
             self.pid = self.proc.pid
 
     def is_alive(self):
+        """Returns True if the Process did not yet return"""
         return self.proc.poll() is None
 
     def wait_for_output(self, match, timeout=5, count=1):

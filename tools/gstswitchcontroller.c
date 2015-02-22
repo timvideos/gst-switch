@@ -293,7 +293,7 @@ gst_switch_controller_on_new_connection (GDBusServer * server,
   GST_SWITCH_CONTROLLER_UNLOCK_CLIENTS (controller);
 
   INFO ("registered: %d, %s, %s", register_id,
-    SWITCH_CONTROLLER_OBJECT_PATH, introspection_data->interfaces[0]->name);
+      SWITCH_CONTROLLER_OBJECT_PATH, introspection_data->interfaces[0]->name);
 
 
   g_object_ref (connection);

@@ -25,19 +25,23 @@ class TestAdjustPIP(IntegrationTestbase):
 
 
 class TestCompositeOutput(IntegrationTestbase):
+    """ Test the actual Output of the Composition-Port
+    """
     def test_caps(self):
         """ Test if the compose-port is sending a video-stream with the
         expected caps
         """
         pass
 
+
 class TestEncodedOutput(IntegrationTestbase):
+    """ Test the actual Output of the Endoded-Port
+    """
     def test_caps(self):
         """ Test if the encode-port is sending a video-stream with the
         expected caps
         """
         pass
-
 
 
 # class TestClickVideo(object):
