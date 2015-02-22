@@ -44,7 +44,7 @@ class ProcessMonitor(subprocess.Popen):
         self.log.debug("starting subprocess")
 
         try:
-            super().__init__(
+            super(ProcessMonitor, self).__init__(
                 cmd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
@@ -58,9 +58,9 @@ class ProcessMonitor(subprocess.Popen):
     def terminate(self):
         """Kills the process and waits for the thread to exit"""
         self.log.debug("terminating the subprocess")
-        super().terminate()
+        super(ProcessMonitor, self).terminate()
         self.log.debug("waiting for the subprocess to die")
-        super().communicate()
+        super(ProcessMonitor, self).communicate()
 
     def check_for_output(self, match, count=1):
         """Searches the output already captured from the running process for
