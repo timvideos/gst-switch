@@ -8,7 +8,7 @@ import pytest
 from gstswitch.exception import ServerProcessError
 import subprocess
 from distutils import spawn
-from mock import Mock
+from mock import Mock, patch
 
 
 PATH = '/usr/bin/'
@@ -301,19 +301,17 @@ class TestRun(object):
 
     def test_start_process_error(self, monkeypatch):
         """Test _start_process method"""
-        serv = Server(path='abc')
-        monkeypatch.setattr(subprocess, 'Popen', Mock(side_effect=OSError))
-        with pytest.raises(ServerProcessError):
-            serv._start_process('cmd')
+        with patch('subprocess.Popen.__init__') as mock:
+            mock.side_effect=OSError
+            serv = Server(path='abc')
+            with pytest.raises(ServerProcessError):
+                serv._start_process('def')
 
     def test_start_process_normal(self, monkeypatch):
         """Test _start_process normally"""
-        serv = Server(path='abc')
-        monkeypatch.setattr(
-            subprocess,
-            'Popen',
-            Mock(return_value=MockProcess()))
-        serv._start_process('cmd')
+        with patch('subprocess.Popen.__init__') as mock:
+            serv = Server(path='abc')
+            serv._start_process('def')
 
 
 class MockProcess(object):
