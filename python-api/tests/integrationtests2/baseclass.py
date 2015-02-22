@@ -20,7 +20,6 @@ class IntegrationTestbase(object):
     """Base class for integration tests."""
 
     # Tests are not allowed to have an __init__ method
-    # pylint: disable=attribute-defined-outside-init
     def setup_method(self, _):
         """Set up called automatically before every test_XXXX method."""
         self.log = logging.getLogger()
