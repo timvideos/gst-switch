@@ -43,12 +43,15 @@ class ProcessMonitor(subprocess.Popen):
 
         self.log.debug("starting subprocess")
 
-        super().__init__(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            bufsize=0,
-            shell=False)
+        try:
+            super().__init__(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                bufsize=0,
+                shell=False)
+        except Exception as e:
+            raise ServerProcessError(e)
 
         self.log.debug("subprocess successfully started")
 
