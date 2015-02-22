@@ -70,24 +70,6 @@ class IntegrationTestbase(object):
         self.serv.wait_for_output('0.0.0.0:4000')
         self._sources.new_test_audio()
 
-    def run_mainloop(self, timeout=5):
-        """Start the MainLoop, set Quit-Counter to Zero"""
-        self.quit_count = 0
-        GLib.timeout_add_seconds(timeout, self.quit_mainloop)
-        self.mainloop = GLib.MainLoop()
-        self.mainloop.run()
-
-    def quit_mainloop(self, *_):
-        """Quit the MainLoop, set Quit-Counter to Zero"""
-        self.mainloop.quit()
-        self.quit_count = 0
-
-    def quit_mainloop_after(self, call_count):
-        """Increment Quit-Counter, if it reaches call_count, Quit the MainLoop"""
-        self.quit_count += 1
-        if self.quit_count == call_count:
-            self.quit_mainloop()
-
     def teardown_method(self, _):
         """Tear down called automatically after every test_XXXX method."""
         self.controller = None
@@ -116,3 +98,27 @@ class IntegrationTestbase(object):
             print(log.read())
 
         self.serv = None
+
+
+class IntegrationTestbaseMainloop(IntegrationTestbase):
+    """Base class for integration tests for Tests that require a GLib-Mainloop.
+    Used for Tests that register and wait for signals.
+    """
+
+    def run_mainloop(self, timeout=5):
+        """Start the MainLoop, set Quit-Counter to Zero"""
+        self.quit_count = 0
+        GLib.timeout_add_seconds(timeout, self.quit_mainloop)
+        self.mainloop = GLib.MainLoop()
+        self.mainloop.run()
+
+    def quit_mainloop(self, *_):
+        """Quit the MainLoop, set Quit-Counter to Zero"""
+        self.mainloop.quit()
+        self.quit_count = 0
+
+    def quit_mainloop_after(self, call_count):
+        """Increment Quit-Counter, if it reaches call_count, Quit the MainLoop"""
+        self.quit_count += 1
+        if self.quit_count == call_count:
+            self.quit_mainloop()

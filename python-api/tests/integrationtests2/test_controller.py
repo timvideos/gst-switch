@@ -4,7 +4,7 @@ Integration Tests for the dbus Controller
 
 from __future__ import absolute_import, print_function, unicode_literals
 import os, sys, datetime, time, random
-from .baseclass import IntegrationTestbase
+from .baseclass import IntegrationTestbase, IntegrationTestbaseMainloop
 from gstswitch.controller import Controller
 from mock import Mock
 
@@ -134,7 +134,7 @@ class TestGetPreviewPorts(IntegrationTestbase):
         assert self.controller.get_preview_ports() == [3003, 3004, 3005, 3006, 3007]
 
 
-class TestSignals(IntegrationTestbase):
+class TestSignals(IntegrationTestbaseMainloop):
     """ Test the various on_* signal-handler methods
     """
     def wait_for_sources(self, count):
