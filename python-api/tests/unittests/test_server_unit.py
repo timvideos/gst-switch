@@ -278,14 +278,6 @@ class TestKillTerminate(object):
         with pytest.raises(ServerProcessError):
             serv.gcov_flush()
 
-    def test_gcov_flush_fail(self):
-        """Test when gcov_flush fails"""
-        serv = Server(path=PATH)
-        serv.proc = 1
-        serv.pid = -300
-        with pytest.raises(ServerProcessError):
-            serv.gcov_flush()
-
 
 class TestRun(object):
 
