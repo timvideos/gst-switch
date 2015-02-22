@@ -72,8 +72,7 @@ class ProcessMonitor(object):
         if self._proc:
             self._proc.terminate()
             self.log.debug("waiting for the subprocess to die")
-            while self._proc.poll() is not None:
-                time.sleep(0.1)
+            self._proc.communicate()
 
     def poll(self):
         """Calls poll() on the running process and returns its result or None
