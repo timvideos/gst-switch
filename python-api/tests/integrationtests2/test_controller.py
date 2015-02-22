@@ -293,7 +293,7 @@ class TestNewRecord(IntegrationTestbase):
         self.log.info("asserting recording-file are not aready existing"
                       "(test_filename=%s)", test_filename)
         assert not os.path.exists(test_filename)
-        assert not os.path.exists(test_filename+'.000')
+        assert not os.path.exists(test_filename + '.000')
 
         self.setup_server(record_file=test_filename)
         self.setup_controller()
@@ -301,17 +301,17 @@ class TestNewRecord(IntegrationTestbase):
 
         self.log.info("asserting server created a recording-file")
         assert os.path.exists(test_filename)
-        assert not os.path.exists(test_filename+'.000')
+        assert not os.path.exists(test_filename + '.000')
 
         self.log.info("starting a new recording")
         assert self.controller.new_record()
 
         self.log.info("asserting server created a new recording-file")
         assert os.path.exists(test_filename)
-        assert os.path.exists(test_filename+'.000')
+        assert os.path.exists(test_filename + '.000')
 
         os.remove(test_filename)
-        os.remove(test_filename+'.000')
+        os.remove(test_filename + '.000')
 
     def test_record_file_grows(self):
         """ Tests, that the Server actually writes Data into the record-file
@@ -331,7 +331,7 @@ class TestNewRecord(IntegrationTestbase):
         assert os.path.exists(test_filename)
 
         self.log.info("sleeping for 5 frames")
-        time.sleep(5/25)
+        time.sleep(5 / 25)
 
         self.log.info("starting a new recording")
         assert self.controller.new_record()
@@ -342,4 +342,4 @@ class TestNewRecord(IntegrationTestbase):
         assert size > 0
 
         os.remove(test_filename)
-        os.remove(test_filename+'.000')
+        os.remove(test_filename + '.000')

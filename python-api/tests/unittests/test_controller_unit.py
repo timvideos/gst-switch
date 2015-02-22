@@ -136,7 +136,7 @@ class TestSignalHandler(object):
                        'show_track_marker', 'select_face'):
             test_cb = Mock()
             controller = Controller(address='unix:abstract=abcd')
-            getattr(controller, 'on_'+signal)(test_cb)
+            getattr(controller, 'on_' + signal)(test_cb)
 
             controller.cb_signal_handler(
                 None,
@@ -159,9 +159,9 @@ class TestSignalHandler(object):
         test_cbs = {}
         for signal in signals:
             test_cbs[signal] = Mock()
-            getattr(controller, 'on_'+signal)(test_cbs[signal])
-            getattr(controller, 'on_'+signal)(test_cbs[signal])
-            getattr(controller, 'on_'+signal)(test_cbs[signal])
+            getattr(controller, 'on_' + signal)(test_cbs[signal])
+            getattr(controller, 'on_' + signal)(test_cbs[signal])
+            getattr(controller, 'on_' + signal)(test_cbs[signal])
 
         for signal in signals:
             controller.cb_signal_handler(

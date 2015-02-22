@@ -21,13 +21,15 @@ lint:
 	@echo "Code style is okay!!"
 
 pep8:
-	${PEP8} gstswitch
+	# E402 module level import not at top of file
+	#  triggered by sys.path.insert(...) before gstswitch-imports
+	${PEP8} --ignore=E402 gstswitch
 	@echo "gstswitch is pep8 clean!!"
-	${PEP8} tests/unittests
+	${PEP8} --ignore=E402 tests/unittests
 	@echo "unittests are pep8 clean!!"
-	${PEP8} tests/integrationtests
+	${PEP8} --ignore=E402 tests/integrationtests
 	@echo "integration tests are pep8 clean!!"
-	${PEP8} tests/integrationtests2
+	${PEP8} --ignore=E402 tests/integrationtests2
 	@echo "integration tests 2 are pep8 clean!!"
 
 style: pep8 lint
@@ -41,15 +43,15 @@ unittests:
 	@rm -f ../tools/*.gcda
 	@rm -rf reports
 	@mkdir -p reports/coverage/unittests
-	${PYTEST} --cov gstswitch --pep8 -v -s tests/unittests/
+	${PYTEST} --cov gstswitch --pep8 -v tests/unittests/
 	#-@mv htmlcov/*.* reports/coverage/unittests
 
 integration: imgurbash.sh
 	@rm -f ../tools/*.c.gcov
 	@rm -f ../tools/*.gcda
 	@rm -rf reports
-	@mkdir -p reports/coverage/integration
-	${PYTEST} --cov gstswitch --pep8 -v -s tests/integrationtests/
+	@mkdir -p reports/coverage/integration2
+	${PYTEST} --cov gstswitch --pep8 -v tests/integrationtests2/
 	#-@mv htmlcov/*.* reports/coverage/integration
 
 performance:
