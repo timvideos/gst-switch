@@ -15,12 +15,12 @@ class TestEstablishConnection(IntegrationTestbase):
         """ Start the Server and connect to it. Assert it starts up correctly
         and can be connected to via the python-controller.
         """
-        # setup_server asserts internally that the server started up correctly
         self.setup_server()
+        assert self.serv is not None
+        assert self.serv.is_alive()
 
-        # setup_controller asserts internally that the connection is okay
         self.setup_controller()
-
+        assert self.controller.connection is not None
 
 class TestGetComposePort(IntegrationTestbase):
     """ Test get_compose_port method

@@ -328,6 +328,9 @@ class Server(object):
         if self.proc:
             self.pid = self.proc.pid
 
+    def is_alive(self):
+        return self.proc.poll() is None
+
     def wait_for_output(self, match, timeout=5, count=1):
         """Calls wait_for_output with the given parameters on the underlying
         ProcessMonitor"""

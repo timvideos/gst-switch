@@ -41,7 +41,7 @@ class IntegrationTestbase(object):
 
         self.log.info("running Server")
         self.serv.run()
-        assert self.serv.pid
+        assert self.serv.is_alive()
 
         self.log.info("waiting for Server to open Controller-Port")
         self.serv.wait_for_output('tcp:host=0.0.0.0,port=5000')
