@@ -82,10 +82,10 @@ class IntegrationTestbase(object):
         self.mainloop.quit()
         self.quit_count = 0
 
-    def quit_mainloop_after(self, num):
-        """Increment Quit-Counter, if it reaches num, Quit the MainLoop"""
+    def quit_mainloop_after(self, call_count):
+        """Increment Quit-Counter, if it reaches call_count, Quit the MainLoop"""
         self.quit_count += 1
-        if self.quit_count == num:
+        if self.quit_count == call_count:
             self.quit_mainloop()
 
     def teardown_method(self, _):
@@ -103,7 +103,7 @@ class IntegrationTestbase(object):
 
         if self.serv is not None:
             self.log.info("terminating Server")
-            self.serv.terminate(1)
+            self.serv.terminate(cov=True)
 
             if self.serv.proc:
                 poll = self.serv.proc.poll()

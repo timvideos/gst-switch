@@ -5,6 +5,7 @@ Integration Tests for the dbus Controller
 from __future__ import absolute_import, print_function, unicode_literals
 import os, sys, datetime, time, random
 from .baseclass import IntegrationTestbase
+from gstswitch.controller import Controller
 from mock import Mock
 
 class TestEstablishConnection(IntegrationTestbase):
@@ -94,7 +95,7 @@ class TestGetAudioPort(IntegrationTestbase):
 class TestGetPreviewPorts(IntegrationTestbase):
     """ Test get_preview_ports method
     """
-    def wait_until_ready(self, count):
+    def wait_for_sources(self, count):
         """ Blocks until the Server has reported, that the right number of
         preview-ports are is started
         """
@@ -109,7 +110,7 @@ class TestGetPreviewPorts(IntegrationTestbase):
         self.log.info("starting 1 test-video source")
         self.new_test_video()
 
-        self.wait_until_ready(1)
+        self.wait_for_sources(count=1)
 
         self.log.info("calling get_preview_ports")
         assert self.controller.get_preview_ports() == [3003]
@@ -127,7 +128,7 @@ class TestGetPreviewPorts(IntegrationTestbase):
         self.new_test_video()
 
         self.log.info("waiting for the test-video sources to come up")
-        self.wait_until_ready(5)
+        self.wait_for_sources(count=5)
 
         self.log.info("calling get_preview_ports")
         assert self.controller.get_preview_ports() == [3003, 3004, 3005, 3006, 3007]
@@ -136,7 +137,7 @@ class TestGetPreviewPorts(IntegrationTestbase):
 class TestSignals(IntegrationTestbase):
     """ Test the various on_* signal-handler methods
     """
-    def wait_until_ready(self, count):
+    def wait_for_sources(self, count):
         """ Blocks until the Server has reported, that the right number of
         preview-ports are is started
         """
@@ -151,7 +152,7 @@ class TestSignals(IntegrationTestbase):
         self.new_test_video()
 
         self.log.info("waiting for the test-video sources to come up")
-        self.wait_until_ready(2)
+        self.wait_for_sources(count=2)
 
 
     def test_initial_mode_callback(self):
@@ -168,9 +169,9 @@ class TestSignals(IntegrationTestbase):
         self.setup_sources()
 
 
-        self.log.info("waiting for initial callback with default-mode 3")
+        self.log.info("waiting for initial callback with default-mode COMPOSITE_DUAL_EQUAL")
         self.run_mainloop(timeout=5)
-        test_cb.assert_called_once_with(3)
+        test_cb.assert_called_once_with(Controller.COMPOSITE_DUAL_EQUAL)
 
     def test_new_mode_callback(self):
         """Create a Controller object, call on_new_mode_online method and
@@ -185,19 +186,18 @@ class TestSignals(IntegrationTestbase):
 
         self.setup_sources()
 
-
         self.log.info("waiting for initial callback with default-mode 3")
         self.run_mainloop(timeout=5)
-        test_cb.assert_called_once_with(3)
+        test_cb.assert_called_once_with(Controller.COMPOSITE_DUAL_EQUAL)
         test_cb.reset_mock()
 
 
         self.log.info("setting new composite mode")
-        assert self.controller.set_composite_mode(0)
+        assert self.controller.set_composite_mode(Controller.COMPOSITE_NONE)
         self.run_mainloop(timeout=5)
 
         self.log.info("waiting for callback with new mode 0")
-        test_cb.assert_called_once_with(0)
+        test_cb.assert_called_once_with(Controller.COMPOSITE_NONE)
 
 
     def test_same_mode_no_callback(self):
@@ -214,17 +214,16 @@ class TestSignals(IntegrationTestbase):
 
         self.setup_sources()
 
-
-        self.log.info("waiting for initial callback with default-mode 3")
+        self.log.info("waiting for initial callback with default-mode COMPOSITE_DUAL_EQUAL")
         self.run_mainloop(timeout=5)
-        test_cb.assert_called_once_with(3)
+        test_cb.assert_called_once_with(Controller.COMPOSITE_DUAL_EQUAL)
         test_cb.reset_mock()
 
-        self.log.info("setting the same composite mode (3) again")
-        assert not self.controller.set_composite_mode(3)
+        self.log.info("setting the same composite mode (COMPOSITE_DUAL_EQUAL) again")
+        assert not self.controller.set_composite_mode(Controller.COMPOSITE_DUAL_EQUAL)
 
-        self.log.info("setting a new composite-mode 1")
-        assert self.controller.set_composite_mode(1)
+        self.log.info("setting a new composite-mode COMPOSITE_PIP")
+        assert self.controller.set_composite_mode(Controller.COMPOSITE_PIP)
         self.run_mainloop(timeout=5)
 
         # just waiting for the timeout to verify no incoming call
@@ -232,8 +231,8 @@ class TestSignals(IntegrationTestbase):
         # mode-change, knowing that when it arrives without an
         # intermediate call, there was no duplicate callback
 
-        self.log.info("waiting for callback with new mode 1")
-        test_cb.assert_called_once_with(1)  # no second call with mode 3
+        self.log.info("waiting for callback with new mode COMPOSITE_PIP")
+        test_cb.assert_called_once_with(Controller.COMPOSITE_PIP)
 
     def test_preview_port_added_callback(self):
         """Create a Controller object, call on_preview_port_added method and
@@ -244,7 +243,7 @@ class TestSignals(IntegrationTestbase):
         self.setup_controller()
 
         test_cb = Mock(side_effect=lambda mode, serve, type:
-                       self.quit_mainloop_after(2))
+                       self.quit_mainloop_after(call_count=2))
         self.controller.on_preview_port_added(test_cb)
 
         self.setup_sources()
@@ -260,7 +259,7 @@ class TestNewRecord(IntegrationTestbase):
     """ Test new_record method
     """
 
-    def wait_until_ready(self, count):
+    def wait_for_sources(self, count):
         """ Blocks until the Server has reported, that the right number of
         preview-ports are is started
         """
@@ -275,7 +274,7 @@ class TestNewRecord(IntegrationTestbase):
         self.new_test_video()
 
         self.log.info("waiting for the test-video sources to come up")
-        self.wait_until_ready(2)
+        self.wait_for_sources(count=2)
 
     def test_filename_changes(self):
         """ Tests, that the Server creates a new File each time
