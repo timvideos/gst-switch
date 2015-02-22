@@ -43,7 +43,7 @@ unittests:
 	@rm -f ../tools/*.gcda
 	@rm -rf reports
 	@mkdir -p reports/coverage/unittests
-	${PYTEST} --cov gstswitch --pep8 -v tests/unittests/
+	${PYTEST} --cov gstswitch -v tests/unittests/
 	#-@mv htmlcov/*.* reports/coverage/unittests
 
 integration: imgurbash.sh
@@ -51,7 +51,7 @@ integration: imgurbash.sh
 	@rm -f ../tools/*.gcda
 	@rm -rf reports
 	@mkdir -p reports/coverage/integration2
-	${PYTEST} --cov gstswitch --pep8 -v tests/integrationtests2/
+	${PYTEST} --cov gstswitch -v tests/integrationtests2/
 	#-@mv htmlcov/*.* reports/coverage/integration
 
 performance:
