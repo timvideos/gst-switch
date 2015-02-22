@@ -119,9 +119,16 @@ class ProcessMonitor(object):
             self.log.debug("waiting for data output by subprocess (remaining time to timeout = %fs)", timeout)
             (r, w, e) = select.select([self._proc.stdout], [], [], timeout)
             if self._proc.stdout not in r:
-                raise RuntimeError("Timeout while waiting for match "
-                                   "'%s' %dx in the subprocess output."
-                                   % (match, count,))
+                remaining = endtime - time.time()
+                if remaining < 0.001:
+                    raise RuntimeError("Timeout while waiting for match "
+                                       "'%s' %dx in the subprocess output.\n"
+                                       "re-run tests with -x and look at "
+                                       "server.log to investigate further"
+                                       % (match, count,))
+
+                raise RuntimeError("select returned without stdout being"
+                                   " readable, assuming an exception")
 
             self.log.debug("reading data from subprocess")
             chunk = os.read(self._proc.stdout.fileno(), 2000).decode('utf-8')
