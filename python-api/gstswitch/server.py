@@ -62,14 +62,6 @@ class ProcessMonitor(subprocess.Popen):
         self.log.debug("waiting for the subprocess to die")
         super(ProcessMonitor, self).communicate()
 
-    def check_for_output(self, match, count=1):
-        """Searches the output already captured from the running process for
-        match and returns a boolean indicating if the match has already been
-        captured.
-        """
-        self.log.debug("testing for %dx '%s' in buffer", count, match)
-        return self._buffer.count(match) >= count
-
     def wait_for_output(self, match, timeout=5, count=1):
         """Searches the output already captured from the running process for
         match and returns immediatly if match has already been captured.
@@ -79,8 +71,7 @@ class ProcessMonitor(subprocess.Popen):
         timeout. If no match is found until timeout is passed, a RuntimeError
         is raised.
         """
-
-        if self.check_for_output(match, count):
+        if self._buffer.count(match) >= count:
             self.log.debug("match found, returning without reading more data")
             return
 
