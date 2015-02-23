@@ -3,10 +3,12 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(__file__, "../../../")))
 
-from gstswitch.server import Server
+from gstswitch.server import Server, ProcessMonitor
 import pytest
-from gstswitch.exception import ServerProcessError
+from gstswitch.exception import ServerProcessError, PathError
+from gstswitch.exception import MatchTimeoutError
 import subprocess
+from errno import ENOENT
 from distutils import spawn
 from mock import Mock, patch
 
@@ -61,6 +63,15 @@ class TestPath(object):
             assert serv._run_process() == "/usr/gst-switch-srv \
 --video-input-port=3000 --audio-input-port=4000 \
 --controller-address=tcp:host=0.0.0.0,port=5000".split()
+
+    def test_binary_not_found(self, monkeypatch):
+        """Test that a PathError os raised when
+           distutils.spawn.find_executable return nothing"""
+
+        monkeypatch.setattr(spawn, 'find_executable', Mock(return_value=''))
+        with pytest.raises(PathError):
+            serv = Server()
+            serv._run_process()
 
 
 class TestVideoPort(object):
@@ -278,6 +289,15 @@ class TestKillTerminate(object):
         with pytest.raises(ServerProcessError):
             serv.gcov_flush()
 
+    def test_gov_flush_fail(self):
+        """Test when gov_flush fails"""
+        serv = Server(path=PATH)
+        serv.proc = Mock(ProcessMonitor)
+        serv.proc.send_signal.side_effect = OSError
+
+        with pytest.raises(ServerProcessError):
+            serv.gcov_flush()
+
 
 class TestRun(object):
 
@@ -299,6 +319,24 @@ class TestRun(object):
         ret = serv._run_process()
         assert ret is not None
 
+    def test_option_string(self):
+        """Test option_string property"""
+        serv = Server(path='abc')
+        serv._start_process = Mock()
+        serv.gst_option_string = '-ZZZ'
+        serv._run_process()
+        serv._start_process.assert_called_once()
+        assert '-ZZZ' in serv._start_process.call_args[0][0]
+
+    def test_video_format(self):
+        """Test video_format property"""
+        serv = Server(path='abc')
+        serv._start_process = Mock()
+        serv.video_format = 'ZZZ'
+        serv._run_process()
+        serv._start_process.assert_called_once()
+        assert '--video-format=ZZZ' in serv._start_process.call_args[0][0]
+
     def test_start_process_error(self, monkeypatch):
         """Test _start_process method"""
         with patch('subprocess.Popen.__init__') as mock:
@@ -313,6 +351,40 @@ class TestRun(object):
             mock.return_value = MockProcess()
             serv = Server(path='abc')
             serv._start_process('def')
+
+    def test_log_to_stderr(self):
+        """Test log_to_file=False property"""
+        with patch('gstswitch.server.ProcessMonitor') as mock:
+            serv = Server(path='abc')
+            serv.log_to_file = False
+            serv._start_process('cmd')
+            mock.assert_called_with('cmd')
+
+    def test_log_to_file(self):
+        """Test log_to_file=True property"""
+        with patch('gstswitch.server.open', create=True) as mock_open:
+            mock_open.return_value = 123
+            with patch('gstswitch.server.ProcessMonitor') as mock:
+                serv = Server(path='abc')
+                serv.log_to_file = True
+                serv._start_process('cmd')
+                mock.assert_called_with('cmd', 123)
+
+    def test_raises_enoent(self):
+        """Test what happens when ProcessMonitor raises an OSError ENOENT"""
+        with patch('gstswitch.server.ProcessMonitor') as mock:
+            mock.side_effect = OSError(ENOENT, "not found")
+            serv = Server(path='abc')
+            with pytest.raises(PathError):
+                serv._start_process('cmd')
+
+    def test_raises_oserror(self):
+        """Test what happens when ProcessMonitor raises an OSError"""
+        with patch('gstswitch.server.ProcessMonitor') as mock:
+            mock.side_effect = OSError()
+            serv = Server(path='abc')
+            with pytest.raises(ServerProcessError):
+                serv._start_process('cmd')
 
 
 class MockProcess(object):
@@ -423,3 +495,58 @@ class TestNormal(object):
         serv = Server(path='abc')
         monkeypatch.setattr(subprocess, 'Popen', MockPopen)
         serv.make_coverage()
+
+
+class TestIsAlive(object):
+
+    """Test the is_alive method"""
+
+    def test_is_alive(self, monkeypatch):
+        """ Test that is_alive returns True when the
+            underlying proc returns None on Poll
+        """
+        serv = Server()
+        serv.proc = Mock()
+        monkeypatch.setattr(serv.proc, 'poll', Mock(return_value=None))
+
+        assert serv.is_alive() is True
+
+    def test_is_not_alive(self, monkeypatch):
+        """ Test that is_alive returns True when the
+            underlying proc returns None on Poll
+        """
+        serv = Server()
+        serv.proc = Mock()
+        monkeypatch.setattr(serv.proc, 'poll', Mock(return_value=123))
+
+        assert serv.is_alive() is False
+
+
+class TestWaitForOutput(object):
+
+    """Test the wait_for_output method"""
+
+    def test_args_are_passed(self, monkeypatch):
+        """ Test that wait_for_output passes all
+            Arguments to the underlying ProcessMonitor
+        """
+        serv = Server()
+        serv.proc = Mock()
+        monkeypatch.setattr(serv.proc, 'wait_for_output', Mock())
+
+        serv.wait_for_output("foo", timeout=123, count=456)
+        serv.proc.wait_for_output.called_once_with(
+            "foo", timeout=123, count=456)
+
+    def test_error_is_passed(self, monkeypatch):
+        """ Test that wait_for_output passes all
+            Exceptions from the underlying ProcessMonitor
+        """
+        serv = Server()
+        serv.proc = Mock()
+        monkeypatch.setattr(serv.proc,
+                            'wait_for_output',
+                            Mock(side_effect=MatchTimeoutError))
+
+        with pytest.raises(MatchTimeoutError):
+            serv.wait_for_output("foo", timeout=123, count=456)
