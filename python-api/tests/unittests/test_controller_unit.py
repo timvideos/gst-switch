@@ -137,6 +137,20 @@ class TestSignalHandler(object):
         controller.cb_signal_handler(None, ':0', '/foo/bar',
                                      'foo.bar', 'foobar', None, None)
 
+    def test_invalid_callback(self, monkeypatch):
+        """Test that a ValueError is raised when a not-callable object is
+        registered as callback-handler
+        """
+        monkeypatch.setattr(Connection, 'connect_dbus', Mock())
+
+        for signal in ('preview_port_added', 'preview_port_removed',
+                       'new_mode_online', 'show_face_marker',
+                       'show_track_marker', 'select_face'):
+            test_cb = 123
+            controller = Controller(address='unix:abstract=abcd')
+            with pytest.raises(ValueError):
+                getattr(controller, 'on_' + signal)(test_cb)
+
     def test_single_handler_calls(self, monkeypatch):
         """Test that the various Handler gets calles"""
         monkeypatch.setattr(Connection, 'connect_dbus', Mock())
@@ -192,8 +206,9 @@ class MockConnection(object):
 
     """A class which mocks the Connection class"""
 
-    def __init__(self, return_variant):
+    def __init__(self, return_variant, should_fail=False):
         self.return_variant = return_variant
+        self.should_fail = should_fail
 
     def get_compose_port(self):
         """mock of get_compose_port"""
@@ -226,30 +241,30 @@ class MockConnection(object):
     def set_composite_mode(self, mode):
         """mock of set_composite_mode"""
         if self.return_variant:
-            return GLib.Variant('(b)', (True,))
+            return GLib.Variant('(b)', (not self.should_fail,))
         else:
-            return (False,)
+            return (not self.should_fail,)
 
     def get_composite_mode(self):
         """mock of set_composite_mode"""
         if self.return_variant:
             return GLib.Variant('(i)', (0,))
         else:
-            return (False,)
+            return (0,)
 
     def set_encode_mode(self, mode):
         """mock of get_set_encode_mode"""
         if self.return_variant:
-            return GLib.Variant('(b)', (True,))
+            return GLib.Variant('(b)', (not self.should_fail,))
         else:
-            return (True,)
+            return (not self.should_fail,)
 
     def new_record(self):
         """mock of new_record"""
         if self.return_variant:
-            return GLib.Variant('(b)', (True,))
+            return GLib.Variant('(b)', (not self.should_fail,))
         else:
-            return (True,)
+            return (not self.should_fail,)
 
     def adjust_pip(self, xpos, ypos, width, height):
         """mock of adjust_pip"""
@@ -261,16 +276,16 @@ class MockConnection(object):
     def switch(self, channel, port):
         """mock of switch"""
         if self.return_variant:
-            return GLib.Variant('(b)', (True,))
+            return GLib.Variant('(b)', (not self.should_fail,))
         else:
-            return (True,)
+            return (not self.should_fail,)
 
     def click_video(self, xpos, ypos, width, height):
         """mock of click_video"""
         if self.return_variant:
-            return GLib.Variant('(b)', (True,))
+            return GLib.Variant('(b)', (not self.should_fail,))
         else:
-            return (True,)
+            return (not self.should_fail,)
 
     def mark_face(self, face):
         """mock of mark_face"""
@@ -406,6 +421,14 @@ class TestSetEncodeMode(object):
         with pytest.raises(ConnectionReturnError):
             controller.set_encode_mode(1)
 
+    def test_action_fails(self):
+        """Test what happens if the requested action fails"""
+        controller = Controller(address='unix:abstract=abcde')
+        controller.establish_connection = Mock(return_value=None)
+        controller.connection = MockConnection(
+            return_variant=True, should_fail=True)
+        assert controller.set_encode_mode(1) is False
+
     def test_normal_unpack(self):
         """Test if valid"""
         controller = Controller(address='unix:abstract=abcdef')
@@ -425,6 +448,14 @@ class TestNewRecord(object):
         controller.connection = MockConnection(return_variant=False)
         with pytest.raises(ConnectionReturnError):
             controller.new_record()
+
+    def test_action_fails(self):
+        """Test what happens if the requested action fails"""
+        controller = Controller(address='unix:abstract=abcde')
+        controller.establish_connection = Mock(return_value=None)
+        controller.connection = MockConnection(
+            return_variant=True, should_fail=True)
+        assert controller.new_record() is False
 
     def test_normal_unpack(self):
         """Test if valid"""
@@ -466,6 +497,14 @@ class TestSwitch(object):
         with pytest.raises(ConnectionReturnError):
             controller.switch(Controller.VIDEO_CHANNEL_A, 2)
 
+    def test_action_fails(self):
+        """Test what happens if the requested action fails"""
+        controller = Controller(address='unix:abstract=abcde')
+        controller.establish_connection = Mock(return_value=None)
+        controller.connection = MockConnection(
+            return_variant=True, should_fail=True)
+        assert controller.switch(Controller.VIDEO_CHANNEL_A, 2) is False
+
     def test_normal_unpack(self):
         """Test if valid"""
         controller = Controller(address='unix:abstract=abcdef')
@@ -485,6 +524,14 @@ class TestClickVideo(object):
         controller.connection = MockConnection(return_variant=False)
         with pytest.raises(ConnectionReturnError):
             controller.click_video(1, 2, 3, 4)
+
+    def test_action_fails(self):
+        """Test what happens if the requested action fails"""
+        controller = Controller(address='unix:abstract=abcde')
+        controller.establish_connection = Mock(return_value=None)
+        controller.connection = MockConnection(
+            return_variant=True, should_fail=True)
+        assert controller.click_video(1, 2, 3, 4) is False
 
     def test_normal_unpack(self):
         """Test if valid"""
