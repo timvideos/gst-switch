@@ -41,18 +41,18 @@ imgurbash.sh:
 unittests:
 	@rm -f ../tools/*.c.gcov
 	@rm -f ../tools/*.gcda
-	@rm -rf reports
-	@mkdir -p reports/coverage/unittests
-	${PYTEST} --cov gstswitch -v tests/unittests/
-	#-@mv htmlcov/*.* reports/coverage/unittests
+	${PYTEST} --cov gstswitch --cov-report html -v tests/unittests/
+	mkdir -p reports/coverage/
+	rm -rf reports/coverage/unittests-${PYTHONVERSION}
+	mv htmlcov reports/coverage/unittests-${PYTHONVERSION}
 
 integration: imgurbash.sh
 	@rm -f ../tools/*.c.gcov
 	@rm -f ../tools/*.gcda
-	@rm -rf reports
-	@mkdir -p reports/coverage/integration2
-	${PYTEST} --cov gstswitch -v tests/integrationtests2/
-	#-@mv htmlcov/*.* reports/coverage/integration
+	${PYTEST} --cov gstswitch --cov-report html -v tests/integrationtests2/
+	mkdir -p reports/coverage/
+	rm -rf reports/coverage/integration-${PYTHONVERSION}
+	mv htmlcov reports/coverage/integration-${PYTHONVERSION}
 
 performance:
 	${PYTEST} tests/performancetests/*.py -v -s
