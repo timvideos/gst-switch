@@ -5,7 +5,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(__file__, "../../../")))
 
 from gstswitch.server import ProcessMonitor
 import pytest
-from gstswitch.exception import ServerProcessError
+from gstswitch.exception import ServerProcessError, MatchTimeoutError
+from gstswitch.exception import MatchEofError, SelectError
 from mock import Mock, patch, DEFAULT, ANY
 
 
@@ -79,7 +80,7 @@ class TestProcessMonitor(object):
                 mon = ProcessMonitor('abc')
                 mon.stdout = None
                 mon._buffer = 'aaa bbb ccc'
-                with pytest.raises(RuntimeError):
+                with pytest.raises(MatchTimeoutError):
                     mon.wait_for_output('ZZZ', timeout=0, count=1)
                 mock.assert_called_once()
 
@@ -116,7 +117,7 @@ class TestProcessMonitor(object):
                 mon = ProcessMonitor('abc')
                 mon.stdout = 123
                 mon._buffer = 'aaa ZZZ bbb ccc'
-                with pytest.raises(RuntimeError):
+                with pytest.raises(MatchTimeoutError):
                     mon.wait_for_output('ZZZ', timeout=0, count=2)
             selectmock.assert_called_once()
 
@@ -130,7 +131,7 @@ class TestProcessMonitor(object):
                 mon = ProcessMonitor('abc')
                 mon.stdout = 123
                 mon._buffer = 'aaa bbb ccc'
-                with pytest.raises(RuntimeError):
+                with pytest.raises(SelectError):
                     mon.wait_for_output('ZZZ', timeout=500, count=1)
                     mock.assert_called_once()
 
@@ -169,7 +170,7 @@ class TestProcessMonitor(object):
                     mon = ProcessMonitor('abc')
                     mon.stdout = stdoutmock
 
-                    with pytest.raises(RuntimeError):
+                    with pytest.raises(MatchEofError):
                         mon.wait_for_output('ZZZ', timeout=0, count=1)
 
                 readmock.assert_called_once_with(stdoutmock.fileno(), ANY)

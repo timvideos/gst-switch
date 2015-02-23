@@ -17,6 +17,7 @@ import logging
 
 from errno import ENOENT
 from .exception import PathError, ServerProcessError
+from .exception import MatchTimeoutError, MatchEofError, SelectError
 
 
 __all__ = ["Server", ]
@@ -84,22 +85,23 @@ class ProcessMonitor(subprocess.Popen):
             if self.stdout not in read:
                 remaining = endtime - time.time()
                 if remaining < 0.001:
-                    raise RuntimeError("Timeout while waiting for match "
-                                       "'%s' %dx in the subprocess output.\n"
-                                       "re-run tests with -x and look at "
-                                       "server.log to investigate further"
-                                       % (match, count,))
+                    raise MatchTimeoutError(
+                        "Timeout while waiting for match "
+                        "'%s' %dx in the subprocess output.\n"
+                        "re-run tests with -x and look at "
+                        "server.log to investigate further"
+                        % (match, count,))
 
-                raise RuntimeError("select returned without stdout being"
-                                   " readable, assuming an exception")
+                raise SelectError("select returned without stdout being"
+                                  " readable, assuming an exception")
 
             self.log.debug("reading data from subprocess")
             chunk = os.read(self.stdout.fileno(), 2000).decode('utf-8')
 
             if len(chunk) == 0:
-                raise RuntimeError("Subprocess died while waiting for match "
-                                   "'%s' %dx in the subprocess output."
-                                   % (match, count,))
+                raise MatchEofError("Subprocess died while waiting for match "
+                                    "'%s' %dx in the subprocess output."
+                                    % (match, count,))
 
             self.log.debug("read %d bytes, appending to buffer", len(chunk))
             self._buffer += chunk
