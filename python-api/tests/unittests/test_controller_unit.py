@@ -118,12 +118,22 @@ class TestEstablishConnection(object):
 
 class TestSignalHandler(object):
 
-    """Test the establish_connection method"""
+    """Test the cb_signal_handler method"""
 
     def test_unknown_signal_name(self, monkeypatch):
         """Test that nothing happens when a unknown signal is on the bus"""
         monkeypatch.setattr(Connection, 'connect_dbus', Mock())
         controller = Controller(address='unix:abstract=abcd')
+        controller.cb_signal_handler(None, ':0', '/foo/bar',
+                                     'foo.bar', 'foobar', None, None)
+
+    def test_signal_name_collision(self, monkeypatch):
+        """Test that nothing happens when a signal is on the bus which name
+        collides with a attribute also starting with 'callbacks_'
+        """
+        monkeypatch.setattr(Connection, 'connect_dbus', Mock())
+        controller = Controller(address='unix:abstract=abcd')
+        controller.callbacks_foobar = 123
         controller.cb_signal_handler(None, ':0', '/foo/bar',
                                      'foo.bar', 'foobar', None, None)
 
