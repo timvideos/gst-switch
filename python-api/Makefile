@@ -61,6 +61,12 @@ performance:
 test: unittests integration
 
 clean:
+	rm -f gstswitch/*.pyc
+	rm -rf gstswitch/__pycache__
+	rm -f tests/unittests/*.pyc
+	rm -rf tests/unittests/__pycache__
+	rm -f tests/integrationtests2/*.pyc
+	rm -rf tests/integrationtests2/__pycache__
 	rm -f *.avi*
 	rm -f *.data*
 	rm -f *.html
