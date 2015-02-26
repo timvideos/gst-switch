@@ -17,7 +17,7 @@ object_path = "/info/duzy/gst/switch/SwitchController"
 #print(type(mode), mode)
 # mode=0
 # while mode<=3:
-    # print("mode:", mode)
+#     print("mode:", mode)
 connection = Gio.DBusConnection.new_for_address_sync(
                 address,
                 Gio.DBusConnectionFlags.AUTHENTICATION_CLIENT,
@@ -32,5 +32,5 @@ b =  connection.call_sync(
 print(b, b.unpack()[0],type(b.unpack()[0]))
 # mode += 1
 # if mode==4:
-    # mode=0
+#     mode=0
 sleep(0.5)
