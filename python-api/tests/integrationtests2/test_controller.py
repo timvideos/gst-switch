@@ -192,16 +192,16 @@ class TestSignals(IntegrationTestbaseMainloop):
 
         self.setup_sources()
 
-        self.log.info("waiting for initial callback with default-mode 3")
+        self.log.info("waiting for initial callback with default-mode COMPOSITE_DUAL_EQUAL")
         self.run_mainloop(timeout=5)
         test_cb.assert_called_once_with(Controller.COMPOSITE_DUAL_EQUAL)
         test_cb.reset_mock()
 
-        self.log.info("setting new composite mode")
+        self.log.info("setting new composite mode COMPOSITE_NONE")
         assert self.controller.set_composite_mode(Controller.COMPOSITE_NONE)
         self.run_mainloop(timeout=5)
 
-        self.log.info("waiting for callback with new mode 0")
+        self.log.info("waiting for callback with new mode COMPOSITE_NONE")
         test_cb.assert_called_once_with(Controller.COMPOSITE_NONE)
 
     def test_same_mode_no_callback(self):
