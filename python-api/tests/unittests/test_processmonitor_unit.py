@@ -7,8 +7,8 @@ from gstswitch.server import ProcessMonitor
 import pytest
 from gstswitch.exception import ServerProcessError, MatchTimeoutError
 from gstswitch.exception import MatchEofError, SelectError
-from mock import Mock, patch, DEFAULT, ANY
-
+from mock import Mock, patch, mock_open, DEFAULT, ANY
+from six import StringIO
 
 PATH = '/usr/bin/'
 
@@ -58,6 +58,52 @@ class TestProcessMonitor(object):
 
             mocks['communicate'].assert_called_once()
             mocks['terminate'].assert_called_once()
+
+    def test_copy_remaining_on_terminate(self):
+        """ Test if terminating a ProcessMonitor at least calls
+            communicate and terminate on the Popen-Instance
+        """
+        with patch.multiple('subprocess.Popen',
+                            __init__=DEFAULT,
+                            terminate=DEFAULT,
+                            communicate=DEFAULT):
+
+            m_file = mock_open(read_data='testpattern')
+            m_file.fileno = Mock(return_value=123)
+
+            with patch('select.select', return_value=([m_file], [], [])):
+                reads = [b'testpattern', b'']
+                with patch('os.read', side_effect=lambda a, b: reads.pop(0)):
+                    mon = ProcessMonitor('abc')
+                    mon.stdout = m_file
+                    mon._logtarget = StringIO()
+                    mon.pid = 123
+                    mon.terminate()
+
+                assert mon._logtarget.getvalue() == 'testpattern'
+
+    def test_break_no_remaining_on_terminate(self):
+        """ Test if terminating a ProcessMonitor at least calls
+            communicate and terminate on the Popen-Instance
+        """
+        with patch.multiple('subprocess.Popen',
+                            __init__=DEFAULT,
+                            terminate=DEFAULT,
+                            communicate=DEFAULT):
+
+            m_file = mock_open(read_data='testpattern')
+            m_file.fileno = Mock(return_value=123)
+
+            with patch('select.select', return_value=([], [], [])):
+                reads = [b'testpattern', b'']
+                with patch('os.read', side_effect=lambda a, b: reads.pop(0)):
+                    mon = ProcessMonitor('abc')
+                    mon.stdout = m_file
+                    mon._logtarget = StringIO()
+                    mon.pid = 123
+                    mon.terminate()
+
+                assert mon._logtarget.getvalue() == ''
 
     def test_instant_return(self):
         """ Test if wait_for_output returns instantly if the buffer
