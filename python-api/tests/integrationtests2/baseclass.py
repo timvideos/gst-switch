@@ -62,10 +62,10 @@ class IntegrationTestbase(object):
 
         assert self.controller.connection is not None
 
-    def new_test_video(self):
+    def new_test_video(self, pattern=None):
         """Start a new Video-Testsource and wait until it's ready"""
         self.serv.wait_for_output('0.0.0.0:3000')
-        self._sources.new_test_video()
+        self._sources.new_test_video(pattern=pattern)
 
     def new_test_audio(self):
         """Start a new Audio-Testsource and wait until it's ready"""
