@@ -58,6 +58,22 @@ class ProcessMonitor(subprocess.Popen):
 
     def terminate(self):
         """Kills the process and waits for the thread to exit"""
+
+        self.log.info("reading remaining data from subprocess")
+        while True:
+            (read, _, _) = select.select([self.stdout], [], [], 0)
+            if self.stdout not in read:
+                break
+
+            self.log.debug("reading data from subprocess")
+            chunk = os.read(self.stdout.fileno(), 2000).decode('utf-8')
+
+            if len(chunk) == 0:
+                break;
+
+            self.log.debug("read %d bytes, appending to logtarget", len(chunk))
+            self._logtarget.write(chunk)
+
         self.log.debug("terminating the subprocess")
         super(ProcessMonitor, self).terminate()
         self.log.debug("waiting for the subprocess to die")
