@@ -141,4 +141,4 @@ class IntegrationTestbaseCompare(IntegrationTestbase):
         Return when a match is found or timeout seconds have passed"""
         self.log.info("waiting for a frame that compares against %s"
                       "(timeout=%u)", filename, timeout)
-        # …
+        # ...
