@@ -186,8 +186,6 @@ class Controller(object):
                 # to make sure that it's arguments match with the DBus Signal
                 # Specification for the particular Signal he's subscribing for
                 # Disable pylint-warning because we know what we're doing here.
-
-                # pylint: disable=star-args
                 callback(*unpack)
 
         except AttributeError:
