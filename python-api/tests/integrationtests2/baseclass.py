@@ -135,6 +135,10 @@ class IntegrationTestbaseCompare(IntegrationTestbase):
     """Base class for integration tests that require image capture
     and comparison. Used for Video- and Audio-Tests.
     """
+
     def expect_frame(self, filename, timeout=5):
-        self.log.info("waiting for a frame that compares against %s", filename)
+        """Read frames fro mthe server and compare them against filename.
+        Return when a match is found or timeout seconds have passed"""
+        self.log.info("waiting for a frame that compares against %s"
+                      "(timeout=%u)", filename, timeout)
         # …

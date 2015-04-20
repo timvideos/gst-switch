@@ -69,7 +69,7 @@ class ProcessMonitor(subprocess.Popen):
             chunk = os.read(self.stdout.fileno(), 2000).decode('utf-8')
 
             if len(chunk) == 0:
-                break;
+                break
 
             self.log.debug("read %d bytes, appending to logtarget", len(chunk))
             self._logtarget.write(chunk)

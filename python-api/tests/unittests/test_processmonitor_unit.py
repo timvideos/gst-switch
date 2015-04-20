@@ -53,6 +53,7 @@ class TestProcessMonitor(object):
                             communicate=DEFAULT) as mocks:
 
             mon = ProcessMonitor('abc')
+            mon.stdout = sys.stdout
             mon.terminate()
 
             mocks['communicate'].assert_called_once()

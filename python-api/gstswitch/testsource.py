@@ -355,7 +355,6 @@ class VideoSrc(object):
     PATTERN_PINWHEEL = 21
     PATTERN_SPOKES = 22
 
-
     def __init__(
             self,
             port,

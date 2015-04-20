@@ -3,18 +3,18 @@ Integration Tests for the Video-Pipelines
 """
 
 from __future__ import absolute_import, print_function, unicode_literals
-import time
-from mock import Mock
 
 from .baseclass import IntegrationTestbase, IntegrationTestbaseCompare
 from gstswitch.testsource import VideoSrc
 from gstswitch.controller import Controller
+
 
 class TestCompositeModes(IntegrationTestbaseCompare):
     """ Test the various composition modes and their results
     """
 
     def setup_test(self):
+        """Setup Server, Controller and two Video-Test-Sources"""
         self.setup_server()
         self.setup_controller()
 
@@ -30,35 +30,44 @@ class TestCompositeModes(IntegrationTestbaseCompare):
         self.serv.wait_for_output('ending transition')
 
     def test_set_composite_mode_none(self):
-        """Test set_composite_mode"""
+        """Test set_composite_mode COMPOSITE_NONE"""
         self.setup_test()
 
         self.expect_frame('COMPOSITE_DUAL_EQUAL.png')
-        assert self.controller.set_composite_mode(Controller.COMPOSITE_NONE)
+        assert self.controller.set_composite_mode(
+            Controller.COMPOSITE_NONE)
+
         self.expect_frame('COMPOSITE_NONE.png')
 
     def test_set_composite_mode_pip(self):
-        """Test set_composite_mode"""
+        """Test set_composite_mode COMPOSITE_PIP"""
         self.setup_test()
 
         self.expect_frame('COMPOSITE_DUAL_EQUAL.png')
-        assert self.controller.set_composite_mode(Controller.COMPOSITE_PIP)
+        assert self.controller.set_composite_mode(
+            Controller.COMPOSITE_PIP)
+
         self.expect_frame('COMPOSITE_PIP.png')
 
     def test_set_composite_mode_preview(self):
-        """Test set_composite_mode"""
+        """Test set_composite_mode COMPOSITE_DUAL_PREVIEW"""
         self.setup_test()
 
         self.expect_frame('COMPOSITE_DUAL_EQUAL.png')
-        assert self.controller.set_composite_mode(Controller.COMPOSITE_DUAL_PREVIEW)
+        assert self.controller.set_composite_mode(
+            Controller.COMPOSITE_DUAL_PREVIEW)
+
         self.expect_frame('COMPOSITE_DUAL_PREVIEW.png')
 
     def test_set_composite_mode_equal(self):
-        """Test set_composite_mode"""
+        """Test set_composite_mode COMPOSITE_DUAL_EQUAL"""
         self.setup_test()
 
         self.expect_frame('COMPOSITE_DUAL_EQUAL.png')
-        assert self.controller.set_composite_mode(Controller.COMPOSITE_DUAL_EQUAL)
+        # mode is unchanged -> returns false
+        assert not self.controller.set_composite_mode(
+            Controller.COMPOSITE_DUAL_EQUAL)
+
         self.expect_frame('COMPOSITE_DUAL_EQUAL.png')
 
 

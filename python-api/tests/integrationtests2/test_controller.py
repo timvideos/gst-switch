@@ -192,7 +192,8 @@ class TestSignals(IntegrationTestbaseMainloop):
 
         self.setup_sources()
 
-        self.log.info("waiting for initial callback with default-mode COMPOSITE_DUAL_EQUAL")
+        self.log.info("waiting for initial callback with default-mode"
+                      "COMPOSITE_DUAL_EQUAL")
         self.run_mainloop(timeout=5)
         test_cb.assert_called_once_with(Controller.COMPOSITE_DUAL_EQUAL)
         test_cb.reset_mock()
