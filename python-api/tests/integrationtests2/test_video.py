@@ -23,7 +23,7 @@ class TestCompositeModes(IntegrationTestbaseCompare):
         self.serv.wait_for_output('tcpserversink name=sink', count=1)
 
         self.log.info("starting up 2nd VideoSrc")
-        self.new_test_video(pattern=VideoSrc.PATTERN_BLUE)
+        self.new_test_video(pattern=VideoSrc.PATTERN_GREEN)
         self.serv.wait_for_output('tcpserversink name=sink', count=2)
 
         self.log.info("waiting for end of initial transition")
