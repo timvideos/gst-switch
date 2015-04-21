@@ -146,7 +146,7 @@ class IntegrationTestbaseCompare(IntegrationTestbase):
     and comparison. Used for Video- and Audio-Tests.
     """
 
-    def expect_frame(self, filename, port=3001, timeout=1):
+    def expect_frame(self, filename, port=3001, timeout=5):
         """Read frames fro mthe server and compare them against filename.
         Return when a match is found or timeout seconds have passed
         Source-Port defaults to 3001=video compoe-port"""
