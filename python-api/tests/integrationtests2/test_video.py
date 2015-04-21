@@ -9,8 +9,8 @@ from gstswitch.testsource import VideoSrc
 from gstswitch.controller import Controller
 
 
-class TestCompositeModes(IntegrationTestbaseCompare):
-    """ Test the various composition modes and their results
+class IntegrationTestbaseVideo(IntegrationTestbaseCompare):
+    """ Testbase used to test video-pipeline results
     """
 
     def setup_test(self):
@@ -20,14 +20,22 @@ class TestCompositeModes(IntegrationTestbaseCompare):
 
         self.log.info("starting up 1st VideoSrc")
         self.new_test_video(pattern=VideoSrc.PATTERN_RED)
-        self.serv.wait_for_output('tcpserversink name=sink', count=1)
 
         self.log.info("starting up 2nd VideoSrc")
         self.new_test_video(pattern=VideoSrc.PATTERN_GREEN)
-        self.serv.wait_for_output('tcpserversink name=sink', count=2)
+
+        self.log.info("starting up 3rd VideoSrc")
+        self.new_test_video(pattern=VideoSrc.PATTERN_BLUE)
+
+        self.serv.wait_for_output('tcpserversink name=sink', count=3)
 
         self.log.info("waiting for end of initial transition")
         self.serv.wait_for_output('ending transition')
+
+
+class TestCompositeModes(IntegrationTestbaseVideo):
+    """ Test the various composition modes and their results
+    """
 
     def test_set_composite_mode_none(self):
         """Test set_composite_mode COMPOSITE_NONE"""
@@ -71,10 +79,57 @@ class TestCompositeModes(IntegrationTestbaseCompare):
         self.expect_frame('COMPOSITE_DUAL_EQUAL.png')
 
 
-class TestSwitch(IntegrationTestbase):
+class TestSwitch(IntegrationTestbaseVideo):
     """ Test switching between the available input sources
     """
-    pass
+    PORT_RED = 3003
+    PORT_GREEN = 3004
+    PORT_BLUE = 3005
+
+    def test_switch_video_source_a(self):
+        """Test set_composite_mode COMPOSITE_NONE"""
+        self.setup_test()
+
+        # default: A=RED, B=GREEN
+        self.expect_frame('SWITCH_RED_GREEN.png')
+
+        # switch: A=GREEN, [B=RED]
+        assert self.controller.switch(
+            Controller.VIDEO_CHANNEL_A, self.PORT_GREEN)
+
+        self.expect_frame('SWITCH_GREEN_RED.png')
+
+    def test_switch_video_source_b(self):
+        """Test set_composite_mode COMPOSITE_NONE"""
+        self.setup_test()
+
+        # default: A=RED, B=GREEN
+        self.expect_frame('SWITCH_RED_GREEN.png')
+
+        # switch: [A=GREEN], B=RED
+        assert self.controller.switch(
+            Controller.VIDEO_CHANNEL_B, self.PORT_RED)
+
+        self.expect_frame('SWITCH_GREEN_RED.png')
+
+    def test_switch_video_source_ab(self):
+        """Test set_composite_mode COMPOSITE_NONE"""
+        self.setup_test()
+
+        # default: A=RED, B=GREEN
+        self.expect_frame('SWITCH_RED_GREEN.png')
+
+        # switch: A=BLUE, B=GREEN
+        assert self.controller.switch(
+            Controller.VIDEO_CHANNEL_A, self.PORT_BLUE)
+
+        self.expect_frame('SWITCH_BLUE_GREEN.png')
+
+        # switch: B=BLUE, [A=GREEN]
+        assert self.controller.switch(
+            Controller.VIDEO_CHANNEL_B, self.PORT_BLUE)
+
+        self.expect_frame('SWITCH_GREEN_BLUE.png')
 
 
 class TestAdjustPIP(IntegrationTestbase):
