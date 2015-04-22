@@ -15,9 +15,10 @@ gi.require_version('Gst', '1.0')
 
 sys.path.insert(0, os.path.abspath(os.path.join(__file__, "../../../")))
 from gstswitch.server import Server
-from gstswitch.helpers import TestSources  # PreviewSinks
+from gstswitch.helpers import TestSources
 from gstswitch.controller import Controller
 from gi.repository import GLib, GObject, Gst
+from gstswitch.testsource import VideoSrc
 
 GObject.threads_init()
 Gst.init(None)
@@ -146,10 +147,9 @@ class IntegrationTestbaseCompare(IntegrationTestbase):
     and comparison. Used for Video- and Audio-Tests.
     """
 
-    def expect_frame(self, filename, port=3001, timeout=5):
-        """Read frames fro mthe server and compare them against filename.
-        Return when a match is found or timeout seconds have passed
-        Source-Port defaults to 3001=video compoe-port"""
+    def expect_frame(self, filename, port, shape, timeout=5):
+        """Read frames from the server and compare them against filename.
+        Return when a match is found or timeout seconds have passed"""
 
         filepath = os.path.join(
             os.path.dirname(__file__),
@@ -160,7 +160,7 @@ class IntegrationTestbaseCompare(IntegrationTestbase):
         expected = scipy.misc.imread(filepath).astype(float)
 
         # build frame-fetching gstreamer pipeline
-        appsink = self.build_frame_fetching_appsink(port)
+        appsink = self.get_appsink(port)
 
         # calculate timestamp to timeout at
         endtime = time.time() + timeout
@@ -185,7 +185,7 @@ class IntegrationTestbaseCompare(IntegrationTestbase):
 
             # create numpy-array from RGB-Data
             img = numpy.frombuffer(bytedata, numpy.uint8).astype(float)
-            img.shape = (200, 300, 3)
+            img.shape = shape
 
             # Calulcate image-difference
             diff = abs(img - expected)
@@ -223,36 +223,6 @@ class IntegrationTestbaseCompare(IntegrationTestbase):
                     "Timeout while waiting for matching frame %s" % filename)
 
         self.log.info("comparison succeeded after %u frames", frame)
-
-    def build_frame_fetching_appsink(self, port):
-        """Construct a Gstreamer-Pipeline which receives frames,
-        converts them to RGB and pushes them to an Appsink.
-        The Appsink is returned."""
-
-        self.log.debug("building frame-fetching gstreamer pipeline")
-        pipeline = Gst.Pipeline()
-
-        tcpsrc = Gst.ElementFactory.make('tcpclientsrc')
-        depay = Gst.ElementFactory.make('gdpdepay')
-        conv = Gst.ElementFactory.make('videoconvert')
-        appsink = Gst.ElementFactory.make('appsink')
-
-        pipeline.add(tcpsrc)
-        pipeline.add(depay)
-        pipeline.add(conv)
-        pipeline.add(appsink)
-
-        tcpsrc.link(depay)
-        depay.link(conv)
-        conv.link_filtered(
-            appsink,
-            Gst.Caps.from_string('video/x-raw,format=RGB'))
-
-        tcpsrc.set_property('host', 'localhost')
-        tcpsrc.set_property('port', port)
-        pipeline.set_state(Gst.State.PLAYING)
-
-        return appsink
 
     def is_running_in_ci(self):
         """Test if the testsuite is ran by Travis-CI"""
@@ -305,3 +275,66 @@ class IntegrationTestbaseCompare(IntegrationTestbase):
                 './imgurbash.sh',
                 filename
             ], stderr=devnull).decode('utf-8').strip()
+
+
+class IntegrationTestbaseVideo(IntegrationTestbaseCompare):
+    """ Testbase used to test video-pipeline results
+    """
+
+    def expect_video_frame(self, filename, port=3001, timeout=5):
+        """Read frames fro mthe server and compare them against filename.
+        Return when a match is found or timeout seconds have passed
+        Source-Port defaults to 3001=video compoe-port"""
+
+        super().expect_frame(
+            filename, port,
+            shape=(200, 300, 3), timeout=timeout)
+
+    def get_appsink(self, port):
+        """Construct a Gstreamer-Pipeline which receives frames,
+        converts them to RGB and pushes them to an Appsink.
+        The Appsink is returned."""
+
+        self.log.debug("building frame-fetching gstreamer pipeline")
+        pipeline = Gst.Pipeline()
+
+        tcpsrc = Gst.ElementFactory.make('tcpclientsrc')
+        depay = Gst.ElementFactory.make('gdpdepay')
+        conv = Gst.ElementFactory.make('videoconvert')
+        appsink = Gst.ElementFactory.make('appsink')
+
+        pipeline.add(tcpsrc)
+        pipeline.add(depay)
+        pipeline.add(conv)
+        pipeline.add(appsink)
+
+        tcpsrc.link(depay)
+        depay.link(conv)
+        conv.link_filtered(
+            appsink,
+            Gst.Caps.from_string('video/x-raw,format=RGB'))
+
+        tcpsrc.set_property('host', 'localhost')
+        tcpsrc.set_property('port', port)
+        pipeline.set_state(Gst.State.PLAYING)
+
+        return appsink
+
+    def setup_test(self):
+        """Setup Server, Controller and two Video-Test-Sources"""
+        self.setup_server()
+        self.setup_controller()
+
+        self.log.info("starting up 1st VideoSrc")
+        self.new_test_video(pattern=VideoSrc.PATTERN_RED)
+
+        self.log.info("starting up 2nd VideoSrc")
+        self.new_test_video(pattern=VideoSrc.PATTERN_GREEN)
+
+        self.log.info("starting up 3rd VideoSrc")
+        self.new_test_video(pattern=VideoSrc.PATTERN_BLUE)
+
+        self.serv.wait_for_output('tcpserversink name=sink', count=3)
+
+        self.log.info("waiting for end of initial transition")
+        self.serv.wait_for_output('ending transition')
