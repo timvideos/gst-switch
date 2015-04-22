@@ -18,7 +18,7 @@ from gstswitch.server import Server
 from gstswitch.helpers import TestSources
 from gstswitch.controller import Controller
 from gi.repository import GLib, GObject, Gst
-from gstswitch.testsource import VideoSrc
+from gstswitch.testsource import VideoSrc, AudioSrc
 
 GObject.threads_init()
 Gst.init(None)
@@ -78,10 +78,10 @@ class IntegrationTestbase(object):
         self.serv.wait_for_output('0.0.0.0:3000')
         self._sources.new_test_video(pattern=pattern)
 
-    def new_test_audio(self):
+    def new_test_audio(self, freq=110, wave=AudioSrc.WAVE_SINE):
         """Start a new Audio-Testsource and wait until it's ready"""
         self.serv.wait_for_output('0.0.0.0:4000')
-        self._sources.new_test_audio()
+        self._sources.new_test_audio(freq=freq, wave=wave)
 
     def teardown_method(self, _):
         """Tear down called automatically after every test_XXXX method."""
@@ -379,3 +379,70 @@ class IntegrationTestbaseVideo(IntegrationTestbaseCompare):
 
         self.log.info("waiting for end of initial transition")
         self.serv.wait_for_output('ending transition')
+
+
+class IntegrationTestbaseAudio(IntegrationTestbaseCompare):
+    """ Testbase used to test video-pipeline results
+    """
+
+    PORT_110 = 3003
+    # PORT_220 = 3004
+    PORTS = (PORT_110, )
+
+    def expect_audio_wavescope(self, filename, port=3003, timeout=5):
+        """Read frames from the server and compare them against filename.
+        Return when a match is found or timeout seconds have passed
+        Source-Port defaults to 3001=video compose-port"""
+
+        self.expect_frame(
+            filename, port,
+            shape=(200, 400, 3), timeout=timeout)
+
+    def get_appsink(self, port):
+        """Construct a Gstreamer-Pipeline which receives frames,
+        converts them to RGB and pushes them to an Appsink.
+        The Appsink is returned."""
+
+        self.log.debug("building audio-sample-fetching gstreamer pipeline")
+        pipeline = Gst.Pipeline()
+
+        tcpsrc = Gst.ElementFactory.make('tcpclientsrc')
+        depay = Gst.ElementFactory.make('gdpdepay')
+        wavescope = Gst.ElementFactory.make('spectrascope')
+        conv = Gst.ElementFactory.make('videoconvert')
+        appsink = Gst.ElementFactory.make('appsink')
+
+        pipeline.add(tcpsrc)
+        pipeline.add(depay)
+        pipeline.add(wavescope)
+        pipeline.add(conv)
+        pipeline.add(appsink)
+
+        tcpsrc.link(depay)
+        depay.link(wavescope)
+        wavescope.link_filtered(
+            conv,
+            Gst.Caps.from_string('video/x-raw,width=400,height=200'))
+        conv.link_filtered(
+            appsink,
+            Gst.Caps.from_string('video/x-raw,format=RGB'))
+
+        tcpsrc.set_property('host', 'localhost')
+        tcpsrc.set_property('port', port)
+        wavescope.set_property('shader', 'none')
+        pipeline.set_state(Gst.State.PLAYING)
+
+        return appsink
+
+    def setup_test(self):
+        """Setup Server, Controller and two Video-Test-Sources"""
+        self.setup_server()
+        self.setup_controller()
+
+        self.log.info("starting up 1st AudioSrc")
+        self.new_test_audio(freq=110, wave=AudioSrc.WAVE_SINE)
+
+        # self.log.info("starting up 2nd AudioSrc")
+        # self.new_test_audio(freq=220, wave=AudioSrc.WAVE_TICKS)
+
+        self.serv.wait_for_output('tcpserversink name=sink', count=1)

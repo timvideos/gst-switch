@@ -547,6 +547,20 @@ class AudioSrc(object):
 
     HOST = '127.0.0.1'
 
+    WAVE_SINE = 0
+    WAVE_SQUARE = 1
+    WAVE_SAW = 2
+    WAVE_TRIANGLE = 3
+    WAVE_SILENCE = 4
+    WAVE_WHITE_NOISE = 5
+    WAVE_PINK_NOISE = 6
+    WAVE_SINE_TABLE = 7
+    WAVE_TICKS = 8
+    WAVE_GAUSSIAN_NOISE = 9
+    WAVE_RED_NOISE = 10
+    WAVE_BLUE_NOISE = 11
+    WAVE_VIOLET_NOISE = 12
+
     def __init__(
             self,
             port,

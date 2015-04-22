@@ -173,7 +173,7 @@ class TestEncodedOutput(IntegrationTestbaseVideo):
 
 
 class TestPreviewPorts(IntegrationTestbaseVideo):
-    """ Test the actual Output of the Endoded-Port
+    """ Test the actual Output of the Preview-Ports
     """
     def test_caps(self):
         """ Test if the encode-port is sending a video-stream with the
