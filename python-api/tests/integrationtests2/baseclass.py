@@ -323,9 +323,9 @@ class IntegrationTestbaseVideo(IntegrationTestbaseCompare):
     PORTS = (PORT_RED, PORT_GREEN, PORT_BLUE, )
 
     def expect_video_frame(self, filename, port=3001, timeout=5):
-        """Read frames fro mthe server and compare them against filename.
+        """Read frames from the server and compare them against filename.
         Return when a match is found or timeout seconds have passed
-        Source-Port defaults to 3001=video compoe-port"""
+        Source-Port defaults to 3001=video compose-port"""
 
         super().expect_frame(
             filename, port,
