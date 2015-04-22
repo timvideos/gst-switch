@@ -224,6 +224,42 @@ class IntegrationTestbaseCompare(IntegrationTestbase):
 
         self.log.info("comparison succeeded after %u frames", frame)
 
+    def expect_caps(self, port, expectedcapsstr):
+        """Fetch a sample-frame from the server and return its
+        caps as string"""
+        self.log.debug("building sample-fetching gstreamer pipeline")
+        pipeline = Gst.Pipeline()
+
+        tcpsrc = Gst.ElementFactory.make('tcpclientsrc')
+        depay = Gst.ElementFactory.make('gdpdepay')
+        appsink = Gst.ElementFactory.make('appsink')
+
+        pipeline.add(tcpsrc)
+        pipeline.add(depay)
+        pipeline.add(appsink)
+
+        tcpsrc.link(depay)
+        depay.link(appsink)
+
+        tcpsrc.set_property('host', 'localhost')
+        tcpsrc.set_property('port', port)
+        pipeline.set_state(Gst.State.PLAYING)
+
+        self.log.debug("pull a frame from server")
+        sample = appsink.emit('pull_sample')
+        assert isinstance(sample, Gst.Sample)
+
+        caps = sample.get_caps()
+        assert isinstance(caps, Gst.Caps)
+
+        capsstr = caps.to_string()
+        self.log.info("got caps=%s", capsstr)
+        self.log.info("expected caps=%s", expectedcapsstr)
+
+        expected = Gst.Caps.from_string(expectedcapsstr)
+        assert caps.is_subset(expected), \
+            "%s is not a subset of %s" % (capsstr, expectedcapsstr)
+
     def is_running_in_ci(self):
         """Test if the testsuite is ran by Travis-CI"""
         return os.environ.get('CI', "False") == "true"
@@ -281,6 +317,11 @@ class IntegrationTestbaseVideo(IntegrationTestbaseCompare):
     """ Testbase used to test video-pipeline results
     """
 
+    PORT_RED = 3003
+    PORT_GREEN = 3004
+    PORT_BLUE = 3005
+    PORTS = (PORT_RED, PORT_GREEN, PORT_BLUE, )
+
     def expect_video_frame(self, filename, port=3001, timeout=5):
         """Read frames fro mthe server and compare them against filename.
         Return when a match is found or timeout seconds have passed
@@ -295,7 +336,7 @@ class IntegrationTestbaseVideo(IntegrationTestbaseCompare):
         converts them to RGB and pushes them to an Appsink.
         The Appsink is returned."""
 
-        self.log.debug("building frame-fetching gstreamer pipeline")
+        self.log.debug("building video-frame-fetching gstreamer pipeline")
         pipeline = Gst.Pipeline()
 
         tcpsrc = Gst.ElementFactory.make('tcpclientsrc')

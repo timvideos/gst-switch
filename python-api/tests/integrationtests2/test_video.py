@@ -66,9 +66,6 @@ class TestCompositeModes(IntegrationTestbaseVideo):
 class TestSwitch(IntegrationTestbaseVideo):
     """ Test switching between the available input sources
     """
-    PORT_RED = 3003
-    PORT_GREEN = 3004
-    PORT_BLUE = 3005
 
     def test_switch_video_source_a(self):
         """Test set_composite_mode COMPOSITE_NONE"""
@@ -146,11 +143,19 @@ class TestAdjustPIP(IntegrationTestbaseVideo):
 class TestCompositeOutput(IntegrationTestbaseVideo):
     """ Test the actual Output of the Composition-Port
     """
+    @pytest.mark.xfail(reason="issue #200")
     def test_caps(self):
         """ Test if the compose-port is sending a video-stream with the
         expected caps
         """
-        pass
+
+        self.setup_test()
+        caps = ('video/x-raw, format=(string)I420, '
+                'width=(int)300, height=(int)200, '
+                'framerate=(fraction)25/1')
+
+        self.log.info("testing caps of composite-output")
+        self.expect_caps(3001, caps)
 
 
 class TestEncodedOutput(IntegrationTestbaseVideo):
@@ -160,7 +165,29 @@ class TestEncodedOutput(IntegrationTestbaseVideo):
         """ Test if the encode-port is sending a video-stream with the
         expected caps
         """
-        pass
+
+        self.setup_test()
+
+        self.log.info("testing caps of encoded-output")
+        self.expect_caps(3002, 'video/x-matroska')
+
+
+class TestPreviewPorts(IntegrationTestbaseVideo):
+    """ Test the actual Output of the Endoded-Port
+    """
+    def test_caps(self):
+        """ Test if the encode-port is sending a video-stream with the
+        expected caps
+        """
+
+        self.setup_test()
+        caps = ('video/x-raw, format=(string)I420, '
+                'width=(int)300, height=(int)200, '
+                'framerate=(fraction)25/1')
+
+        for port in self.PORTS:
+            self.log.info("testing caps of preview-port %u", port)
+            self.expect_caps(port, caps)
 
 
 # class TestClickVideo(object):
