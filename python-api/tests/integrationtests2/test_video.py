@@ -42,6 +42,8 @@ class TestCompositeModes(IntegrationTestbaseVideo):
         self.setup_test()
 
         self.expect_frame('COMPOSITE_DUAL_EQUAL.png')
+
+        self.log.info("setting composite-mode=COMPOSITE_NONE")
         assert self.controller.set_composite_mode(
             Controller.COMPOSITE_NONE)
 
@@ -52,6 +54,8 @@ class TestCompositeModes(IntegrationTestbaseVideo):
         self.setup_test()
 
         self.expect_frame('COMPOSITE_DUAL_EQUAL.png')
+
+        self.log.info("setting composite-mode=COMPOSITE_PIP")
         assert self.controller.set_composite_mode(
             Controller.COMPOSITE_PIP)
 
@@ -62,6 +66,8 @@ class TestCompositeModes(IntegrationTestbaseVideo):
         self.setup_test()
 
         self.expect_frame('COMPOSITE_DUAL_EQUAL.png')
+
+        self.log.info("setting composite-mode=COMPOSITE_DUAL_PREVIEW")
         assert self.controller.set_composite_mode(
             Controller.COMPOSITE_DUAL_PREVIEW)
 
@@ -72,7 +78,9 @@ class TestCompositeModes(IntegrationTestbaseVideo):
         self.setup_test()
 
         self.expect_frame('COMPOSITE_DUAL_EQUAL.png')
+
         # mode is unchanged -> returns false
+        self.log.info("setting composite-mode=COMPOSITE_DUAL_EQUAL")
         assert not self.controller.set_composite_mode(
             Controller.COMPOSITE_DUAL_EQUAL)
 
@@ -94,6 +102,7 @@ class TestSwitch(IntegrationTestbaseVideo):
         self.expect_frame('SWITCH_RED_GREEN.png')
 
         # switch: A=GREEN, [B=RED]
+        self.log.info("switching video channel A to GREEN")
         assert self.controller.switch(
             Controller.VIDEO_CHANNEL_A, self.PORT_GREEN)
 
@@ -107,6 +116,7 @@ class TestSwitch(IntegrationTestbaseVideo):
         self.expect_frame('SWITCH_RED_GREEN.png')
 
         # switch: [A=GREEN], B=RED
+        self.log.info("switching video channel B to RED")
         assert self.controller.switch(
             Controller.VIDEO_CHANNEL_B, self.PORT_RED)
 
