@@ -327,7 +327,7 @@ class IntegrationTestbaseVideo(IntegrationTestbaseCompare):
         Return when a match is found or timeout seconds have passed
         Source-Port defaults to 3001=video compose-port"""
 
-        super().expect_frame(
+        self.expect_frame(
             filename, port,
             shape=(200, 300, 3), timeout=timeout)
 
