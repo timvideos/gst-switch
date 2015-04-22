@@ -82,13 +82,12 @@ class TestGetAudioPort(IntegrationTestbase):
         self.log.info("waiting for Server to start preview-port-outputs")
         self.serv.wait_for_output('tcpserversink name=sink')
 
-    def test_preview_ports(self):
+    def test_audio_port(self):
         """Test get_audio_port method returning the expected port"""
         self.setup_server()
         self.setup_controller()
 
-        self.log.info("starting 2 test-audio sources")
-        self.new_test_audio()
+        self.log.info("starting 1 test-audio source")
         self.new_test_audio()
 
         self.wait_until_ready()
