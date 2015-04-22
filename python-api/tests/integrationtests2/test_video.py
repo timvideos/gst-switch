@@ -7,6 +7,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 from .baseclass import IntegrationTestbase, IntegrationTestbaseCompare
 from gstswitch.testsource import VideoSrc
 from gstswitch.controller import Controller
+import pytest
 
 
 class IntegrationTestbaseVideo(IntegrationTestbaseCompare):
@@ -130,22 +131,41 @@ class TestSwitch(IntegrationTestbaseVideo):
         self.expect_frame('SWITCH_RED_GREEN.png')
 
         # switch: A=BLUE, B=GREEN
+        self.log.info("switching video channel A to BLUE")
         assert self.controller.switch(
             Controller.VIDEO_CHANNEL_A, self.PORT_BLUE)
 
         self.expect_frame('SWITCH_BLUE_GREEN.png')
 
         # switch: B=BLUE, [A=GREEN]
+        self.log.info("switching video channel B to BLUE")
         assert self.controller.switch(
             Controller.VIDEO_CHANNEL_B, self.PORT_BLUE)
 
         self.expect_frame('SWITCH_GREEN_BLUE.png')
 
 
-class TestAdjustPIP(IntegrationTestbase):
+class TestAdjustPIP(IntegrationTestbaseVideo):
     """ Test adjusting the PIP Position via DBus API
     """
-    pass
+    @pytest.mark.xfail(reason="issue #167")
+    def test_adjust_pip(self):
+        """Test set_composite_mode COMPOSITE_NONE"""
+        self.setup_test()
+
+        self.log.info("setting composite-mode=COMPOSITE_PIP")
+        assert self.controller.set_composite_mode(
+            Controller.COMPOSITE_PIP)
+
+        # default: A=RED, B=GREEN
+        self.expect_frame('COMPOSITE_PIP.png')
+
+        # adjusted pip: A=RED, B=GREEN
+        self.log.info("calling adjust_pip")
+        assert self.controller.adjust_pip(
+            74, 92, 90, 60)
+
+        self.expect_frame('COMPOSITE_PIP_PLACEMENT.png')
 
 
 class TestCompositeOutput(IntegrationTestbase):
