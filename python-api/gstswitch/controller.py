@@ -182,12 +182,9 @@ class Controller(object):
             unpack = parameters.unpack()
             for callback in callbacks:
                 # We're passing the values unpacked from the GVariant as-is
-                # to the callback. The auther of the callback is responsible
+                # to the callback. The author of the callback is responsible
                 # to make sure that it's arguments match with the DBus Signal
                 # Specification for the particular Signal he's subscribing for
-                # Disable pylint-warning because we know what we're doing here.
-
-                # pylint: disable=star-args
                 callback(*unpack)
 
         except AttributeError:
