@@ -4,7 +4,7 @@ PYTHONVERSION := 3.4
 
 PYTEST := py.test-${PYTHONVERSION}
 PYLINT := python${PYTHONVERSION} $(shell which pylint)
-# Ignore E402 module level import not at top of file
+# Keep the --ignore in sync with setup.cfg
 PEP8 := python${PYTHONVERSION} $(shell which pep8) --ignore=E402
 
 lint: export PYTHONWARNINGS := ignore
