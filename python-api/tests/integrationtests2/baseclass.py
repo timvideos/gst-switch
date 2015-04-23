@@ -217,10 +217,23 @@ class IntegrationTestbaseCompare(IntegrationTestbase):
             if remaining < 0.001:
                 # Save last failed Frame and (in Travis) upload to imageurl
                 self.save_images(filename, img, expected, diff)
+                appsink.get_parent().set_state(Gst.State.NULL)
 
                 # Throw an Error
                 raise RuntimeError(
                     "Timeout while waiting for matching frame %s" % filename)
+
+            del img
+            del diff
+            del bytedata
+            del buf
+            del sample
+
+        del img
+        del diff
+        del bytedata
+        del buf
+        del sample
 
         appsink.get_parent().set_state(Gst.State.NULL)
         self.log.info("comparison succeeded after %u frames", frame)
