@@ -199,8 +199,8 @@ class TestGetPreviewPorts(object):
                     sources.new_test_video()
                 expected_result = map(
                     tuple,
-                    [[x for x in range(3003, 3004 + self.NUM)]]
-                    * self.NUM * self.FACTOR)
+                    [[x for x in range(3003, 3004 + self.NUM)]] *
+                    self.NUM * self.FACTOR)
                 res = map(tuple, self.get_preview_ports())
                 print('\n', res, '\n')
                 print(expected_result)
