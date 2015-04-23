@@ -175,7 +175,7 @@ class Controller(object):
         classes/DBusConnection.html#Gio.DBusConnection.signal_subscribe>
         """
         try:
-            callbacks = getattr(self, 'callbacks_'+signal_name)
+            callbacks = getattr(self, 'callbacks_' + signal_name)
             if not isinstance(callbacks, list):
                 raise AttributeError()
 
