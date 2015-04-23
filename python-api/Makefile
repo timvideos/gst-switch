@@ -4,7 +4,8 @@ PYTHONVERSION := 3.4
 
 PYTEST := py.test-${PYTHONVERSION}
 PYLINT := python${PYTHONVERSION} $(shell which pylint)
-PEP8 := python${PYTHONVERSION} $(shell which pep8)
+# Ignore E402 module level import not at top of file
+PEP8 := python${PYTHONVERSION} $(shell which pep8) --ignore=E402
 
 lint: export PYTHONWARNINGS := ignore
 lint: export PYTHONPATH := ${PYTHONPATH}:${PWD}
