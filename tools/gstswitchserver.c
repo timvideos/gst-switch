@@ -39,10 +39,10 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#define GST_SWITCH_SERVER_DEFAULT_HOST "0.0.0.0"
+#define GST_SWITCH_SERVER_DEFAULT_HOST "::"     /* All IPv4 *and* IPv6 addresses */
 #define GST_SWITCH_SERVER_DEFAULT_VIDEO_ACCEPTOR_PORT	3000
 #define GST_SWITCH_SERVER_DEFAULT_AUDIO_ACCEPTOR_PORT	4000
-#define GST_SWITCH_SERVER_DEFAULT_CONTROLLER_ADDRESS	"tcp:host=0.0.0.0,port=5000"
+#define GST_SWITCH_SERVER_DEFAULT_CONTROLLER_ADDRESS	"tcp:host=::,port=5000"
 #define GST_SWITCH_SERVER_LISTEN_BACKLOG 8      /* client connection queue */
 
 #define GST_SWITCH_SERVER_HOST_SPEC "%q"
