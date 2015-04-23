@@ -222,6 +222,7 @@ class IntegrationTestbaseCompare(IntegrationTestbase):
                 raise RuntimeError(
                     "Timeout while waiting for matching frame %s" % filename)
 
+        appsink.get_parent().set_state(Gst.State.NULL)
         self.log.info("comparison succeeded after %u frames", frame)
 
     def expect_caps(self, port, expectedcapsstr):
