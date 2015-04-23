@@ -223,18 +223,6 @@ class IntegrationTestbaseCompare(IntegrationTestbase):
                 raise RuntimeError(
                     "Timeout while waiting for matching frame %s" % filename)
 
-            del img
-            del diff
-            del bytedata
-            del buf
-            del sample
-
-        del img
-        del diff
-        del bytedata
-        del buf
-        del sample
-
         appsink.get_parent().set_state(Gst.State.NULL)
         self.log.info("comparison succeeded after %u frames", frame)
 
@@ -257,11 +245,15 @@ class IntegrationTestbaseCompare(IntegrationTestbase):
 
         tcpsrc.set_property('host', 'localhost')
         tcpsrc.set_property('port', port)
+        appsink.set_property('max-buffers', 2)
+        appsink.set_property('drop', True)
         pipeline.set_state(Gst.State.PLAYING)
 
         self.log.debug("pull a frame from server")
         sample = appsink.emit('pull_sample')
         assert isinstance(sample, Gst.Sample)
+
+        pipeline.set_state(Gst.State.NULL)
 
         caps = sample.get_caps()
         assert isinstance(caps, Gst.Caps)
@@ -371,6 +363,8 @@ class IntegrationTestbaseVideo(IntegrationTestbaseCompare):
 
         tcpsrc.set_property('host', 'localhost')
         tcpsrc.set_property('port', port)
+        appsink.set_property('max-buffers', 2)
+        appsink.set_property('drop', True)
         pipeline.set_state(Gst.State.PLAYING)
 
         return appsink
@@ -443,6 +437,8 @@ class IntegrationTestbaseAudio(IntegrationTestbaseCompare):
 
         tcpsrc.set_property('host', 'localhost')
         tcpsrc.set_property('port', port)
+        appsink.set_property('max-buffers', 2)
+        appsink.set_property('drop', True)
         wavescope.set_property('shader', 'none')
         pipeline.set_state(Gst.State.PLAYING)
 
