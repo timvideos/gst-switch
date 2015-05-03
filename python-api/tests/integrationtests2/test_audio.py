@@ -21,7 +21,7 @@ class TestSwitch(IntegrationTestbaseAudio):
         """
         self.setup_test()
 
-        self.expect_audio_wavescope('SPECTRASCOPE_110.png')
+        self.expect_audio_spectrascope('SPECTRASCOPE_110.png')
 
     @pytest.mark.xfail(reason="issue #201")
     def test_switch_audio_source(self):
@@ -29,14 +29,14 @@ class TestSwitch(IntegrationTestbaseAudio):
         """
         self.setup_test()
 
-        self.expect_audio_wavescope('SPECTRASCOPE_110.png')
+        self.expect_audio_spectrascope('SPECTRASCOPE_110.png')
 
         # this fails because there is no PORT_220 to select
         # adding it is disabled in the baseclass, because of issue #201
         assert self.controller.switch(
             Controller.AUDIO_CHANNEL, self.PORT_220)
 
-        self.expect_audio_wavescope('SPECTRASCOPE_220.png')
+        self.expect_audio_spectrascope('SPECTRASCOPE_220.png')
 
 
 class TestPreviewPorts(IntegrationTestbaseAudio):
