@@ -7,11 +7,14 @@ from __future__ import absolute_import, print_function, unicode_literals
 from .baseclass import IntegrationTestbaseAudio
 from gstswitch.controller import Controller
 import pytest
+import os
 
 
 class TestSwitch(IntegrationTestbaseAudio):
     """ Test switching between multiple audio sources
     """
+    @pytest.mark.xfail(os.environ.get('CI', "false") == "true",
+                       reason="issue #207 (travis only)")
     def test_audio_passes(self):
         """ Test if audio passed into the gst-switch-server comes
         out the other end
