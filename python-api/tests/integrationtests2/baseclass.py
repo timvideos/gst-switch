@@ -180,12 +180,14 @@ class IntegrationTestbaseCompare(IntegrationTestbase):
             self.log.debug("command finished, comparing generated frames")
             (success, img, diff) = self.compare_frames(expected, folder)
 
+            self.log.debug("removing temp-folder")
             shutil.rmtree(folder)
 
             if success:
                 break
 
         if not success:
+            self.log.debug("last turn failed, saving images for human inspection")
             self.save_images(filename, img, expected, diff)
 
         assert success
@@ -258,8 +260,9 @@ class IntegrationTestbaseCompare(IntegrationTestbase):
         """Save and (in Travis) upload Failed images"""
 
         basename = os.path.splitext(os.path.basename(basename))[0]
-        filename = '%s-a_img.png' % basename
 
+        filename = '%s-a_img.png' % basename
+        self.log.debug("saving to %s", filename)
         scipy.misc.imsave(
             filename,
             img.astype(numpy.uint8))
@@ -272,6 +275,7 @@ class IntegrationTestbaseCompare(IntegrationTestbase):
                           filename)
 
         filename = '%s-b_expected.png' % (os.path.splitext(basename)[0])
+        self.log.debug("saving to %s", filename)
         scipy.misc.imsave(
             filename,
             expected.astype(numpy.uint8))
@@ -284,6 +288,7 @@ class IntegrationTestbaseCompare(IntegrationTestbase):
                           filename)
 
         filename = '%s-c_diff.png' % (os.path.splitext(basename)[0])
+        self.log.debug("saving to %s", filename)
         scipy.misc.imsave(
             filename,
             diff.astype(numpy.uint8))
@@ -297,12 +302,12 @@ class IntegrationTestbaseCompare(IntegrationTestbase):
 
     def upload_image(self, filename):
         """ upload the specified image to imgurl"""
-        with open(os.devnull, 'w') as devnull:
-            return subprocess.check_output([
-                'bash',
-                './imgurbash.sh',
-                filename
-            ], stderr=devnull).decode('utf-8').strip()
+        self.log.debug("calling imgurbash.sh %s", filename)
+        return subprocess.check_output([
+            'bash',
+            './imgurbash.sh',
+            filename
+        ]).decode('utf-8').strip()
 
 
 class IntegrationTestbaseVideo(IntegrationTestbaseCompare):
