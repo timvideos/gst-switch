@@ -259,7 +259,7 @@ class IntegrationTestbaseCompare(IntegrationTestbase):
 
     def is_running_in_ci(self):
         """Test if the testsuite is ran by Travis-CI"""
-        return os.environ.get('CI', "False") == "true"
+        return os.environ.get('CI', "false") == "true"
 
     def save_images(self, basename, img, expected, diff):
         """Save and (in Travis) upload Failed images"""
