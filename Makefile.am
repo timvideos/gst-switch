@@ -30,6 +30,11 @@ tests/test-switch-server: tests/test_switch_server.c \
 tests/test-fd-leaks: tests/test_fd_leaks.c \
   tools/*.h tools/*.c
 
+clean-local:
+	rm -f tools/*.gcno
+	rm -f tools/*.gcda
+	rm -f tools/*.gcov
+
 clean-test-data:
 	rm -f "tests/test-recording "*" "*.data
 	rm -f "tests/test-server-"*.log
