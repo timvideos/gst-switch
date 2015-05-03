@@ -18,7 +18,6 @@ lint:
 	${PYLINT} --rcfile=.pylintrc_gstswitch gstswitch
 	${PYLINT} --rcfile=.pylintrc_unittests tests/unittests/*
 	${PYLINT} --rcfile=.pylintrc_integrationtests tests/integrationtests/*.py
-	${PYLINT} --rcfile=.pylintrc_integrationtests2 tests/integrationtests2/*.py
 	@echo "Code style is okay!!"
 
 pep8:
@@ -30,8 +29,6 @@ pep8:
 	@echo "unittests are pep8 clean!!"
 	${PEP8} --ignore=E402 tests/integrationtests
 	@echo "integration tests are pep8 clean!!"
-	${PEP8} --ignore=E402 tests/integrationtests2
-	@echo "integration tests 2 are pep8 clean!!"
 
 style: pep8 lint
 
@@ -50,7 +47,7 @@ unittests:
 integration: imgurbash.sh
 	@rm -f ../tools/*.c.gcov
 	@rm -f ../tools/*.gcda
-	${PYTEST} --cov gstswitch --cov-report html -v tests/integrationtests2/
+	${PYTEST} --cov gstswitch --cov-report html -v tests/integrationtests/
 	mkdir -p reports/coverage/
 	rm -rf reports/coverage/integration-${PYTHONVERSION}
 	mv htmlcov reports/coverage/integration-${PYTHONVERSION}
@@ -66,8 +63,8 @@ clean:
 	rm -rf gstswitch/__pycache__
 	rm -f tests/unittests/*.pyc
 	rm -rf tests/unittests/__pycache__
-	rm -f tests/integrationtests2/*.pyc
-	rm -rf tests/integrationtests2/__pycache__
+	rm -f tests/integrationtests/*.pyc
+	rm -rf tests/integrationtests/__pycache__
 	rm -f *.avi*
 	rm -f *.data*
 	rm -f *.html
