@@ -12,7 +12,7 @@ sudo apt-get -y install gstreamer1.0.* libgstreamer.*1.0.*
 sudo apt-get -y install python-software-properties python-pip
 sudo apt-get -y install libglib2.0-dev gir1.2-glib-2.0 libgirepository1.0-dev libglib2.0-0 python-gi
 sudo apt-get -y install python-scipy python-pil
-sudo pip install --upgrade -r requirements.txt
+sudo pip install --upgrade -r requirements.txt subprocess32
 
 # Python stuff for gst-switch API - Python 3.4
 sudo apt-get -y install python3-software-properties python3-pip

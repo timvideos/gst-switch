@@ -8,7 +8,11 @@ import logging
 import tempfile
 import shlex
 import shutil
-import subprocess
+try:
+    import subprocess32 as subprocess
+except ImportError:
+    import subprocess
+
 from glob import glob
 import numpy
 import scipy.misc
@@ -187,7 +191,8 @@ class IntegrationTestbaseCompare(IntegrationTestbase):
                 break
 
         if not success:
-            self.log.debug("last turn failed, saving images for human inspection")
+            self.log.debug("last turn failed, "
+                           "saving images for human inspection")
             self.save_images(filename, img, expected, diff)
 
         assert success
@@ -268,8 +273,8 @@ class IntegrationTestbaseCompare(IntegrationTestbase):
             img.astype(numpy.uint8))
 
         if self.is_running_in_ci():
-            self.log.warn("uploaded failed frame as: %s",
-                          self.upload_image(filename))
+            self.log.warn("uploaded failed frame")
+            self.upload_image(filename)
         else:
             self.log.warn("saved failed frame as: %s",
                           filename)
@@ -281,8 +286,8 @@ class IntegrationTestbaseCompare(IntegrationTestbase):
             expected.astype(numpy.uint8))
 
         if self.is_running_in_ci():
-            self.log.warn("uploaded expected frame as: %s",
-                          self.upload_image(filename))
+            self.log.warn("uploaded expected frame")
+            self.upload_image(filename)
         else:
             self.log.warn("saved expected frame as: %s",
                           filename)
@@ -294,8 +299,8 @@ class IntegrationTestbaseCompare(IntegrationTestbase):
             diff.astype(numpy.uint8))
 
         if self.is_running_in_ci():
-            self.log.warn("uploaded difference frame as: %s",
-                          self.upload_image(filename))
+            self.log.warn("uploaded difference frame")
+            self.upload_image(filename)
         else:
             self.log.warn("saved difference frame as: %s",
                           filename)
@@ -303,11 +308,11 @@ class IntegrationTestbaseCompare(IntegrationTestbase):
     def upload_image(self, filename):
         """ upload the specified image to imgurl"""
         self.log.debug("calling imgurbash.sh %s", filename)
-        return subprocess.check_output([
+        subprocess.call([
             'bash',
             './imgurbash.sh',
             filename
-        ]).decode('utf-8').strip()
+        ], timeout=5)
 
 
 class IntegrationTestbaseVideo(IntegrationTestbaseCompare):
