@@ -50,7 +50,7 @@ unittests:
 integration: imgurbash.sh
 	@rm -f ../tools/*.c.gcov
 	@rm -f ../tools/*.gcda
-	${PYTEST} --cov gstswitch --cov-report html -v tests/integrationtests2/ -s
+	${PYTEST} --cov gstswitch --cov-report html -v tests/integrationtests2/
 	mkdir -p reports/coverage/
 	rm -rf reports/coverage/integration-${PYTHONVERSION}
 	mv htmlcov reports/coverage/integration-${PYTHONVERSION}
