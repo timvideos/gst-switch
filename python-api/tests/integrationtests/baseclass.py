@@ -159,8 +159,17 @@ class IntegrationTestbaseCompare(IntegrationTestbase):
     """
 
     def expect_frame(self, filename, port, turns=5, timeout=0.5):
-        """Read frames from the server and compare them against filename.
-        Return when a match is found or timeout seconds have passed"""
+        """Start the command-line returned by get_capture_command() and
+        let it run for up to timeout seconds. Compare the generated frames
+        against the image in filename.
+
+        If none of the generated frames match the image in filename, try
+        up to turns time.
+
+        This way, the minimum time the comparison runs is timeout seconds,
+        while the maximum time it can take is turns * timeout seconds. This
+        is implemented to speed up the successful integration tests.
+        """
 
         filepath = os.path.join(
             os.path.dirname(__file__),
@@ -336,6 +345,7 @@ class IntegrationTestbaseVideo(IntegrationTestbaseCompare):
         Return when a match is found or timeout seconds have passed
         Source-Port defaults to 3001=video compose-port"""
 
+        # run the capture_command for 1 seconds, up to timeout times
         self.expect_frame(
             filename, port,
             turns=timeout,
@@ -386,6 +396,7 @@ class IntegrationTestbaseAudio(IntegrationTestbaseCompare):
         Return when a match is found or timeout seconds have passed
         Source-Port defaults to 3001=video compose-port"""
 
+        # run the capture_command for timeout seconds but only once
         self.expect_frame(
             filename, port,
             turns=1,
