@@ -33,7 +33,7 @@ class TestProcessMonitor(object):
 
     def test_start_raises(self):
         """ Test if starting a ProcessMonitor with a Command that makes the
-            Popen-Constructor rise an OSError correctly raises a
+            Popen-Constructor throw an OSError correctly raises a
             ServerProcessError
         """
 
