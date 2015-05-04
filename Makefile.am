@@ -9,8 +9,8 @@ test:
 	make style unittests integration
 
 #	TODO: Use configure to detect Python versions currently installed
-	make PYTHONVERSION=2.7 -Cpython-api style unittests integration
-	make PYTHONVERSION=3.4 -Cpython-api style unittests integration
+	cd python-api; make PYTHONVERSION=2.7 style unittests integration
+	cd python-api; make PYTHONVERSION=3.4 style unittests integration
 
 demo: $(UI_TESTS)
 
