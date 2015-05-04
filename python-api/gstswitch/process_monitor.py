@@ -86,6 +86,9 @@ class ProcessMonitor(subprocess.Popen):
                 len(chunk))
             self._cmd_output_target.write(chunk)
 
+        # TODO: In python3 I'd add a timeout here but because of the forced
+        # python2 compatibility it's not that simple. Using subprocess32
+        # requires different patching in the unit-tests.
         self.log.debug("waiting for the subprocess to die")
         super(ProcessMonitor, self).communicate()
 
