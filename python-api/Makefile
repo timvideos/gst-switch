@@ -23,11 +23,11 @@ lint:
 pep8:
 	# E402 module level import not at top of file
 	#  triggered by sys.path.insert(...) before gstswitch-imports
-	${PEP8} --ignore=E402 gstswitch
+	${PEP8} gstswitch
 	@echo "gstswitch is pep8 clean!!"
-	${PEP8} --ignore=E402 tests/unittests
+	${PEP8} tests/unittests
 	@echo "unittests are pep8 clean!!"
-	${PEP8} --ignore=E402 tests/integrationtests
+	${PEP8} tests/integrationtests
 	@echo "integration tests are pep8 clean!!"
 
 style: pep8 lint
