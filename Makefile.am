@@ -5,7 +5,13 @@ EXTRA_DIST = autogen.sh
 ACLOCAL_AMFLAGS = -I build
 
 include tests/names.mk
-test: update-test-suite clean-test-data $(TESTS)
+test:
+	make style unittests integration
+
+#	TODO: Use configure to detect Python versions currently installed
+	make PYTHONVERSION=2.7 -Cpython-api style unittests integration
+	make PYTHONVERSION=3.4 -Cpython-api style unittests integration
+
 demo: $(UI_TESTS)
 
 show-tests:

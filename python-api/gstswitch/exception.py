@@ -58,3 +58,22 @@ class InvalidIndexError(BaseError):
 
     """docstring for InvalidIndexError"""
     pass
+
+
+class MatchTimeoutError(BaseError):
+
+    """Timeout during ProcessMonitor.wait_for_output"""
+    pass
+
+
+class MatchEofError(BaseError):
+
+    """Process died during ProcessMonitor.wait_for_output"""
+    pass
+
+
+class SelectError(BaseError):
+
+    """select.select returned with an unknown Error
+       during ProcessMonitor.wait_for_output"""
+    pass

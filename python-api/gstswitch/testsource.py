@@ -139,7 +139,6 @@ video/x-raw,
         width = str(width)
         height = str(height)
         capsstring = self.VIDEO_CAPS.format(width, height)
-        print(capsstring)
         caps = Gst.Caps.from_string(capsstring)
         element.set_property('caps', caps)
         return element
@@ -215,7 +214,6 @@ audio/x-raw,
         """
         element = self.make("capsfilter", "afilter")
         capsstring = self.AUDIO_CAPS
-        print(capsstring)
         caps = Gst.Caps.from_string(capsstring)
         element.set_property('caps', caps)
         return element
@@ -332,6 +330,30 @@ class VideoSrc(object):
     :param clockoverlay: True to enable current clock time over video
     """
     HOST = '127.0.0.1'
+
+    PATTERN_SMPTE = 0
+    PATTERN_SNOW = 1
+    PATTERN_BLACK = 2
+    PATTERN_WHITE = 3
+    PATTERN_RED = 4
+    PATTERN_GREEN = 5
+    PATTERN_BLUE = 6
+    PATTERN_CHECKERS1 = 7
+    PATTERN_CHECKERS2 = 8
+    PATTERN_CHECKERS4 = 9
+    PATTERN_CHECKERS8 = 10
+    PATTERN_CIRCULAR = 11
+    PATTERN_BLINK = 12
+    PATTERN_SMPTE75 = 13
+    PATTERN_ZONE_PLATE = 14
+    PATTERN_GAMUT = 15
+    PATTERN_CHROMA_ZONE_PLATE = 16
+    PATTERN_SOLID_COLOR = 17
+    PATTERN_BALL = 18
+    PATTERN_SMPTE100 = 19
+    PATTERN_BAR = 20
+    PATTERN_PINWHEEL = 21
+    PATTERN_SPOKES = 22
 
     def __init__(
             self,
@@ -524,6 +546,20 @@ class AudioSrc(object):
     """docstring for AudioSrc"""
 
     HOST = '127.0.0.1'
+
+    WAVE_SINE = 0
+    WAVE_SQUARE = 1
+    WAVE_SAW = 2
+    WAVE_TRIANGLE = 3
+    WAVE_SILENCE = 4
+    WAVE_WHITE_NOISE = 5
+    WAVE_PINK_NOISE = 6
+    WAVE_SINE_TABLE = 7
+    WAVE_TICKS = 8
+    WAVE_GAUSSIAN_NOISE = 9
+    WAVE_RED_NOISE = 10
+    WAVE_BLUE_NOISE = 11
+    WAVE_VIOLET_NOISE = 12
 
     def __init__(
             self,

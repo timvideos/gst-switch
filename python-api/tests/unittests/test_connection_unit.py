@@ -174,10 +174,8 @@ class TestSignalSubscribe(object):
 
         conn = Connection()
         conn.connect_dbus()
+        test_cb = Mock()
 
-        def test_cb():
-            """ Dummy callback. """
-            pass
         conn.signal_subscribe(test_cb)
 
         # test that Gio's signal_subscribe method is called once
@@ -205,10 +203,8 @@ class TestSignalSubscribe(object):
 
         conn = Connection()
         conn.connect_dbus()
+        test_cb = Mock()
 
-        def test_cb():
-            """ Dummy callback. """
-            pass
         with pytest.raises(ConnectionError):
             conn.signal_subscribe(test_cb)
 

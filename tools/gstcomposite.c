@@ -240,6 +240,7 @@ gst_composite_start_transition (GstComposite * composite)
 
   GST_COMPOSITE_LOCK_TRANSITION (composite);
 
+  INFO ("starting transition");
   if (gst_composite_ready_for_transition (composite)) {
     composite->transition = gst_worker_stop (GST_WORKER (composite));
     /*
@@ -634,6 +635,7 @@ gst_composite_end_transition (GstComposite * composite)
          INFO ("new mode %d, %dx%d transited", composite->mode,
          composite->width, composite->height);
        */
+      INFO ("ending transition");
       composite->transition = FALSE;
       g_signal_emit (composite,
           gst_composite_signals[SIGNAL_END_TRANSITION],

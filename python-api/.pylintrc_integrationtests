@@ -33,7 +33,7 @@ load-plugins=
 # can either give multiple identifier separated by comma (,) or put this option
 # multiple time (only on the command line, not in the configuration file where
 # it should appear only once).
-disable=E0611,E0202,R0801,E1101,E1002,R0201,F0401,W0141,R0904,too-few-public-methods
+disable=superfluous-parens,no-name-in-module,method-hidden,duplicate-code,no-member,super-on-old-class,no-self-use,import-error,bad-builtin,too-many-public-methods,too-few-public-methods,fixme
 
 
 [REPORTS]
@@ -233,7 +233,7 @@ max-public-methods=20
 ignore-iface-methods=isImplementedBy,deferred,extends,names,namesAndDescriptions,queryDescriptionFor,getBases,getDescriptionFor,getDoc,getName,getTaggedValue,getTaggedValueTags,isEqualOrExtendedBy,setTaggedValue,isImplementedByInstancesOf,adaptWith,is_implemented_by
 
 # List of method names used to declare (i.e. assign) instance attributes.
-defining-attr-methods=__init__,__new__,setUp
+defining-attr-methods=__init__,__new__,setUp,setup_method
 
 # List of valid names for the first argument in a class method.
 valid-classmethod-first-arg=cls

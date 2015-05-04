@@ -3,725 +3,321 @@ Integration Tests for the dbus Controller
 """
 
 from __future__ import absolute_import, print_function, unicode_literals
-
-import sys
 import os
-import pytest
+import sys
 import time
-import datetime
-import subprocess
-
-from gi.repository import GLib
-from mock import Mock
-from integrationtests.compare import CompareVideo
-
-sys.path.insert(0, os.path.abspath(os.path.join(__file__, "../../../")))
-from gstswitch.server import Server
-from gstswitch.helpers import TestSources, PreviewSinks
+import random
+from .baseclass import IntegrationTestbase, IntegrationTestbaseMainloop
 from gstswitch.controller import Controller
-
-# PATH = os.getenv("HOME") + '/gst/stage/bin/'
-PATH = '../tools/'
+from mock import Mock
 
 
-class TestEstablishConnection(object):
-
-    """Test establish_connection method"""
-    NUM = 1
-    # fails above 3
-
-    def establish_connection(self):
-        """Create Controller object and call establish_connection"""
-        controller = Controller()
-        controller.establish_connection()
-        # print(controller.connection)
-        assert controller.connection is not None
-
-    def test_establish(self):
-        """Test for establish_connection"""
-        serv = Server(path=PATH, video_format="debug")
-        try:
-            serv.run()
-            for i in range(self.NUM):
-                print(i)
-                self.establish_connection()
-            serv.terminate(1)
-        finally:
-            serv.terminate_and_output_status(cov=True)
-
-
-class TestGetComposePort(object):
-
-    """Test get_compose_port method"""
-    NUM = 1
-    FACTOR = 1
-
-    def get_compose_port(self):
-        """Create Controller and call get_compose_port method"""
-        res = []
-        controller = Controller()
-        controller.establish_connection()
-        for _ in range(self.NUM * self.FACTOR):
-            res.append(controller.get_compose_port())
-        return res
-
-    def test_compose_ports(self):
-        """Test get_compose_port"""
-        res = []
-        expected_result = []
-        for i in range(self.NUM):
-            video_port = (i + 7) * 1000
-            expected_result.append([video_port + 1] * self.NUM * self.FACTOR)
-            serv = Server(path=PATH, video_port=video_port)
-            try:
-                serv.run()
-                sources = TestSources(video_port=video_port)
-                sources.new_test_video()
-                sources.new_test_video()
-
-                res.append(self.get_compose_port())
-                sources.terminate_video()
-                serv.terminate(1)
-            finally:
-                serv.terminate_and_output_status(cov=True)
-
-        set_expected = [tuple(i) for i in expected_result]
-        set_res = [tuple(i) for i in res]
-        assert set(set_expected) == set(set_res)
-
-
-class TestGetEncodePort(object):
-
-    """Test get_encode_port method"""
-    NUM = 1
-    FACTOR = 1
-
-    def get_encode_port(self):
-        """Create a Controller object and call get_encode_port method"""
-        res = []
-        controller = Controller()
-        controller.establish_connection()
-        for _ in range(self.NUM * self.FACTOR):
-            res.append(controller.get_encode_port())
-        return res
-
-    def test_encode_ports(self):
-        """Test get_encode_port"""
-        res = []
-        expected_result = []
-        for i in range(self.NUM):
-            video_port = (i + 8) * 1000
-            expected_result.append([video_port + 2] * self.NUM * self.FACTOR)
-            serv = Server(path=PATH, video_port=video_port)
-            try:
-                serv.run()
-                sources = TestSources(video_port=video_port)
-                sources.new_test_video()
-                sources.new_test_video()
-
-                res.append(self.get_encode_port())
-                sources.terminate_video()
-                serv.terminate(1)
-            finally:
-                serv.terminate_and_output_status(cov=True)
-
-        set_expected = [tuple(i) for i in expected_result]
-        set_res = [tuple(i) for i in res]
-        assert set(set_expected) == set(set_res)
-
-
-class TestGetAudioPort(object):
-
-    """Test get_audio_port method"""
-    NUM = 1
-    FACTOR = 1
-
-    def get_audio_port(self):
-        """Create Controller object and call get_audio_port method"""
-        res = []
-        controller = Controller()
-        controller.establish_connection()
-        for _ in range(self.NUM * self.FACTOR):
-            res.append(controller.get_audio_port())
-        return res
-
-    def test_audio_ports(self):
-        """Test get_audio_port"""
-        res = []
-        expected_result = []
-        for i in range(1, self.NUM + 1):
-            audio_port = (i + 10) * 1000
-            expected_result.append([3003] * self.NUM * self.FACTOR)
-            serv = Server(path=PATH, video_port=3000, audio_port=audio_port)
-            try:
-                serv.run()
-                sources = TestSources(video_port=3000, audio_port=audio_port)
-                sources.new_test_audio()
-
-                res.append(self.get_audio_port())
-
-                sources.terminate_audio()
-                serv.terminate(1)
-
-            finally:
-                serv.terminate_and_output_status(cov=True)
-
-        set_expected = [tuple(i) for i in expected_result]
-        set_res = [tuple(i) for i in res]
-        assert set(set_expected) == set(set_res)
-
-
-class TestGetPreviewPorts(object):
-
-    """Test get_preview_ports method"""
-    NUM = 1
-    FACTOR = 1
-
-    def get_preview_ports(self):
-        """Create Controller object and call get_preview_ports method"""
-        res = []
-        controller = Controller()
-        controller.establish_connection()
-        for _ in range(self.NUM * self.FACTOR):
-            res.append(controller.get_preview_ports())
-        return res
-
-    def test_get_preview_ports(self):
-        """Test get_preview_ports"""
-
-        for _ in range(self.NUM):
-            serv = Server(path=PATH, video_format="debug")
-            try:
-                serv.run()
-                sources = TestSources(video_port=3000, audio_port=4000)
-                for _ in range(self.NUM):
-                    sources.new_test_audio()
-                    sources.new_test_video()
-                expected_result = map(
-                    tuple,
-                    [[x for x in range(3003, 3004 + self.NUM)]] *
-                    self.NUM * self.FACTOR)
-                res = map(tuple, self.get_preview_ports())
-                print('\n', res, '\n')
-                print(expected_result)
-                assert set(expected_result) == set(res)
-                sources.terminate_video()
-                sources.terminate_audio()
-                serv.terminate(1)
-            finally:
-                serv.terminate_and_output_status(cov=True)
-
-
-class TestSignals(object):
-
-    """Test on_*() methods"""
-
-    def __init__(self):
-        self.mainloop = GLib.MainLoop()
-        self.quit_count = 0
-
-    def run_mainloop(self):
-        """Start the MainLoop, set Quit-Counter to Zero"""
-        self.quit_count = 0
-        self.mainloop.run()
-
-    def quit_mainloop(self, *_):
-        """Quit the MainLoop, set Quit-Counter to Zero"""
-        self.mainloop.quit()
-        self.quit_count = 0
-
-    def quit_mainloop_after(self, num):
-        """Increment Quit-Counter, if it reaches num, Quit the MainLoop"""
-        self.quit_count += 1
-        if self.quit_count == num:
-            self.quit_mainloop()
-
-    def test_on_new_mode_online(self):
-        """Create a Controller object, call on_new_mode_online method and
-        check that the callback fires
-        """
-        serv = Server(path=PATH)
-        try:
-            serv.run()
-
-            controller = Controller()
-            controller.establish_connection()
-
-            test_cb = Mock(side_effect=self.quit_mainloop)
-            controller.on_new_mode_online(test_cb)
-            controller.set_composite_mode(0)
-
-            GLib.timeout_add_seconds(5, self.quit_mainloop)
-            self.run_mainloop()
-
-            test_cb.assert_called_once_with(0)
-
-            serv.terminate(1)
-        finally:
-            serv.terminate_and_output_status(cov=True)
-
-    def test_on_preview_port_added(self):
-        """Create a Controller object, call add a source method and
-        check that the callback fires
-        """
-        serv = Server(path=PATH, video_port=3000)
-        try:
-            serv.run()
-
-            controller = Controller()
-            controller.establish_connection()
-
-            test_cb = Mock(side_effect=lambda mode, serve, type:
-                           self.quit_mainloop_after(2))
-            controller.on_preview_port_added(test_cb)
-
-            sources = TestSources(video_port=3000)
-            sources.new_test_video()
-            sources.new_test_video()
-
-            GLib.timeout_add_seconds(5, self.quit_mainloop)
-            self.run_mainloop()
-
-            print(test_cb.call_args_list)
-            test_cb.assert_any_call(3003, 1, 7)
-            test_cb.assert_any_call(3004, 1, 8)
-            assert test_cb.call_count == 2
-
-            serv.terminate(1)
-        finally:
-            serv.terminate_and_output_status(cov=True)
-
-
-class VideoFileSink(object):
-
-    """Sink the video to a file
+class TestEstablishConnection(IntegrationTestbase):
+    """ Test starting and connecting to the Server
     """
 
-    def __init__(self, port, filename):
-        cmd = "gst-launch-1.0 tcpclientsrc port={0} ! gdpdepay !  jpegenc \
-        ! avimux ! filesink location={1}".format(port, filename)
-        with open(os.devnull, 'w') as tempf:
-            self.proc = subprocess.Popen(
-                cmd.split(),
-                stdout=tempf,
-                stderr=tempf,
-                bufsize=-1,
-                shell=False)
+    def test_establish_connection(self):
+        """ Start the Server and connect to it. Assert it starts up correctly
+        and can be connected to via the python-controller.
+        """
+        self.setup_server()
+        assert self.serv is not None
+        assert self.serv.is_alive()
 
-    def terminate(self):
-        """Terminate sinking"""
-        self.proc.terminate()
+        self.setup_controller()
+        assert self.controller.connection is not None
 
 
-class TestSetCompositeMode(object):
+class TestGetComposePort(IntegrationTestbase):
+    """ Test get_compose_port method
+    """
 
-    """Test set_composite_mode method"""
-    NUM = 1
-    FACTOR = 1
+    def wait_until_ready(self):
+        """ Blocks until the Server has reported, that it's
+        composite-output is started
+        """
+        self.log.info("waiting for Server to start composite-output")
+        self.serv.wait_for_output('composite-output started')
 
-    def set_composite_mode(self, mode, generate_frames=False):
-        """Create Controller object and call set_composite_mode method"""
-        for _ in range(self.NUM):
+    def test_compose_port(self):
+        """
+        Test if get_compose_port is returning the expected port
+        """
+        self.setup_server()
+        self.setup_controller()
+        self.wait_until_ready()
 
-            serv = Server(path=PATH, video_format="debug")
-            try:
-                serv.run()
-
-                preview = PreviewSinks()
-                preview.run()
-
-                out_file = 'output-{0}.data'.format(mode)
-                video_sink = VideoFileSink(serv.video_port + 1, out_file)
-
-                sources = TestSources(video_port=3000)
-                sources.new_test_video(pattern=4)
-                sources.new_test_video(pattern=5)
-
-                time.sleep(3)
-                # expected_result = [mode != 3] * self.FACTOR
-                # print(mode, expected_result)
-                controller = Controller()
-                res = controller.set_composite_mode(mode)
-                print(res)
-                time.sleep(3)
-                video_sink.terminate()
-                preview.terminate()
-                sources.terminate_video()
-                serv.terminate(1)
-                if not generate_frames:
-                    controller = Controller()
-                    if mode == Controller.COMPOSITE_DUAL_EQUAL:
-                        assert res is False
-                    else:
-                        assert res is True
-                    assert self.verify_output(mode, out_file) is True
-                # assert expected_result == res
-
-            finally:
-                serv.terminate_and_output_status(cov=True)
-
-    def verify_output(self, mode, video):
-        """Verify if the output is correct by comparing key frames"""
-        test = 'composite_mode_{0}'.format(mode)
-        cmpr = CompareVideo(test, video)
-        res1, res2 = cmpr.compare()
-        print("RESULTS", res1, res2)
-
-        # In the CI environment, upload to imgur the results.
-        if os.environ.get('CI', "False") == "true":
-            folder = cmpr.test_frame_dir
-            cmd = "./imgurbash.sh {0}/*.*".format(folder)
-            print(cmd)
-            proc = subprocess.Popen(
-                cmd,
-                bufsize=-1,
-                shell=True)
-            print(proc.wait())
-
-        # Experimental Value
-        if res1 <= 0.04 and res2 <= 0.04:
-            return True
-        return False
-
-    def test_set_composite_mode_none(self):
-        """Test set_composite_mode"""
-        self.set_composite_mode(Controller.COMPOSITE_NONE)
-
-    def test_set_composite_mode_pip(self):
-        """Test set_composite_mode"""
-        self.set_composite_mode(Controller.COMPOSITE_PIP)
-
-    def test_set_composite_mode_preview(self):
-        """Test set_composite_mode"""
-        self.set_composite_mode(Controller.COMPOSITE_DUAL_PREVIEW)
-
-    def test_set_composite_mode_equal(self):
-        """Test set_composite_mode"""
-        self.set_composite_mode(Controller.COMPOSITE_DUAL_EQUAL)
+        self.log.info("calling get_compose_port")
+        assert self.controller.get_compose_port() == 3001
 
 
-class TestNewRecord(object):
+class TestGetEncodePort(IntegrationTestbase):
+    """ Test get_encode_port method
+    """
 
-    """Test new_record method"""
-    NUM = 1
-    FACTOR = 1
+    def wait_until_ready(self):
+        """ Blocks until the Server has reported, that it's
+        encoding-output is started
+        """
+        self.log.info("waiting for Server to start encoding-output")
+        self.serv.wait_for_output('encoding-output started')
 
-    def new_record(self):
-        """Create a Controller object and call new_record method"""
-        res = []
-        controller = Controller()
-        for _ in range(self.NUM * self.FACTOR):
-            res.append(controller.new_record())
-        return res
+    def test_encode_port(self):
+        """Test get_encode_port method returning the expected port"""
+        self.setup_server()
+        self.setup_controller()
+        self.wait_until_ready()
 
-    def test_new_record(self):
-        """Test new_record"""
-        for _ in range(self.NUM):
-            serv = Server(path=PATH, record_file="test-%Y.data",
-                          video_format="debug")
-            try:
-                serv.run()
-
-                sources = TestSources(video_port=3000)
-                sources.new_test_video()
-                sources.new_test_video()
-
-                curr_time = datetime.datetime.now()
-                time_str = curr_time.strftime('%Y')
-                test_filename = "test-{0}.data".format(time_str)
-
-                res = self.new_record()
-                print(res)
-                sources.terminate_video()
-                serv.terminate(1)
-                assert os.path.exists(test_filename) is True
-            finally:
-                serv.terminate_and_output_status(cov=True)
+        self.log.info("calling get_encode_port")
+        assert self.controller.get_encode_port() == 3002
 
 
-class TestAdjustPIP(object):
+class TestGetAudioPort(IntegrationTestbase):
+    """ Test get_audio_port method
+    """
+    def wait_until_ready(self):
+        """ Blocks until the Server has reported, that it's
+        audio-output has started
+        """
+        self.log.info("waiting for Server to start preview-port-outputs")
+        self.serv.wait_for_output('tcpserversink name=sink')
 
-    """Test adjust_pip method"""
-    NUM = 1
-    FACTOR = 1
+    def test_audio_port(self):
+        """Test get_audio_port method returning the expected port"""
+        self.setup_server()
+        self.setup_controller()
 
-    def adjust_pip(self,
-                   xpos,
-                   ypos,
-                   width,
-                   heigth,
-                   index,
-                   generate_frames=False):
-        """Create Controller object and call adjust_pip"""
-        for _ in range(self.NUM):
-            serv = Server(path=PATH, video_format="debug")
-            try:
-                serv.run()
-                sources = TestSources(video_port=3000)
-                preview = PreviewSinks()
-                preview.run()
-                out_file = "output-{0}.data".format(index)
-                video_sink = VideoFileSink(3001, out_file)
-                sources.new_test_video(pattern=4)
-                sources.new_test_video(pattern=5)
-                controller = Controller()
-                controller.set_composite_mode(Controller.COMPOSITE_PIP)
-                time.sleep(3)
-                res = controller.adjust_pip(xpos, ypos, width, heigth)
-                time.sleep(3)
-                sources.terminate_video()
-                preview.terminate()
-                video_sink.terminate()
-                serv.terminate(1)
-                if not generate_frames:
-                    assert res is not None
-                    assert self.verify_output(index, out_file) is True
+        self.log.info("starting 1 test-audio source")
+        self.new_test_audio()
 
-            finally:
-                serv.terminate_and_output_status(cov=True)
+        self.wait_until_ready()
 
-    def verify_output(self, index, video):
-        """Verify if the output is correct by comparing key frames"""
-        test = 'adjust_pip_{0}'.format(index)
-        cmpr = CompareVideo(test, video)
-        res1, res2 = cmpr.compare()
-        print("RESULTS", res1, res2)
-        #   Experimental Value
-        if res1 <= 0.04 and res2 <= 0.04:
-            return True
-        return False
-
-    @pytest.mark.xfail
-    def test_adjust_pip(self):
-        """Test adjust_pip"""
-        dic = [
-            [50, 75, 0, 0],
-        ]
-        for i in range(4, 5):
-            self.adjust_pip(
-                dic[i - 4][0],
-                dic[i - 4][1],
-                dic[i - 4][2],
-                dic[i - 4][3],
-                i)
+        self.log.info("calling get_audio_port")
+        assert self.controller.get_audio_port() == 3003
 
 
-class TestSwitch(object):
+class TestGetPreviewPorts(IntegrationTestbase):
+    """ Test get_preview_ports method
+    """
+    def wait_for_sources(self, count):
+        """ Blocks until the Server has reported, that the right number of
+        preview-ports are is started
+        """
+        self.log.info("waiting for Server to start preview-port-outputs")
+        self.serv.wait_for_output('tcpserversink name=sink', count=count)
 
-    """Test switch method"""
+    def test_one_preview_port(self):
+        """Test get_preview_ports method returning the expected port"""
+        self.setup_server()
+        self.setup_controller()
 
-    NUM = 1
+        self.log.info("starting 1 test-video source")
+        self.new_test_video()
 
-    def switch(self, channel, port, index):
-        """Create Controller object and call switch method"""
-        for _ in range(self.NUM):
-            serv = Server(path=PATH, video_format="debug")
-            try:
-                serv.run()
+        self.wait_for_sources(count=1)
 
-                sources = TestSources(3000)
-                sources.new_test_video(pattern=4)
-                sources.new_test_video(pattern=5)
-                preview = PreviewSinks(3001)
-                preview.run()
-                out_file = "output-{0}.data".format(index)
-                video_sink = VideoFileSink(3001, out_file)
-                time.sleep(3)
-                controller = Controller()
-                res = controller.switch(channel, port)
-                print(res)
-                time.sleep(3)
-                video_sink.terminate()
-                sources.terminate_video()
-                preview.terminate()
-                serv.terminate(1)
+        self.log.info("calling get_preview_ports")
+        assert self.controller.get_preview_ports() == [3003]
 
-            finally:
-                serv.terminate_and_output_status(cov=True)
+    def test_five_preview_ports(self):
+        """Test get_preview_ports method returning the expected port"""
+        self.setup_server()
+        self.setup_controller()
 
-    def test_switch(self):
-        """Test switch"""
-        dic = [
-            [Controller.VIDEO_CHANNEL_A, 3004]
-        ]
-        start = 5
-        for i in range(start, 6):
-            self.switch(dic[i - start][0], dic[i - start][1], i)
+        self.log.info("starting 5 test-video sources")
+        self.new_test_video()
+        self.new_test_video()
+        self.new_test_video()
+        self.new_test_video()
+        self.new_test_video()
 
+        self.log.info("waiting for the test-video sources to come up")
+        self.wait_for_sources(count=5)
 
-class TestClickVideo(object):
-
-    """Test click_video method"""
-    NUM = 1
-    FACTOR = 1
-
-    def click_video(self,
-                    xpos,
-                    ypos,
-                    width,
-                    heigth,
-                    index,
-                    generate_frames=False):
-        """Create Controller object and call click_video method"""
-        for _ in range(self.NUM):
-            serv = Server(path=PATH, video_format="debug")
-            try:
-                serv.run()
-                sources = TestSources(video_port=3000)
-                preview = PreviewSinks()
-                preview.run()
-                out_file = "output-{0}.data".format(index)
-                video_sink = VideoFileSink(3001, out_file)
-                sources.new_test_video(pattern=4)
-                sources.new_test_video(pattern=5)
-                controller = Controller()
-                time.sleep(1)
-                res = controller.click_video(xpos, ypos, width, heigth)
-                print(res)
-                time.sleep(1)
-                sources.terminate_video()
-                preview.terminate()
-                video_sink.terminate()
-                serv.terminate(1)
-                if not generate_frames:
-                    assert res is not None
-                    assert self.verify_output(index, out_file) is True
-
-            finally:
-                serv.terminate_and_output_status(cov=True)
-
-    def verify_output(self, index, video):
-        """Verify if the output is correct by comparing key frames"""
-        test = 'click_video_{0}'.format(index)
-        cmpr = CompareVideo(test, video)
-        res1, res2 = cmpr.compare()
-        print("RESULTS", res1, res2)
-        #   Experimental Value
-        if res1 <= 0.04 and res2 <= 0.04:
-            return True
-        return False
-
-    def test_click_video(self):
-        """Test click_video"""
-        dic = [
-            [0, 0, 10, 10],
-        ]
-        start = 6
-        for i in range(start, 7):
-            self.click_video(
-                dic[i - start][0],
-                dic[i - start][1],
-                dic[i - start][2],
-                dic[i - start][3],
-                i,
-                True)
+        self.log.info("calling get_preview_ports")
+        assert self.controller.get_preview_ports() == [
+            3003, 3004, 3005, 3006, 3007]
 
 
-class TestMarkFace(object):
+class TestSignals(IntegrationTestbaseMainloop):
+    """ Test the various on_* signal-handler methods
+    """
 
-    """Test mark_face method"""
-    NUM = 1
+    def test_initial_mode_callback(self):
+        """Create a Controller object, call on_new_mode_online method and
+        check that the callback fires initially when the sources are set up
+        """
+        self.setup_server()
+        self.setup_controller()
 
-    def mark_face(self, faces, index, generate_frames=False):
-        """Create the Controller object and call mark_face method"""
-        for _ in range(self.NUM):
-            serv = Server(path=PATH, video_format="debug")
-            try:
-                serv.run()
-                sources = TestSources(video_port=3000)
-                preview = PreviewSinks()
-                preview.run()
-                out_file = "output-{0}.data".format(index)
-                video_sink = VideoFileSink(3001, out_file)
-                sources.new_test_video(pattern=4)
-                sources.new_test_video(pattern=5)
-                controller = Controller()
-                time.sleep(1)
-                res = controller.mark_face(faces)
-                print(res)
-                time.sleep(1)
-                sources.terminate_video()
-                preview.terminate()
-                video_sink.terminate()
-                serv.terminate(1)
-                if not generate_frames:
-                    assert res is not None
-                    assert self.verify_output(index, out_file) is True
+        self.log.info("setting callback")
+        test_cb = Mock(side_effect=self.quit_mainloop)
+        self.controller.on_new_mode_online(test_cb)
 
-            finally:
-                serv.terminate_and_output_status(cov=True)
+        self.log.info("starting test-sources")
+        self.setup_video_sources(count=2)
 
-    def verify_output(self, index, video):
-        """Verify if the output is correct by comparing key frames"""
-        test = 'mark_face_{0}'.format(index)
-        cmpr = CompareVideo(test, video)
-        res1, res2 = cmpr.compare()
-        print("RESULTS", res1, res2)
-        #   Experimental Value
-        if res1 <= 0.04 and res2 <= 0.04:
-            return True
-        return False
+        self.log.info("waiting for initial callback with"
+                      "default-mode COMPOSITE_DUAL_EQUAL")
+        self.run_mainloop(timeout=5)
+        test_cb.assert_called_once_with(Controller.COMPOSITE_DUAL_EQUAL)
 
-    def test_mark_face(self):
-        """Test mark_face"""
-        dic = [
-            [(1, 1, 1, 1), (10, 10, 1, 1)],
-        ]
-        start = 7
-        for i in range(start, 8):
-            self.mark_face(dic[i - start], i, True)
+    def test_new_mode_callback(self):
+        """Create a Controller object, call on_new_mode_online method and
+        check that the callback fires when set_composite_mode is called
+        """
+        self.setup_server()
+        self.setup_controller()
+
+        self.log.info("setting callback")
+        test_cb = Mock(side_effect=self.quit_mainloop)
+        self.controller.on_new_mode_online(test_cb)
+
+        self.log.info("starting test-sources")
+        self.setup_video_sources(count=2)
+
+        self.log.info("waiting for initial callback with default-mode"
+                      "COMPOSITE_DUAL_EQUAL")
+        self.run_mainloop(timeout=5)
+        test_cb.assert_called_once_with(Controller.COMPOSITE_DUAL_EQUAL)
+        test_cb.reset_mock()
+
+        self.log.info("setting new composite mode COMPOSITE_NONE")
+        assert self.controller.set_composite_mode(Controller.COMPOSITE_NONE)
+        self.run_mainloop(timeout=5)
+
+        self.log.info("waiting for callback with new mode COMPOSITE_NONE")
+        test_cb.assert_called_once_with(Controller.COMPOSITE_NONE)
+
+    def test_same_mode_no_callback(self):
+        """Create a Controller object, call on_new_mode_online method and
+        check that the callback fires, but does not fire when
+        set_composite_mode is called multiple times with the same format
+        """
+        self.setup_server()
+        self.setup_controller()
+
+        self.log.info("setting callback")
+        test_cb = Mock(side_effect=self.quit_mainloop)
+        self.controller.on_new_mode_online(test_cb)
+
+        self.log.info("starting test-sources")
+        self.setup_video_sources(count=2)
+
+        self.log.info("waiting for initial callback with"
+                      "default-mode COMPOSITE_DUAL_EQUAL")
+        self.run_mainloop(timeout=5)
+        test_cb.assert_called_once_with(Controller.COMPOSITE_DUAL_EQUAL)
+        test_cb.reset_mock()
+
+        self.log.info("setting the same composite mode"
+                      "(COMPOSITE_DUAL_EQUAL) again")
+        assert not self.controller.set_composite_mode(
+            Controller.COMPOSITE_DUAL_EQUAL)
+
+        self.log.info("setting a new composite-mode COMPOSITE_PIP")
+        assert self.controller.set_composite_mode(Controller.COMPOSITE_PIP)
+        self.run_mainloop(timeout=5)
+
+        # just waiting for the timeout to verify no incoming call
+        # would slow down the tests remarebly, so we send another
+        # mode-change, knowing that when it arrives without an
+        # intermediate call, there was no duplicate callback
+
+        self.log.info("waiting for callback with new mode COMPOSITE_PIP")
+        test_cb.assert_called_once_with(Controller.COMPOSITE_PIP)
+
+    def test_preview_port_added_cb(self):
+        """Create a Controller object, call on_preview_port_added method and
+        check that the callback fires correctly when new video-sources
+        are added
+        """
+        self.setup_server()
+        self.setup_controller()
+
+        test_cb = Mock(side_effect=lambda mode, serve, type:
+                       self.quit_mainloop_after(call_count=2))
+        self.controller.on_preview_port_added(test_cb)
+
+        self.log.info("starting test-sources")
+        self.setup_video_sources(count=2)
+
+        self.run_mainloop(timeout=5)
+
+        self.log.info("test_cb called with: %s", test_cb.call_args_list)
+        test_cb.assert_any_call(3003, 1, 7)
+        test_cb.assert_any_call(3004, 1, 8)
+        assert test_cb.call_count == 2
 
 
-class TestMarkTracking(object):
+class TestNewRecord(IntegrationTestbase):
+    """ Test new_record method
+    """
 
-    """Test mark_tracking method"""
-    NUM = 1
+    def test_filename_changes(self):
+        """ Tests, that the Server creates a new File each time
+        new_record is called
+        """
+        test_filename = "gst-test-{0}.data".format(
+            random.randint(0, sys.maxsize))
 
-    def mark_tracking(self, faces, index, generate_frames=False):
-        """Create Controller object and call mark_tracking method"""
-        for _ in range(self.NUM):
-            serv = Server(path=PATH, video_format="debug")
-            try:
-                serv.run()
-                sources = TestSources(video_port=3000)
-                preview = PreviewSinks()
-                preview.run()
-                out_file = "output-{0}.data".format(index)
-                video_sink = VideoFileSink(3001, out_file)
-                sources.new_test_video(pattern=4)
-                sources.new_test_video(pattern=5)
-                controller = Controller()
-                time.sleep(1)
-                res = controller.mark_tracking(faces)
-                print(res)
-                time.sleep(1)
-                sources.terminate_video()
-                preview.terminate()
-                video_sink.terminate()
-                serv.terminate(1)
-                if not generate_frames:
-                    assert res is not None
-                    assert self.verify_output(index, out_file) is True
+        self.log.info("asserting recording-file are not aready existing"
+                      "(test_filename=%s)", test_filename)
+        assert not os.path.exists(test_filename)
+        assert not os.path.exists(test_filename + '.000')
 
-            finally:
-                serv.terminate_and_output_status(cov=True)
+        self.setup_server(record_file=test_filename)
+        self.setup_controller()
 
-    def verify_output(self, index, video):
-        """Verify if the output is correct by comparing key frames"""
-        test = 'mark_tracking_{0}'.format(index)
-        cmpr = CompareVideo(test, video)
-        res1, res2 = cmpr.compare()
-        print("RESULTS", res1, res2)
-        #   Experimental Value
-        if res1 <= 0.04 and res2 <= 0.04:
-            return True
-        return False
+        self.log.info("starting test-sources")
+        self.setup_video_sources(count=2)
 
-    def test_mark_tracking(self):
-        """Test mark_tracking"""
-        dic = [
-            [(1, 1, 1, 1), (10, 10, 1, 1)],
-        ]
-        start = 7
-        for i in range(start, 8):
-            self.mark_tracking(dic[i - start], i, True)
+        self.log.info("asserting server created a recording-file")
+        assert os.path.exists(test_filename)
+        assert not os.path.exists(test_filename + '.000')
+
+        self.log.info("starting a new recording")
+        assert self.controller.new_record()
+
+        self.log.info("asserting server created a new recording-file")
+        assert os.path.exists(test_filename)
+        assert os.path.exists(test_filename + '.000')
+
+        os.remove(test_filename)
+        os.remove(test_filename + '.000')
+
+    def test_record_file_grows(self):
+        """ Tests, that the Server actually writes Data into the record-file
+        """
+        test_filename = "gst-test-{0}.data".format(
+            random.randint(0, sys.maxsize))
+
+        self.log.info("asserting recording-file are not aready existing"
+                      "(test_filename=%s)", test_filename)
+        assert not os.path.exists(test_filename)
+
+        self.setup_server(record_file=test_filename)
+        self.setup_controller()
+
+        self.log.info("starting test-sources")
+        self.setup_video_sources(count=2)
+
+        self.log.info("asserting server created a recording-file")
+        assert os.path.exists(test_filename)
+
+        # this could be potentially unreliable. It if shows to be,
+        # rewrite into code that waits until the filesite actually
+        # grows and timeouts after a certain amount of time (5s, maybe)
+        self.log.info("sleeping for 5 frames")
+        time.sleep(5 / 25)
+
+        self.log.info("starting a new recording")
+        assert self.controller.new_record()
+
+        self.log.info("asserting the old recording-file was flushed"
+                      "and is >0 bytes")
+        size = os.path.getsize(test_filename)
+        assert size > 0
+
+        os.remove(test_filename)
+        os.remove(test_filename + '.000')

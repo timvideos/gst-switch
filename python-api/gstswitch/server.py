@@ -10,10 +10,11 @@ import os
 import signal
 import subprocess
 from distutils import spawn
+import logging
 
 from errno import ENOENT
+from .process_monitor import ProcessMonitor
 from .exception import PathError, ServerProcessError
-from time import sleep
 
 
 __all__ = ["Server", ]
@@ -37,7 +38,6 @@ class Server(object):
     :param video_format: The video format to use on the server.
     :returns: nothing
     """
-    SLEEP_TIME = 0.5
 
     def __init__(
             self,
@@ -50,6 +50,8 @@ class Server(object):
             log_to_file=True):
 
         super(Server, self).__init__()
+
+        self.log = logging.getLogger('server')
 
         self._path = None
         self._video_port = None
@@ -68,7 +70,7 @@ class Server(object):
         self.log_to_file = log_to_file
 
         self.proc = None
-        self.pid = -1
+        self.pid = None
 
     @property
     def path(self):
@@ -203,11 +205,19 @@ class Server(object):
         gives a OS based error.
         """
         self.gst_option_string = gst_option
-        print("Starting server")
+        self.log.debug("Starting server")
         self.proc = self._run_process()
         if self.proc:
             self.pid = self.proc.pid
-        sleep(self.SLEEP_TIME)
+
+    def is_alive(self):
+        """Returns True if the Process did not yet return"""
+        return self.proc.poll() is None
+
+    def wait_for_output(self, match, timeout=5, count=1):
+        """Calls wait_for_output with the given parameters on the underlying
+        ProcessMonitor"""
+        self.proc.wait_for_output(match, timeout, count)
 
     def _run_process(self):
         """Non-public method: Runs the gst-switch-srv process
@@ -247,14 +257,15 @@ class Server(object):
         :param cmd: The command which needs to be executed
         :returns: process created
         """
-        print('Creating process %s' % (cmd))
+        self.log.info('Starting process %s', cmd)
         try:
             if self.log_to_file:
-                with open('server.log', 'w') as tempf:
-                    return self._start_process_log_file(cmd, tempf, tempf)
+                process = ProcessMonitor(cmd, open('server.log', 'w'))
             else:
-                from sys import stdout, stderr
-                return self._start_process_log_file(cmd, stdout, stderr)
+                process = ProcessMonitor(cmd)
+
+            return process
+
         except OSError as error:
             if error.errno == ENOENT:
                 raise PathError("Cannot find gst-switch-srv at path:"
@@ -263,27 +274,13 @@ class Server(object):
                 raise ServerProcessError("Internal error "
                                          "while launching process")
 
-    @staticmethod
-    def _start_process_log_file(cmd, stdout_file, stderr_file):
-        """
-        Start a process with the specified file like objects.
-        """
-        process = subprocess.Popen(
-            cmd,
-            stdout=stdout_file,
-            stderr=stderr_file,
-            bufsize=-1,
-            shell=False)
-        print(cmd)
-        return process
-
     @classmethod
     def make_coverage(cls):
         """Generate coverage
         Calls 'make coverage' to generate coverage in .gcov files
         """
         cmd = 'make -C {0} coverage'.format(TOOLS_DIR)
-        print(TOOLS_DIR)
+        print('Starting process %s' % (cmd))
         with open(os.devnull, 'w'):
             proc = subprocess.Popen(
                 cmd.split(),
@@ -301,7 +298,7 @@ class Server(object):
         :raises ServerProcessError: Process does not exist
         :raises ServerProcessError: Cannot terminate process. Try killing it
         """
-        print('Killing server')
+        self.log.debug('Killing server')
         proc = self.proc
         if proc is None:
             raise ServerProcessError('Server Process does not exist')
@@ -310,28 +307,13 @@ class Server(object):
                 if cov:
                     self.gcov_flush()
                     self.make_coverage()
+                self.log.info('Killing server')
                 proc.terminate()
-                print('Server Killed')
                 self.proc = None
                 return True
             except OSError:
                 raise ServerProcessError("Cannot terminate server process. "
                                          "Try killing it")
-
-    def terminate_and_output_status(self, cov=False):
-        """Test is a closed Server-Processed died because of a SEGMENTATION
-        FAULT and print its Log if it did
-        """
-
-        if self.proc:
-            poll = self.proc.poll()
-            if poll == -11:
-                print("SEGMENTATION FAULT OCCURRED")
-            print("ERROR CODE - {0}".format(poll))
-
-            self.terminate(cov)
-            with open('server.log') as log:
-                print(log.read())
 
     def kill(self, cov=False):
         """Kill the server process by sending signal.SIGKILL
@@ -370,8 +352,8 @@ class Server(object):
             raise ServerProcessError('Server process does not exist')
         else:
             try:
-                print("GCOV FLUSH")
-                os.kill(self.pid, signal.SIGUSR1)
+                self.log.debug("Signaling GCOV Flush to %s", self.pid)
+                self.proc.send_signal(signal.SIGUSR1)
                 return True
             except OSError:
                 raise ServerProcessError('Unable to send signal')

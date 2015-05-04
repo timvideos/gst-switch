@@ -1,6 +1,9 @@
 #vim :
-language: 
+sudo: required
+
+language:
  - c
+ - python
 
 compiler:
   - gcc
