@@ -76,11 +76,11 @@ class TestProcessMonitor(object):
                 with patch('os.read', side_effect=lambda a, b: reads.pop(0)):
                     mon = ProcessMonitor('abc')
                     mon.stdout = m_file
-                    mon._logtarget = StringIO()
+                    mon._cmd_output_target = StringIO()
                     mon.pid = 123
                     mon.terminate()
 
-                assert mon._logtarget.getvalue() == 'testpattern'
+                assert mon._cmd_output_target.getvalue() == 'testpattern'
 
     def test_break_no_remaining_on_terminate(self):
         """ Test if terminating a ProcessMonitor at least calls
@@ -99,11 +99,11 @@ class TestProcessMonitor(object):
                 with patch('os.read', side_effect=lambda a, b: reads.pop(0)):
                     mon = ProcessMonitor('abc')
                     mon.stdout = m_file
-                    mon._logtarget = StringIO()
+                    mon._cmd_output_target = StringIO()
                     mon.pid = 123
                     mon.terminate()
 
-                assert mon._logtarget.getvalue() == ''
+                assert mon._cmd_output_target.getvalue() == ''
 
     def test_instant_return(self):
         """ Test if wait_for_output returns instantly if the buffer

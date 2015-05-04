@@ -24,11 +24,11 @@ class ProcessMonitor(subprocess.Popen):
     output into a file
     """
 
-    def __init__(self, cmd, logtarget=sys.stderr):
+    def __init__(self, cmd, cmd_output_target=sys.stderr):
         self.log = logging.getLogger('server-output-monitor')
 
         # Logfile to write to
-        self._logtarget = logtarget
+        self._cmd_output_target = cmd_output_target
 
         # Internal Buffer to search for matched when wait_for_output is called
         self._buffer = ""
@@ -62,8 +62,10 @@ class ProcessMonitor(subprocess.Popen):
             if len(chunk) == 0:
                 break
 
-            self.log.debug("read %d bytes, appending to logtarget", len(chunk))
-            self._logtarget.write(chunk)
+            self.log.debug(
+                "read %d bytes, appending to cmd_output_target",
+                len(chunk))
+            self._cmd_output_target.write(chunk)
 
         self.log.debug("terminating the subprocess")
         super(ProcessMonitor, self).terminate()
@@ -112,7 +114,7 @@ class ProcessMonitor(subprocess.Popen):
 
             self.log.debug("read %d bytes, appending to buffer", len(chunk))
             self._buffer += chunk
-            self._logtarget.write(chunk)
+            self._cmd_output_target.write(chunk)
 
             self.log.debug("testing again for %dx '%s' in buffer",
                            count, match)
