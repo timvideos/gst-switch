@@ -150,8 +150,9 @@ class TestSources(object):
         except TypeError:
             raise InvalidIndexError("Index should be a valid integer")
 
-        self.log.debug('terminating video-source'
-                       'with pattern %s', testsrc.pattern)
+        self.log.debug(
+            'terminating video-source with pattern %s',
+            testsrc.pattern)
 
         testsrc.end()
         self._running_tests_video.remove(self._running_tests_video[index])
