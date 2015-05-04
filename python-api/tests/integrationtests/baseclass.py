@@ -236,8 +236,11 @@ class IntegrationTestbaseCompare(IntegrationTestbase):
             self.log.debug("comparison-results on frame %s: max_dev=%f",
                            frame, max_dev)
 
-            # Compare calculated score
-            if max_dev <= 3:
+            # max_dev is the maximal value two subpixels deviate in color.
+            # say the expected pixel is #808080 and the actual pixel is #808182
+            # then max_dev will be 2 = abs(0x80 - 0x82)
+            # max_dev <= 0 requires the images to match pixel-perfect.
+            if max_dev <= 0:
                 # Score is small enough to succeed
                 self.log.info("comparison succeeded on frame %s "
                               "with max_dev=%f", frame, max_dev)
