@@ -356,12 +356,13 @@ class IntegrationTestbaseVideo(IntegrationTestbaseCompare):
         converts them to PNG-Files and writed them to Files.
         A gst-alunch-command is returned"""
 
-        return ("gst-launch-1.0 "
-                "tcpclientsrc host=localhost port=%u ! "
-                "gdpdepay ! "
-                "videoconvert ! "
-                "pngenc ! "
-                "multifilesink location=%s") % (port, filename_pattern)
+        return """gst-launch-1.0
+                  tcpclientsrc host=localhost port=%u !
+                  gdpdepay !
+                  videoconvert !
+                  pngenc !
+                  multifilesink location=%s
+               """ % (port, filename_pattern)
 
     def setup_test(self):
         """Setup Server, Controller and two Video-Test-Sources"""
@@ -407,14 +408,15 @@ class IntegrationTestbaseAudio(IntegrationTestbaseCompare):
         converts them to PNG-Files and writed them to Files.
         A gst-alunch-command is returned"""
 
-        return ("gst-launch-1.0 "
-                "tcpclientsrc num-buffers=75 host=localhost port=%u ! "
-                "gdpdepay ! "
-                "spectrascope shader=none ! "
-                "video/x-raw,width=400,height=200 ! "
-                "videoconvert ! "
-                "pngenc ! "
-                "multifilesink location=%s") % (port, filename_pattern)
+        return """gst-launch-1.0
+                  tcpclientsrc num-buffers=75 host=localhost port=%u !
+                  gdpdepay !
+                  spectrascope shader=none !
+                  video/x-raw,width=400,height=200 !
+                  videoconvert !
+                  pngenc !
+                  multifilesink location=%s
+               """ % (port, filename_pattern)
 
     def setup_test(self):
         """Setup Server, Controller and two Video-Test-Sources"""
