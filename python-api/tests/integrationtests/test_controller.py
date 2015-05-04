@@ -305,6 +305,9 @@ class TestNewRecord(IntegrationTestbase):
         self.log.info("asserting server created a recording-file")
         assert os.path.exists(test_filename)
 
+        # this could be potentially unreliable. It if shows to be,
+        # rewrite into code that waits until the filesite actually
+        # grows and timeouts after a certain amount of time (5s, maybe)
         self.log.info("sleeping for 5 frames")
         time.sleep(5 / 25)
 
