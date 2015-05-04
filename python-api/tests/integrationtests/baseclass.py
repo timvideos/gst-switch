@@ -339,7 +339,7 @@ class IntegrationTestbaseVideo(IntegrationTestbaseCompare):
     PORT_RED = 3003
     PORT_GREEN = 3004
     PORT_BLUE = 3005
-    PORTS = (PORT_RED, PORT_GREEN, PORT_BLUE, )
+    PORTS = (PORT_RED, PORT_GREEN, PORT_BLUE,)
 
     def expect_video_frame(self, filename, port=3001, timeout=5):
         """Read frames from the server and compare them against filename.
@@ -391,7 +391,7 @@ class IntegrationTestbaseAudio(IntegrationTestbaseCompare):
 
     PORT_110 = 3003
     # PORT_220 = 3004
-    PORTS = (PORT_110, )
+    PORTS = (PORT_110,)
 
     def expect_audio_spectrascope(self, filename, port=3003, timeout=5):
         """Read frames from the server and compare them against filename.
