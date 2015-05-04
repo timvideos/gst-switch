@@ -66,7 +66,7 @@ class IntegrationTestbase(object):
         assert self.serv.is_alive()
 
         self.log.info("waiting for Server to open Controller-Port")
-        self.serv.wait_for_output('tcp:host=0.0.0.0,port=5000')
+        self.serv.wait_for_output('tcp:host=::,port=5000')
 
         self.log.info("setting up TestSources")
         self._sources = TestSources(

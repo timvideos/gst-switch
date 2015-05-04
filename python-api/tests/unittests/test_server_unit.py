@@ -32,7 +32,7 @@ class TestPath(object):
         serv._start_process = mock_method
         assert serv._run_process() == "/usr/gst-switch-srv \
 --video-input-port=3000 --audio-input-port=4000 \
---controller-address=tcp:host=0.0.0.0,port=5000".split()
+--controller-address=tcp:host=::,port=5000".split()
 
     def test_path_provided_no_slash(self):
         """Test if a path is provided"""
@@ -44,7 +44,7 @@ class TestPath(object):
         serv._start_process = mock_method
         assert serv._run_process() == "/usr/gst-switch-srv \
 --video-input-port=3000 --audio-input-port=4000 \
---controller-address=tcp:host=0.0.0.0,port=5000".split()
+--controller-address=tcp:host=::,port=5000".split()
 
     def test_path_empty(self, monkeypatch):
         """Test if null path is given"""
@@ -63,7 +63,7 @@ class TestPath(object):
             serv._start_process = mock_method
             assert serv._run_process() == "/usr/gst-switch-srv \
 --video-input-port=3000 --audio-input-port=4000 \
---controller-address=tcp:host=0.0.0.0,port=5000".split()
+--controller-address=tcp:host=::,port=5000".split()
 
     def test_binary_not_found(self, monkeypatch):
         """Test that a PathError os raised when
@@ -174,7 +174,7 @@ class TestRecordFile(object):
         serv._start_process = mock_method
         assert serv._run_process() == "/usr/gst-switch-srv \
 --video-input-port=3000 --audio-input-port=4000 \
---controller-address=tcp:host=0.0.0.0,port=5000".split()
+--controller-address=tcp:host=::,port=5000".split()
 
     def test_record_file_true(self):
         """Test if record file is True"""
@@ -186,7 +186,7 @@ class TestRecordFile(object):
         serv._start_process = mock_method
         assert serv._run_process() == "/usr/gst-switch-srv \
 --video-input-port=3000 --audio-input-port=4000 \
---controller-address=tcp:host=0.0.0.0,port=5000 -r".split()
+--controller-address=tcp:host=::,port=5000 -r".split()
 
     def test_record_file_valid(self):
         """Test if record file is valid"""
@@ -198,7 +198,7 @@ class TestRecordFile(object):
         serv._start_process = mock_method
         assert serv._run_process() == "/usr/gst-switch-srv \
 --video-input-port=3000 --audio-input-port=4000 \
---controller-address=tcp:host=0.0.0.0,port=5000 --record=record.data".split()
+--controller-address=tcp:host=::,port=5000 --record=record.data".split()
 
     def test_record_file_valid_date(self):
         """Test if record file is valid"""
@@ -210,7 +210,7 @@ class TestRecordFile(object):
         serv._start_process = mock_method
         assert serv._run_process() == "/usr/gst-switch-srv \
 --video-input-port=3000 --audio-input-port=4000 \
---controller-address=tcp:host=0.0.0.0,port=5000 \
+--controller-address=tcp:host=::,port=5000 \
 --record=record_%Y.data".split()
 
     def test_record_file_valid_space(self):
@@ -223,7 +223,7 @@ class TestRecordFile(object):
         serv._start_process = mock_method
         assert serv._run_process() == "/usr/gst-switch-srv \
 --video-input-port=3000 --audio-input-port=4000 \
---controller-address=tcp:host=0.0.0.0,port=5000".split() + \
+--controller-address=tcp:host=::,port=5000".split() + \
             ["--record=record 1.data"]
 
     def test_record_file_invalid(self):
