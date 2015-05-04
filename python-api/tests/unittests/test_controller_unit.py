@@ -129,7 +129,7 @@ class TestSignalHandler(object):
 
     def test_signal_name_collision(self, monkeypatch):
         """Test that nothing happens when a signal is on the bus which name
-        collides with a attribute also starting with 'callbacks_'
+        collides with an attribute also starting with 'callbacks_'
         """
         monkeypatch.setattr(Connection, 'connect_dbus', Mock())
         controller = Controller(address='unix:abstract=abcd')
