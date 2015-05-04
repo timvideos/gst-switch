@@ -398,7 +398,7 @@ class IntegrationTestbaseAudio(IntegrationTestbaseCompare):
     def expect_audio_spectrascope(self, filename, port=3003, timeout=5):
         """Read frames from the server and compare them against filename.
         Return when a match is found or timeout seconds have passed
-        Source-Port defaults to 3001=video compose-port"""
+        Source-Port defaults to 3003=monitor port of 1st audio-source """
 
         # run the capture_command for timeout seconds but only once
         self.expect_frame(
