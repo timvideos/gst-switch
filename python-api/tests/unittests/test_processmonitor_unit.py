@@ -3,7 +3,7 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(__file__, "../../../")))
 
-from gstswitch.server import ProcessMonitor
+from gstswitch.process_monitor import ProcessMonitor
 import pytest
 from gstswitch.exception import ServerProcessError, MatchTimeoutError
 from gstswitch.exception import MatchEofError, SelectError
