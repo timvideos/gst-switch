@@ -207,6 +207,17 @@ class MockConnection(object):
     """A class which mocks the Connection class"""
 
     def __init__(self, return_variant, should_fail=False):
+        """Create an Instance of class which mocks the Connection class
+
+        Attributes:
+          return_variant (bool): Indicates whether the get_*-Methods
+            should wrap the return-value into a GLib.Variant or return
+            the native values
+          should_fail (bool): Indicates if the action-Methotds
+            (ie set_encode_mode) should return a Value indicating a
+            failure or a success.
+        """
+
         self.return_variant = return_variant
         self.should_fail = should_fail
 
