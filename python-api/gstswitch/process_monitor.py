@@ -119,7 +119,7 @@ class ProcessMonitor(subprocess.Popen):
             # been an exception or a timeout.
             if self.stdout not in read:
                 remaining = endtime - time.time()
-                if remaining < 0.001:
+                if remaining < 0:
                     raise MatchTimeoutError(
                         "Timeout while waiting for match "
                         "'%s' %dx in the subprocess output.\n"
