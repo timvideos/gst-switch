@@ -324,6 +324,7 @@ class IntegrationTestbaseCompare(IntegrationTestbase):
     def upload_image(self, filename):
         """ upload the specified image to imgurl"""
         self.log.debug("calling imgurbash.sh %s", filename)
+        # TODO use pure python here
         subprocess.call([
             'bash',
             './imgurbash.sh',
