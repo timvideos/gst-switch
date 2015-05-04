@@ -17,6 +17,13 @@ from glob import glob
 import numpy
 import scipy.misc
 import scipy.linalg
+
+try:
+    scipy.misc.imread
+except AttributeError:
+    raise ImportError('Unable to find scipy.misc.imread function, '
+                      'please make sure PIL is installed.')
+
 import gi
 gi.require_version('Gst', '1.0')
 
