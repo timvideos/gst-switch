@@ -336,6 +336,7 @@ class IntegrationTestbaseVideo(IntegrationTestbaseCompare):
     """ Testbase used to test video-pipeline results
     """
 
+    # PORT_RED = Video-Source with red Testpattern, ...
     PORT_RED = 3003
     PORT_GREEN = 3004
     PORT_BLUE = 3005
@@ -389,6 +390,7 @@ class IntegrationTestbaseAudio(IntegrationTestbaseCompare):
     """ Testbase used to test video-pipeline results
     """
 
+    # PORT_110 = Audio-Source with 100kHz Sine, PORT_220 = 220kHz Sine, ...
     PORT_110 = 3003
     # PORT_220 = 3004
     PORTS = (PORT_110,)
