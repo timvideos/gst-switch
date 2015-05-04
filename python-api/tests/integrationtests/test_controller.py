@@ -142,22 +142,6 @@ class TestGetPreviewPorts(IntegrationTestbase):
 class TestSignals(IntegrationTestbaseMainloop):
     """ Test the various on_* signal-handler methods
     """
-    def wait_for_sources(self, count):
-        """ Blocks until the Server has reported, that the right number of
-        preview-ports are is started
-        """
-        self.log.info("waiting for Server to start preview-port-outputs")
-        self.serv.wait_for_output('tcpserversink name=sink', count=count)
-
-    def setup_sources(self):
-        """ Starts some Test-Video streams and waits until they are ready
-        """
-        self.log.info("starting 2 test-video sources")
-        self.new_test_video()
-        self.new_test_video()
-
-        self.log.info("waiting for the test-video sources to come up")
-        self.wait_for_sources(count=2)
 
     def test_initial_mode_callback(self):
         """Create a Controller object, call on_new_mode_online method and
@@ -171,7 +155,7 @@ class TestSignals(IntegrationTestbaseMainloop):
         self.controller.on_new_mode_online(test_cb)
 
         self.log.info("starting test-sources")
-        self.setup_sources()
+        self.setup_video_sources(count=2)
 
         self.log.info("waiting for initial callback with"
                       "default-mode COMPOSITE_DUAL_EQUAL")
@@ -189,7 +173,8 @@ class TestSignals(IntegrationTestbaseMainloop):
         test_cb = Mock(side_effect=self.quit_mainloop)
         self.controller.on_new_mode_online(test_cb)
 
-        self.setup_sources()
+        self.log.info("starting test-sources")
+        self.setup_video_sources(count=2)
 
         self.log.info("waiting for initial callback with default-mode"
                       "COMPOSITE_DUAL_EQUAL")
@@ -216,7 +201,8 @@ class TestSignals(IntegrationTestbaseMainloop):
         test_cb = Mock(side_effect=self.quit_mainloop)
         self.controller.on_new_mode_online(test_cb)
 
-        self.setup_sources()
+        self.log.info("starting test-sources")
+        self.setup_video_sources(count=2)
 
         self.log.info("waiting for initial callback with"
                       "default-mode COMPOSITE_DUAL_EQUAL")
@@ -253,7 +239,9 @@ class TestSignals(IntegrationTestbaseMainloop):
                        self.quit_mainloop_after(call_count=2))
         self.controller.on_preview_port_added(test_cb)
 
-        self.setup_sources()
+        self.log.info("starting test-sources")
+        self.setup_video_sources(count=2)
+
         self.run_mainloop(timeout=5)
 
         self.log.info("test_cb called with: %s", test_cb.call_args_list)
@@ -265,23 +253,6 @@ class TestSignals(IntegrationTestbaseMainloop):
 class TestNewRecord(IntegrationTestbase):
     """ Test new_record method
     """
-
-    def wait_for_sources(self, count):
-        """ Blocks until the Server has reported, that the right number of
-        preview-ports are is started
-        """
-        self.log.info("waiting for Server to start preview-port-outputs")
-        self.serv.wait_for_output('tcpserversink name=sink', count=count)
-
-    def setup_sources(self):
-        """ Starts some Test-Video streams and waits until they are ready
-        """
-        self.log.info("starting 2 test-video sources")
-        self.new_test_video()
-        self.new_test_video()
-
-        self.log.info("waiting for the test-video sources to come up")
-        self.wait_for_sources(count=2)
 
     def test_filename_changes(self):
         """ Tests, that the Server creates a new File each time
@@ -297,7 +268,9 @@ class TestNewRecord(IntegrationTestbase):
 
         self.setup_server(record_file=test_filename)
         self.setup_controller()
-        self.setup_sources()
+
+        self.log.info("starting test-sources")
+        self.setup_video_sources(count=2)
 
         self.log.info("asserting server created a recording-file")
         assert os.path.exists(test_filename)
@@ -325,7 +298,9 @@ class TestNewRecord(IntegrationTestbase):
 
         self.setup_server(record_file=test_filename)
         self.setup_controller()
-        self.setup_sources()
+
+        self.log.info("starting test-sources")
+        self.setup_video_sources(count=2)
 
         self.log.info("asserting server created a recording-file")
         assert os.path.exists(test_filename)

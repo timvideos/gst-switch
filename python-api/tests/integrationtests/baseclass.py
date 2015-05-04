@@ -89,10 +89,37 @@ class IntegrationTestbase(object):
         self.serv.wait_for_output(':::3000')
         self._sources.new_test_video(pattern=pattern)
 
+    def setup_video_sources(self, count):
+        """ Starts some Test-Video streams and waits until they are ready
+        """
+        self.log.info("starting 2 test-video sources")
+        for _ in range(0, count):
+            self.new_test_video()
+
+        self.log.info("waiting for the test-video sources to come up")
+        self.wait_for_sources(count)
+
     def new_test_audio(self, freq=110, wave=AudioSrc.WAVE_SINE):
         """Start a new Audio-Testsource and wait until it's ready"""
         self.serv.wait_for_output(':::4000')
         self._sources.new_test_audio(freq=freq, wave=wave)
+
+    def setup_audio_sources(self, count):
+        """ Starts some Test-Audio streams and waits until they are ready
+        """
+        self.log.info("starting 2 test-audio sources")
+        for _ in range(0, count):
+            self.new_test_audio()
+
+        self.log.info("waiting for the test-audio sources to come up")
+        self.wait_for_sources(count)
+
+    def wait_for_sources(self, count):
+        """ Blocks until the Server has reported, that the right number of
+        preview-ports are is started
+        """
+        self.log.info("waiting for Server to start preview-port-outputs")
+        self.serv.wait_for_output('tcpserversink name=sink', count=count)
 
     def teardown_method(self, _):
         """Tear down called automatically after every test_XXXX method."""
