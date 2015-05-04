@@ -40,7 +40,7 @@ class ProcessMonitor(subprocess.Popen):
                 cmd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
-                bufsize=0,
+                bufsize=4096,
                 shell=False)
         except Exception as err:
             raise ServerProcessError(err)
