@@ -52,10 +52,26 @@ class ProcessMonitor(subprocess.Popen):
 
         self.log.info("reading remaining data from subprocess")
         while True:
+            # select takes three lists of file-descriptors to be monitored:
+            #   readable, writeable and exceptional
+            # The last argument is the timeout after which select should give
+            # up. 0 means, that select should return immediately without
+            # blocking (called a "poll")
             (read, _, _) = select.select([self.stdout], [], [], 0)
+
+            # if the processes' stdout is not readable (ie there is nothing
+            # to read), we're done and can exit the loop
             if self.stdout not in read:
                 break
 
+            # otherwise read as many bytes as possible, up to 2000,
+            # from the process. os.read does not wait until exactly 2000
+            # bytes have been read but returns as many bytes as possible
+            # the only time os.read block is, when there's nothing to read,
+            # which we ruled out by the poll-call to select before
+            #
+            # os.read -in contrast to self.stdout.read- is non-blocking,
+            # if at least 1 character is readable.
             self.log.debug("reading data from subprocess")
             chunk = os.read(self.stdout.fileno(), 2000).decode('utf-8')
 
@@ -90,7 +106,17 @@ class ProcessMonitor(subprocess.Popen):
             timeout = endtime - time.time()
             self.log.debug("waiting for data output by subprocess"
                            "(remaining time to timeout = %fs)", timeout)
+
+            # select takes three lists of file-descriptors to be monitored:
+            #   readable, writeable and exceptional
+            # The last argument is the timeout after which select should give
+            # up. If one of the supplied descriptors gets readable within the
+            # supplied timeout, the function returns.
             (read, _, _) = select.select([self.stdout], [], [], timeout)
+
+            # if the processed' stdout is not readable (ie there's
+            # to read) and select did return nevertheless, so there must have
+            # been an exception or a timeout.
             if self.stdout not in read:
                 remaining = endtime - time.time()
                 if remaining < 0.001:
@@ -104,6 +130,14 @@ class ProcessMonitor(subprocess.Popen):
                 raise SelectError("select returned without stdout being"
                                   " readable, assuming an exception")
 
+            # read as many bytes as possible, up to 2000,
+            # from the process. os.read does not wait until exactly 2000
+            # bytes have been read but returns as many bytes as possible
+            # the only time os.read block is, when there's nothing to read,
+            # which we ruled out by the call to select before
+            #
+            # os.read -in contrast to self.stdout.read- is non-blocking,
+            # if at least 1 character is readable.
             self.log.debug("reading data from subprocess")
             chunk = os.read(self.stdout.fileno(), 2000).decode('utf-8')
 
