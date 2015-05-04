@@ -8,6 +8,7 @@ include tests/names.mk
 test:
 	make style unittests integration
 
+#	TODO: Use configure to detect Python versions currently installed
 	make PYTHONVERSION=2.7 -Cpython-api style unittests integration
 	make PYTHONVERSION=3.4 -Cpython-api style unittests integration
 
