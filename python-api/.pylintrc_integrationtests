@@ -33,7 +33,7 @@ load-plugins=
 # can either give multiple identifier separated by comma (,) or put this option
 # multiple time (only on the command line, not in the configuration file where
 # it should appear only once).
-disable=superfluous-parens,no-name-in-module,method-hidden,duplicate-code,no-member,super-on-old-class,no-self-use,import-error,bad-builtin,too-many-public-methods,too-few-public-methods
+disable=superfluous-parens,no-name-in-module,method-hidden,duplicate-code,no-member,super-on-old-class,no-self-use,import-error,bad-builtin,too-many-public-methods,too-few-public-methods,fixme
 
 
 [REPORTS]

@@ -33,7 +33,7 @@ load-plugins=
 # can either give multiple identifier separated by comma (,) or put this option
 # multiple time (only on the command line, not in the configuration file where
 # it should appear only once).
-disable=redefined-builtin,no-name-in-module,method-hidden,duplicate-code,no-member,super-on-old-class,no-self-use,unused-argument,protected-access,interface-not-implemented,too-many-public-methods,raising-non-exception
+disable=redefined-builtin,no-name-in-module,method-hidden,duplicate-code,no-member,super-on-old-class,no-self-use,unused-argument,protected-access,interface-not-implemented,too-many-public-methods,raising-non-exception,fixme
 
 
 [REPORTS]
