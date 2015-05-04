@@ -50,6 +50,9 @@ class ProcessMonitor(subprocess.Popen):
     def terminate(self):
         """Kills the process and waits for the thread to exit"""
 
+        self.log.debug("terminating the subprocess")
+        super(ProcessMonitor, self).terminate()
+
         self.log.info("reading remaining data from subprocess")
         while True:
             # select takes three lists of file-descriptors to be monitored:
@@ -83,8 +86,6 @@ class ProcessMonitor(subprocess.Popen):
                 len(chunk))
             self._cmd_output_target.write(chunk)
 
-        self.log.debug("terminating the subprocess")
-        super(ProcessMonitor, self).terminate()
         self.log.debug("waiting for the subprocess to die")
         super(ProcessMonitor, self).communicate()
 
