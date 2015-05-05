@@ -167,7 +167,7 @@ Application Options:
   -r, --record=FILENAME             Enable recorder and record into the specified FILENAME
   -p, --video-input-port=NUM        Specify the video input listen port.
   -a, --audio-input-port=NUM        Specify the audio input listen port.
-  -c, --controller-address=ADDRESS     Specify DBus-Address for remote control, defaults to tcp:host=0.0.0.0,port=5000.
+  -c, --controller-address=ADDRESS     Specify DBus-Address for remote control, defaults to tcp:host=::,port=5000.
 ```
 
 ### Video Input

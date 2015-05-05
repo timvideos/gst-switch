@@ -33,7 +33,7 @@ class Server(object):
     :param video_port: The video port number - default = 3000
     :param audio_port: The audio port number - default = 4000
     :param controller_address: The DBus-Address for remote control -
-        default = tcp:host=0.0.0.0,port=5000
+        default = tcp:host=::,port=5000
     :param record_file: The record file format
     :param video_format: The video format to use on the server.
     :returns: nothing
@@ -44,7 +44,7 @@ class Server(object):
             path=None,
             video_port=3000,
             audio_port=4000,
-            controller_address='tcp:host=0.0.0.0,port=5000',
+            controller_address='tcp:host=::,port=5000',
             record_file=False,
             video_format=None,
             log_to_file=True):
