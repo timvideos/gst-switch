@@ -46,6 +46,11 @@ if GCOV_ENABLED
 coverage:
 	$(MAKE) -C tools coverage
 	$(MAKE) -C tests/unit coverage
+
+clean-local:
+	rm -f tools/*.gcno
+	rm -f tools/*.gcda
+	rm -f tools/*.gcov
 endif
 
 style:
