@@ -1,3 +1,17 @@
+----
+
+# gst-switch has been deprecated in favor of [voctomix](https://github.com/voc/voctomix).
+# All development effort is now going into [voctomix](https://github.com/voc/voctomix).
+
+
+----
+----
+----
+----
+----
+----
+
+
 # Build Status
 [![Build Status](https://travis-ci.org/timvideos/gst-switch.png?branch=master)](https://travis-ci.org/timvideos/gst-switch)
 [![Coverage Status](https://coveralls.io/repos/timvideos/gst-switch/badge.png)](https://coveralls.io/r/timvideos/gst-switch)
